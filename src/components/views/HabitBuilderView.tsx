@@ -32,18 +32,29 @@ export function HabitBuilderView() {
         const loadData = () => {
             const habitsData = localStorage.getItem('habitsData');
             const historyData = localStorage.getItem('habitsHistory');
-            let loadedHabits = [];
+            
             if (habitsData) {
                 try {
-                    loadedHabits = JSON.parse(habitsData);
+                    const loadedHabits = JSON.parse(habitsData);
+                    setHabits(checkStreaks(loadedHabits));
                 } catch (e) {
                     console.error("Failed to parse habits data from localStorage", e);
-                    loadedHabits = [];
+                    setHabits([]);
                 }
+            } else {
+                 setHabits([]);
             }
             
-            setHistory(historyData ? JSON.parse(historyData) : {});
-            setHabits(checkStreaks(loadedHabits));
+            if(historyData) {
+                try {
+                    setHistory(JSON.parse(historyData));
+                } catch (e) {
+                    console.error("Failed to parse history data from localStorage", e);
+                    setHistory({});
+                }
+            } else {
+                setHistory({});
+            }
         };
 
         loadData();
