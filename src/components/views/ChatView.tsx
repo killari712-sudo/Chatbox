@@ -27,6 +27,7 @@ import {
   Users,
   X,
   Flame,
+  ClipboardList,
 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -36,6 +37,7 @@ import { QueryHubView } from "./QueryHubView";
 import { RoadmapsView } from "./RoadmapsView";
 import { WellnessView } from "./WellnessView";
 import { MentorView } from "./MentorView";
+import { HabitBuilderView } from "./HabitBuilderView";
 
 
 export function ChatView() {
@@ -123,6 +125,7 @@ export function ChatView() {
       { type: 'divider', label: 'Productivity' },
       { type: 'item', icon: Map, label: 'Roadmaps', tooltip: 'View your personalized goals and progress.' },
       { type: 'item', icon: BarChart3, label: 'My Journey', tooltip: "Shows XP bar + today's streak." },
+      { type: 'item', icon: ClipboardList, label: 'Habits', tooltip: 'Build and track your habits.' },
       { type: 'divider', label: 'Wellness' },
       { type: 'item', icon: NotebookPen, label: 'Diary', tooltip: 'Your private, encrypted journal.' },
       { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
@@ -209,6 +212,8 @@ export function ChatView() {
         return <WellnessView />;
       case 'Mentors':
         return <MentorView />;
+      case 'Habits':
+        return <HabitBuilderView />;
       default:
         return (
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
@@ -358,3 +363,5 @@ export function ChatView() {
     </TooltipProvider>
   );
 }
+
+    
