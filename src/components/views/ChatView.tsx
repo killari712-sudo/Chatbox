@@ -159,7 +159,7 @@ export function ChatView() {
 
   return (
     <TooltipProvider delayDuration={0}>
-    <div className="h-screen w-screen flex flex-col font-body">
+    <div className="h-screen w-screen flex flex-col font-body text-gray-800">
       {/* TOP BAR */}
       <header className="w-full h-16 flex-shrink-0 flex items-center justify-between px-6 glassmorphic border-b z-30">
           <div className="flex items-center gap-2 cursor-pointer">
@@ -168,11 +168,11 @@ export function ChatView() {
                   <path d="M2 7L12 12L22 7" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M12 12V22" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <span className="font-bold text-lg font-headline">EcosystemAI</span>
+              <span className="font-bold text-lg font-headline text-gray-800">EcosystemAI</span>
           </div>
           <div className="relative">
               {userAvatar && (
-                <Image src={userAvatar.imageUrl} alt="Avatar" width={40} height={40} className="w-10 h-10 rounded-full cursor-pointer border-2 border-cyan-400/50 hover:border-cyan-400 transition" />
+                <Image src={userAvatar.imageUrl} alt="Avatar" width={40} height={40} className="w-10 h-10 rounded-full cursor-pointer border-2 border-blue-200 hover:border-blue-400 transition" />
               )}
           </div>
       </header>
@@ -193,10 +193,10 @@ export function ChatView() {
                           }`}
                         >
                           {message.role === 'assistant' && aiAvatar && (
-                              <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-cyan-500/30" />
+                              <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />
                           )}
-                          <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-cyan-600/70 rounded-br-lg' : 'glassmorphic-dark rounded-bl-lg'}`}>
-                              <p className="text-white">{message.content}</p>
+                          <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-blue-500 text-white rounded-br-lg' : 'bg-white/80 rounded-bl-lg'}`}>
+                              <p>{message.content}</p>
                           </div>
                           {message.role === 'user' && userAvatar && (
                               <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
@@ -205,9 +205,9 @@ export function ChatView() {
                       ))}
                       {isPending && (
                         <div className="flex items-start gap-4 animate-bubble-in">
-                          {aiAvatar && <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-cyan-500/30" />}
-                          <div className="p-4 rounded-lg glassmorphic-dark">
-                            <Loader2 className="w-5 h-5 animate-spin text-cyan-400" />
+                          {aiAvatar && <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />}
+                          <div className="p-4 rounded-lg bg-white/80">
+                            <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
                           </div>
                         </div>
                       )}
@@ -215,19 +215,19 @@ export function ChatView() {
                   </ScrollArea>
                 </div>
               ) : (
-                <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-8">
+                <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
                   <div className="glassmorphic-dark glowing-edge rounded-2xl p-8 max-w-3xl w-full">
-                      <h2 className="text-3xl font-bold font-headline text-cyan-300 mb-4">{activeView}</h2>
-                      <p className="text-gray-300">This is the placeholder content for the {activeView} section. Dashboards, charts, and other components would be rendered here.</p>
+                      <h2 className="text-3xl font-bold font-headline text-blue-800 mb-4">{activeView}</h2>
+                      <p className="text-gray-600">This is the placeholder content for the {activeView} section. Dashboards, charts, and other components would be rendered here.</p>
                   </div>
                 </div>
               )}
 
               {/* CHAT INPUT BAR */}
               <div className="w-full flex-shrink-0 px-4 md:px-6 pb-4 md:pb-6 pt-2">
-                <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto glassmorphic-dark glowing-edge rounded-full p-2 flex items-center gap-2 shadow-2xl shadow-black/50">
-                    <Button type="button" variant="ghost" size="icon" className="w-10 h-10 rounded-full flex-shrink-0 hover:bg-cyan-400/20">
-                      <Paperclip className="w-5 h-5 text-cyan-300" />
+                <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto glassmorphic-dark glowing-edge rounded-full p-2 flex items-center gap-2 shadow-2xl shadow-black/10">
+                    <Button type="button" variant="ghost" size="icon" className="w-10 h-10 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                      <Paperclip className="w-5 h-5 text-blue-600" />
                     </Button>
                     <Textarea
                       ref={inputRef}
@@ -241,13 +241,13 @@ export function ChatView() {
                       }}
                       rows={1}
                       placeholder="Type your message..."
-                      className="w-full bg-transparent focus:outline-none text-gray-200 placeholder-gray-500 max-h-40 py-2 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden"
+                      className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-2 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden"
                       disabled={isPending}
                     />
-                    <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-10 h-10 rounded-full flex-shrink-0 hover:bg-cyan-400/20">
-                      <Mic className="w-5 h-5 text-cyan-300" />
+                    <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-10 h-10 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                      <Mic className="w-5 h-5 text-blue-600" />
                     </Button>
-                    <Button type="submit" size="icon" className="w-10 h-10 rounded-full bg-cyan-400 hover:bg-cyan-300 transition-colors shadow-lg shadow-cyan-500/30 text-gray-900 flex-shrink-0" disabled={isPending || !input.trim()}>
+                    <Button type="submit" size="icon" className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 text-white flex-shrink-0" disabled={isPending || !input.trim()}>
                       <Send className="w-5 h-5" />
                     </Button>
                 </form>
@@ -258,15 +258,15 @@ export function ChatView() {
           <aside 
             onMouseEnter={() => setSidebarExpanded(true)}
             onMouseLeave={() => setSidebarExpanded(false)}
-            className="group flex-shrink-0 w-20 hover:w-64 bg-black/20 backdrop-blur-lg border-l h-full overflow-y-auto overflow-x-hidden p-2 transition-all duration-300 ease-in-out"
+            className="group flex-shrink-0 w-20 hover:w-64 bg-white/30 backdrop-blur-lg border-l h-full overflow-y-auto overflow-x-hidden p-2 transition-all duration-300 ease-in-out"
           >
             <nav className="flex flex-col gap-2">
                 {sidebarItems.map((item, index) => {
                   if (item.type === 'divider') {
                     return (
                       <div key={index} className="flex items-center gap-4 px-4 py-2 transition-opacity duration-300">
-                        <div className="h-px bg-cyan-900/50 w-6 flex-shrink-0"></div>
-                        <span className={`text-xs text-cyan-500 uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
+                        <div className="h-px bg-gray-300/80 w-6 flex-shrink-0"></div>
+                        <span className={`text-xs text-gray-500 uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
                       </div>
                     )
                   }
@@ -274,7 +274,7 @@ export function ChatView() {
                   const button = (
                      <button
                         onClick={(e) => { handleSidebarClick(item); handleRipple(e); }}
-                        className={`w-full h-14 flex items-center justify-start gap-4 px-4 rounded-full text-gray-300 hover:text-white ripple-btn ${item.isSOS ? 'hover:bg-red-500/20 text-red-400 hover:text-red-300' : 'hover:bg-cyan-500/20'}`}
+                        className={`w-full h-14 flex items-center justify-start gap-4 px-4 rounded-full text-gray-600 hover:text-blue-600 ripple-btn ${item.isSOS ? 'hover:bg-red-500/10 text-red-500 hover:text-red-600' : 'hover:bg-blue-500/10'}`}
                       >
                         <Icon className="w-6 h-6 flex-shrink-0" />
                         <span className={`font-medium whitespace-nowrap transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
@@ -286,7 +286,7 @@ export function ChatView() {
                         {button}
                       </TooltipTrigger>
                       {!isSidebarExpanded && (
-                        <TooltipContent side="left" className="bg-cyan-300 text-gray-900 font-semibold">
+                        <TooltipContent side="left" className="bg-gray-800 text-white font-semibold">
                           <p>{item.tooltip}</p>
                         </TooltipContent>
                       )}
@@ -299,13 +299,13 @@ export function ChatView() {
       
       {/* VOICE MODE OVERLAY */}
       {isVoiceOverlayVisible && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-50 flex flex-col items-center justify-center">
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-xl z-50 flex flex-col items-center justify-center">
             <div style={{animation: 'avatar-float 5s ease-in-out infinite'}}>
-              <div className="absolute inset-0 bg-cyan-400 rounded-full blur-3xl opacity-40"></div>
-              {aiAvatar && <Image src={aiAvatar.imageUrl} alt="Assistant Avatar" width={144} height={144} className="w-36 h-36 rounded-full border-4 border-cyan-400 shadow-2xl shadow-cyan-500/50" />}
+              <div className="absolute inset-0 bg-blue-400 rounded-full blur-3xl opacity-40"></div>
+              {aiAvatar && <Image src={aiAvatar.imageUrl} alt="Assistant Avatar" width={144} height={144} className="w-36 h-36 rounded-full border-4 border-blue-400 shadow-2xl shadow-blue-500/50" />}
             </div>
-            <p className="mt-8 text-2xl font-medium text-gray-300 tracking-wider">Listening...</p>
-            <Button onClick={() => setVoiceOverlayVisible(false)} variant="ghost" size="icon" className="absolute top-8 right-8 text-gray-400 hover:text-white w-10 h-10">
+            <p className="mt-8 text-2xl font-medium text-gray-600 tracking-wider">Listening...</p>
+            <Button onClick={() => setVoiceOverlayVisible(false)} variant="ghost" size="icon" className="absolute top-8 right-8 text-gray-500 hover:text-gray-800 w-10 h-10">
               <X className="w-8 h-8" />
             </Button>
         </div>
@@ -313,15 +313,15 @@ export function ChatView() {
 
       {/* SOS CRISIS OVERLAY */}
       {isSosOverlayVisible && (
-        <div className="fixed inset-0 bg-red-900/50 backdrop-blur-2xl z-50 flex items-center justify-center p-4">
-            <div className="glassmorphic bg-red-500/20 border-red-500/50 rounded-3xl p-8 md:p-12 text-center max-w-lg w-full">
-                <AlertTriangle className="w-20 h-20 text-red-300 mx-auto animate-pulse" />
-                <h2 className="text-4xl md:text-5xl font-bold font-headline mt-6 text-white">Crisis Alert</h2>
-                <p className="text-red-200 mt-4 max-w-sm mx-auto">You've activated the SOS protocol. Help is being notified. Please stay calm.</p>
+        <div className="fixed inset-0 bg-red-100/50 backdrop-blur-2xl z-50 flex items-center justify-center p-4">
+            <div className="glassmorphic bg-red-500/10 border-red-500/30 rounded-3xl p-8 md:p-12 text-center max-w-lg w-full">
+                <AlertTriangle className="w-20 h-20 text-red-500 mx-auto animate-pulse" />
+                <h2 className="text-4xl md:text-5xl font-bold font-headline mt-6 text-red-900">Crisis Alert</h2>
+                <p className="text-red-800 mt-4 max-w-sm mx-auto">You've activated the SOS protocol. Help is being notified. Please stay calm.</p>
                 <Button className="mt-10 bg-red-600/80 border-2 border-red-400 text-white font-bold text-xl py-4 px-10 rounded-full transition-transform hover:scale-105 h-auto" style={{animation: 'pulse-glow 2s infinite'}}>
                   Connect to Support
                 </Button>
-                <Button onClick={() => setSosOverlayVisible(false)} variant="link" className="mt-6 text-red-200 hover:text-white underline text-sm">Cancel Alert</Button>
+                <Button onClick={() => setSosOverlayVisible(false)} variant="link" className="mt-6 text-red-700 hover:text-red-900 underline text-sm">Cancel Alert</Button>
             </div>
         </div>
       )}

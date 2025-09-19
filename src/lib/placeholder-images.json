@@ -3,13 +3,13 @@
     {
       "id": "user-avatar",
       "description": "User avatar for the header",
-      "imageUrl": "https://placehold.co/40x40/0a192f/ffffff?text=A",
+      "imageUrl": "https://placehold.co/40x40/EBF4FF/708090?text=A",
       "imageHint": "profile picture"
     },
     {
       "id": "ai-avatar",
       "description": "AI assistant avatar",
-      "imageUrl": "https://placehold.co/40x40/0a192f/00ffff?text=AI",
+      "imageUrl": "https://placehold.co/40x40/3B82F6/FFFFFF?text=AI",
       "imageHint": "robot face"
     }
   ]
