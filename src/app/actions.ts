@@ -1,9 +1,11 @@
+
 "use server";
 
 import { moodBasedResponse } from "@/ai/flows/mood-based-response";
 import { inputSuggestionAlternatives } from "@/ai/flows/input-suggestion-alternatives";
 import { analyzeMoodAndSuggestResources } from "@/ai/flows/mood-tracking-and-ui-adaptation";
 import { getProactiveSuggestions } from "@/ai/flows/proactive-suggestions";
+import { getNutritionInfo as getNutritionInfoFlow } from "@/ai/flows/nutrition-analysis";
 import { z } from "zod";
 
 export async function getChatResponse(userInput: string) {
@@ -46,3 +48,15 @@ export async function getSuggestions(data: z.infer<typeof proactiveSuggestionsSc
         return { error: "Failed to get suggestions." };
     }
 }
+
+export async function getNutritionInfo(foodItem: string) {
+    try {
+        const result = await getNutritionInfoFlow({ foodItem });
+        return { nutritionData: result.nutritionData };
+    } catch (error) {
+        console.error("Error in getNutritionInfo action:", error);
+        return { error: "Failed to get nutrition information from AI." };
+    }
+}
+
+    

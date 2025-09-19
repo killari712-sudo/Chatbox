@@ -37,6 +37,7 @@ import { FriendFinderView } from "./FriendFinderView";
 import { ChallengesView } from "./ChallengesView";
 import { QueryHubView } from "./QueryHubView";
 import { RoadmapsView } from "./RoadmapsView";
+import { WellnessView } from "./WellnessView";
 
 
 export function ChatView() {
@@ -213,6 +214,8 @@ export function ChatView() {
         return <QueryHubView />;
       case 'Roadmaps':
         return <RoadmapsView />;
+      case 'Wellness':
+        return <WellnessView />;
       default:
         return (
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
@@ -363,3 +366,5 @@ export function ChatView() {
     </TooltipProvider>
   );
 }
+
+    
