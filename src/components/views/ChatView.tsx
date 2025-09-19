@@ -37,6 +37,8 @@ import { QueryHubView } from "./QueryHubView";
 import { RoadmapsView } from "./RoadmapsView";
 import { WellnessView } from "./WellnessView";
 import { HabitBuilderView } from "./HabitBuilderView";
+import { MentorView } from "./MentorView";
+import { CounselorView } from "./CounselorView";
 
 
 export function ChatView() {
@@ -212,6 +214,10 @@ export function ChatView() {
         return <WellnessView />;
       case 'Habits':
         return <HabitBuilderView />;
+      case 'Mentors':
+        return <MentorView />;
+      case 'Counselor':
+        return <CounselorView />;
       default:
         return (
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
