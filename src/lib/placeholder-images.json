@@ -3,8 +3,14 @@
     {
       "id": "user-avatar",
       "description": "User avatar for the header",
-      "imageUrl": "https://picsum.photos/seed/10/40/40",
+      "imageUrl": "https://placehold.co/40x40/0a192f/ffffff?text=A",
       "imageHint": "profile picture"
+    },
+    {
+      "id": "ai-avatar",
+      "description": "AI assistant avatar",
+      "imageUrl": "https://placehold.co/40x40/0a192f/00ffff?text=AI",
+      "imageHint": "robot face"
     }
   ]
 }
