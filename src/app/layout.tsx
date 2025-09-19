@@ -2,8 +2,8 @@ import type {Metadata} from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'EcosystemAI',
-  description: 'An AI assistant for a better you.',
+  title: 'Ecosystem',
+  description: 'Your personal ecosystem.',
 };
 
 export default function RootLayout({

@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    --background: 210 27% 94%; /* #E9EEF2 */
+    --background: 210 20% 98%;
     --foreground: 222 84% 5%;
-    --card: 210 17% 98%; /* #F6F8FA */
+    --card: 0 0% 100%;
     --card-foreground: 222 84% 5%;
-    --popover: 210 17% 98%;
+    --popover: 0 0% 100%;
     --popover-foreground: 222 84% 5%;
-    --primary: 211 100% 50%; /* #007AFF */
+    --primary: 211 100% 50%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222 47% 11%;
@@ -24,8 +24,6 @@
     --input: 214 32% 91%;
     --ring: 211 100% 50%;
     --radius: 0.5rem;
-    --sidebar-background: 210 17% 98%;
-    --sidebar-foreground: 222 84% 5%;
   }
 
   .dark {
@@ -48,11 +46,8 @@
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 211 100% 50%;
-    --sidebar-background: 222 84% 8%;
-    --sidebar-foreground: 210 40% 98%;
   }
 
-  /* Mood themes */
   html[data-mood="happy"] {
     --primary: 45 100% 51%; /* Joyful Yellow */
     --ring: 45 100% 51%;
@@ -77,21 +72,6 @@
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-@layer components {
-  [data-sidebar="sidebar"] {
-    background-color: hsl(var(--sidebar-background) / 0.6) !important;
-    @apply backdrop-blur-lg border-r-0;
-    border-right: 1px solid hsl(var(--border) / 0.2) !important;
-  }
-}
-
-@layer utilities {
-  .glassmorphism {
-    background-color: hsl(var(--card) / 0.6);
-    @apply backdrop-blur-lg border border-white/20 shadow-lg;
   }
 }
 
