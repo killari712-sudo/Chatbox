@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState } from 'react';
@@ -9,24 +10,11 @@ export function HabitBuilderView() {
     const [activeFilter, setActiveFilter] = useState('all');
 
     useEffect(() => {
-        
-        const initialHabits = [
-            { id: 'h1', icon: '📚', title: 'Study for 1 Hour', category: '🎓 Academic', streak: 12, goal: 3, progress: 1, lastCompleted: '2025-09-16' },
-            { id: 'h2', icon: '🧘', title: 'Meditate', category: '🧘 Wellness', streak: 27, goal: 1, progress: 1, lastCompleted: '2025-09-16' },
-            { id: 'h3', icon: '🚶', title: '10k Steps', category: '🧘 Wellness', streak: 5, goal: 10000, progress: 4500, lastCompleted: '2025-09-15' },
-            { id: 'h4', icon: '💧', title: 'Drink Water', category: '🌱 Lifestyle', streak: 40, goal: 8, progress: 5, lastCompleted: '2025-09-16' }
-        ];
-
-        const getTodayString = () => new Date().toISOString().split('T')[0];
-        const getYesterdayString = () => {
+        const checkStreaks = (habitsToCheck: any[]) => {
+            const todayStr = new Date().toISOString().split('T')[0];
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
-            return yesterday.toISOString().split('T')[0];
-        };
-
-        const checkStreaks = (habitsToCheck: any[]) => {
-            const todayStr = getTodayString();
-            const yesterdayStr = getYesterdayString();
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
             
             habitsToCheck.forEach(habit => {
                 if (habit.lastCompleted !== todayStr && habit.lastCompleted !== yesterdayStr) {
@@ -44,17 +32,17 @@ export function HabitBuilderView() {
         const loadData = () => {
             const habitsData = localStorage.getItem('habitsData');
             const historyData = localStorage.getItem('habitsHistory');
-            let loadedHabits;
-            if (habitsData && JSON.parse(habitsData).length > 0) {
-                loadedHabits = JSON.parse(habitsData);
-                setHistory(historyData ? JSON.parse(historyData) : {});
-            } else {
-                loadedHabits = initialHabits;
-                setHistory({
-                    '2025-09-16': ['h1', 'h2', 'h4'],
-                    '2025-09-15': ['h1', 'h2', 'h3', 'h4'],
-                });
+            let loadedHabits = [];
+            if (habitsData) {
+                try {
+                    loadedHabits = JSON.parse(habitsData);
+                } catch (e) {
+                    console.error("Failed to parse habits data from localStorage", e);
+                    loadedHabits = [];
+                }
             }
+            
+            setHistory(historyData ? JSON.parse(historyData) : {});
             setHabits(checkStreaks(loadedHabits));
         };
 
@@ -148,7 +136,7 @@ export function HabitBuilderView() {
                          {topHabits.map((habit, index) => {
                             const radius = 90 - (index * 15);
                             const circumference = 2 * Math.PI * radius;
-                            const progress = Math.min(habit.progress / habit.goal, 1);
+                            const progress = habit.goal > 0 ? Math.min(habit.progress / habit.goal, 1) : 0;
                             const offset = circumference * (1 - progress);
                             return (
                                 <svg key={index} viewBox="0 0 200 200">
@@ -189,37 +177,43 @@ export function HabitBuilderView() {
                             <button className="add-habit-btn" onClick={() => setIsModalOpen(true)}>+</button>
                         </div>
                         <div className="habit-grid">
-                            {filteredHabits.map(habit => {
-                                const progress = habit.progress / habit.goal;
-                                const circumference = 2 * Math.PI * 36;
-                                const offset = circumference * (1 - Math.min(progress, 1));
-                                return (
-                                    <div key={habit.id} className={`habit-card ${habit.streak > 0 ? 'glow-border' : ''}`}>
-                                        <div className="habit-header">
-                                            <span className="habit-icon">{habit.icon}</span>
-                                            <div>
-                                                <h3 className="habit-title">{habit.title}</h3>
-                                                <p className="habit-level">{getLevel(habit.streak)}</p>
+                            {filteredHabits.length === 0 ? (
+                                <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: 'var(--text-muted)' }}>
+                                    No habits yet. Click the '+' button to add your first one!
+                                </p>
+                            ) : (
+                                filteredHabits.map(habit => {
+                                    const progress = habit.goal > 0 ? habit.progress / habit.goal : 0;
+                                    const circumference = 2 * Math.PI * 36;
+                                    const offset = circumference * (1 - Math.min(progress, 1));
+                                    return (
+                                        <div key={habit.id} className={`habit-card ${habit.streak > 0 ? 'glow-border' : ''}`}>
+                                            <div className="habit-header">
+                                                <span className="habit-icon">{habit.icon}</span>
+                                                <div>
+                                                    <h3 className="habit-title">{habit.title}</h3>
+                                                    <p className="habit-level">{getLevel(habit.streak)}</p>
+                                                </div>
+                                                <div className="habit-progress">
+                                                    <svg viewBox="0 0 80 80">
+                                                        <circle className="ring-bg" cx="40" cy="40" r="36"></circle>
+                                                        <circle className="ring-progress" cx="40" cy="40" r="36" style={{ strokeDasharray: circumference, strokeDashoffset: offset, stroke: progress >= 1 ? 'var(--green-glow)' : 'var(--blue-glow)' }}></circle>
+                                                    </svg>
+                                                    <span className="habit-progress-value">{habit.goal > 1 ? `${habit.progress}/${habit.goal}` : `${Math.round(progress * 100)}%`}</span>
+                                                </div>
                                             </div>
-                                            <div className="habit-progress">
-                                                <svg viewBox="0 0 80 80">
-                                                    <circle className="ring-bg" cx="40" cy="40" r="36"></circle>
-                                                    <circle className="ring-progress" cx="40" cy="40" r="36" style={{ strokeDasharray: circumference, strokeDashoffset: offset, stroke: progress >= 1 ? 'var(--green-glow)' : 'var(--blue-glow)' }}></circle>
-                                                </svg>
-                                                <span className="habit-progress-value">{habit.goal > 1 ? `${habit.progress}/${habit.goal}` : `${Math.round(progress * 100)}%`}</span>
+                                            <div className="habit-stats">
+                                                <div className="stat-item"><h4>🔥 {habit.streak}</h4><p>Current Streak</p></div>
+                                                <div className="stat-item"><h4>🎯 {habit.goal}</h4><p>Daily Goal</p></div>
+                                            </div>
+                                            <div className="habit-actions">
+                                                <button className={`action-btn ${progress >= 1 ? 'done' : ''}`} onClick={() => handleMarkDone(habit.id)}>{progress >= 1 ? '✅ Done' : 'Mark Done'}</button>
+                                                <button className="action-btn">📊 Stats</button>
                                             </div>
                                         </div>
-                                        <div className="habit-stats">
-                                            <div className="stat-item"><h4>🔥 {habit.streak}</h4><p>Current Streak</p></div>
-                                            <div className="stat-item"><h4>🎯 {habit.goal}</h4><p>Daily Goal</p></div>
-                                        </div>
-                                        <div className="habit-actions">
-                                            <button className={`action-btn ${progress >= 1 ? 'done' : ''}`} onClick={() => handleMarkDone(habit.id)}>{progress >= 1 ? '✅ Done' : 'Mark Done'}</button>
-                                            <button className="action-btn">📊 Stats</button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })
+                            )}
                         </div>
                     </section>
 
@@ -287,3 +281,5 @@ export function HabitBuilderView() {
         </div>
     );
 }
+
+    
