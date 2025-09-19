@@ -38,10 +38,6 @@ export const ChallengesView: FC<ChallengesViewProps> = ({ isOpen, onClose }) => 
     const [activeCategory, setActiveCategory] = useState('all');
 
     const deckRef = useRef<HTMLDivElement>(null);
-    const isDragging = useRef(false);
-    const activeCard = useRef<HTMLDivElement | null>(null);
-    const startX = useRef(0);
-    const startY = useRef(0);
 
     const getChallengesForCategory = (category: string): Challenge[] => {
         if (category === 'all') {
@@ -60,31 +56,15 @@ export const ChallengesView: FC<ChallengesViewProps> = ({ isOpen, onClose }) => 
     useEffect(() => {
         renderDeck('all');
     }, []);
-
-    const updateCardStack = () => {
+    
+    useEffect(() => {
         if (!deckRef.current) return;
         const cards = deckRef.current.querySelectorAll('.challenge-card:not(.removing)');
         cards.forEach((card, index) => {
             (card as HTMLElement).style.setProperty('--index', index.toString());
             (card as HTMLElement).style.zIndex = (cards.length - index).toString();
         });
-    };
-
-    useEffect(() => {
-        updateCardStack();
     }, [currentChallenges]);
-
-    const updateProgress = () => {
-        const percentage = totalCount > 0 ? (acceptedCount / totalCount) * 100 : 0;
-        const progressBar = document.getElementById('progress-bar-fg');
-        if (progressBar) {
-            progressBar.style.width = `${percentage}%`;
-        }
-    };
-    
-    useEffect(() => {
-      updateProgress();
-    }, [acceptedCount, totalCount]);
 
     const showXPFloater = () => {
         if (!deckRef.current) return;
@@ -96,10 +76,10 @@ export const ChallengesView: FC<ChallengesViewProps> = ({ isOpen, onClose }) => 
     };
 
     const processDecision = (action: 'accept' | 'skip') => {
-        const newChallenges = [...currentChallenges];
-        const cardData = newChallenges.pop();
-        if (!cardData) return;
+        if (currentChallenges.length === 0) return;
 
+        const newChallenges = [...currentChallenges];
+        newChallenges.pop();
         setCurrentChallenges(newChallenges);
         
         if (action === 'accept') {
@@ -114,6 +94,8 @@ export const ChallengesView: FC<ChallengesViewProps> = ({ isOpen, onClose }) => 
     };
 
     if (!isOpen) return null;
+
+    const progressPercentage = totalCount > 0 ? (acceptedCount / totalCount) * 100 : 0;
 
     return (
         <div className={`challenges-modal-overlay ${isOpen ? 'active' : ''}`} onClick={onClose}>
@@ -156,9 +138,12 @@ export const ChallengesView: FC<ChallengesViewProps> = ({ isOpen, onClose }) => 
                         <div className="progress-container">
                             <p id="progress-label" className="progress-label">{acceptedCount}/{totalCount} Challenges Done ✅</p>
                             <div className="progress-bar-bg">
-                                <div id="progress-bar-fg" className="progress-bar-fg" style={{ width: `${totalCount > 0 ? (acceptedCount / totalCount) * 100 : 0}%` }}></div>
+                                <div id="progress-bar-fg" className="progress-bar-fg" style={{ width: `${progressPercentage}%` }}></div>
                             </div>
                         </div>
                     </footer>
                 </div>
             </div>
+        </div>
+    );
+}
