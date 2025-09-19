@@ -24,7 +24,6 @@ import {
   NotebookPen,
   Paperclip,
   Send,
-  ShieldHalf,
   Users,
   X,
   Flame,
@@ -38,7 +37,6 @@ import { RoadmapsView } from "./RoadmapsView";
 import { WellnessView } from "./WellnessView";
 import { HabitBuilderView } from "./HabitBuilderView";
 import { MentorView } from "./MentorView";
-import { CounselorView } from "./CounselorView";
 
 
 export function ChatView() {
@@ -134,7 +132,6 @@ export function ChatView() {
       { type: 'item', icon: Users, label: 'Support Circles', tooltip: 'Connect with peer support groups.' },
       { type: 'item', icon: MessageSquare, label: 'Query Hub', tooltip: 'Ask questions and get answers from the community.' },
       { type: 'item', icon: GraduationCap, label: 'Mentors', tooltip: 'Find and chat with mentors.' },
-      { type: 'item', icon: ShieldHalf, label: 'Counselor', tooltip: 'Schedule a session with a professional.' },
       { type: 'divider', label: 'Settings' },
       { type: 'item', icon: Bot, label: 'Avatar & Voice', tooltip: 'Customize your AI assistant.' },
       { type: 'item', icon: AlertOctagon, label: 'SOS Crisis', isSOS: true, tooltip: 'Immediate crisis support.' }
@@ -216,8 +213,6 @@ export function ChatView() {
         return <HabitBuilderView />;
       case 'Mentors':
         return <MentorView />;
-      case 'Counselor':
-        return <CounselorView />;
       default:
         return (
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
@@ -367,3 +362,5 @@ export function ChatView() {
     </TooltipProvider>
   );
 }
+
+    

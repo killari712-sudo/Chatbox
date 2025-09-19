@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -99,7 +100,7 @@ export function SupportCirclesView() {
     const handleFormSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (validateForm()) {
-            const btn = createBtn.current;
+            const btn = createBtnRef.current;
             const btnText = btn?.querySelector('.btn-text');
             const spinner = btn?.querySelector('.loading-spinner');
             

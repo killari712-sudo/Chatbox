@@ -1298,11 +1298,11 @@
     height: 100%;
     display: grid;
     grid-template-rows: auto 1fr auto;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 350px;
     grid-template-areas:
-        "header"
-        "main"
-        "footer";
+        "header header"
+        "main aside"
+        "footer footer";
 }
 
 @keyframes glow-pulse-red {
@@ -1364,6 +1364,11 @@
 }
 .roadmaps-body .view.hidden {
     display: none;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .roadmaps-body #roadmap-selection-view {
@@ -1448,6 +1453,11 @@
     flex-direction: column;
     gap: 20px;
     padding: 20px 0;
+}
+
+@keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .roadmaps-body .step-card {
@@ -2140,19 +2150,6 @@
     overflow-y: auto;
     background-image: radial-gradient(circle at top left, rgba(74, 144, 226, 0.15) 0%, transparent 30%),
                       radial-gradient(circle at bottom right, rgba(138, 63, 252, 0.1) 0%, transparent 30%);
-}
-
-/* Counselor View styles */
-.counselor-view-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f0f4f8;
-    color: #1a202c;
-    min-height: 100vh;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    background-image: radial-gradient(circle at 10% 20%, rgba(74, 144, 226, 0.1), transparent 30%),
-                      radial-gradient(circle at 80% 90%, rgba(138, 63, 252, 0.08), transparent 30%);
 }
 
 /* --- SupportCirclesView styles --- */
