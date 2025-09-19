@@ -1279,6 +1279,17 @@
 
 /* Roadmaps View Styles */
 .roadmaps-body {
+    --light-bg: #f0f4f8;
+    --card-bg: rgba(255, 255, 255, 0.6);
+    --border-color: rgba(200, 200, 200, 0.4);
+    --text-primary: #1a202c;
+    --text-secondary: #718096;
+    --accent-blue: #4a90e2;
+    --accent-pink: #e24a90;
+    --accent-green: #2a7c49;
+    --accent-red: #ef4444;
+    --font-family-body: 'Poppins', sans-serif;
+    
     font-family: var(--font-family-body);
     background: var(--light-bg);
     background-image: radial-gradient(circle at 1% 1%, rgba(74, 144, 226, 0.1), transparent 30%),
@@ -1682,3 +1693,5 @@
 .roadmaps-body .fab-main:hover {
     transform: rotate(90deg) scale(1.1);
 }
+
+    
