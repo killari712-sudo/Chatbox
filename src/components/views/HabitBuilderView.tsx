@@ -123,6 +123,7 @@ export function HabitBuilderView() {
         const newHabits = [...habits, newHabit];
         saveData(newHabits, history);
         setIsModalOpen(false);
+        e.currentTarget.reset();
     };
     
     const overallStreak = habits.length > 0 ? Math.min(...habits.map(h => h.streak)) : 0;
@@ -263,15 +264,15 @@ export function HabitBuilderView() {
                         <form onSubmit={handleFormSubmit}>
                              <div className="form-group">
                                 <label htmlFor="habit-title-input">Title</label>
-                                <input type="text" name="habit-title-input" placeholder="e.g., Morning Walk" required />
+                                <input type="text" name="habit-title-input" id="habit-title-input" placeholder="e.g., Morning Walk" required />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="habit-icon-input">Icon (Emoji)</label>
-                                <input type="text" name="habit-icon-input" defaultValue="💪" required />
+                                <input type="text" name="habit-icon-input" id="habit-icon-input" defaultValue="💪" required />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="habit-category-select">Category</label>
-                                <select name="habit-category-select">
+                                <select name="habit-category-select" id="habit-category-select">
                                     <option>🧘 Wellness</option>
                                     <option>🎓 Academic</option>
                                     <option>🌱 Lifestyle</option>
@@ -280,7 +281,7 @@ export function HabitBuilderView() {
                             </div>
                             <div className="form-group">
                                 <label htmlFor="habit-goal-input">Daily Goal (Quantitative)</label>
-                                <input type="number" name="habit-goal-input" defaultValue="1" min="1" required />
+                                <input type="number" name="habit-goal-input" id="habit-goal-input" defaultValue="1" min="1" required />
                             </div>
                             <div className="modal-footer">
                                 <button type="submit" className="save-btn">Save Habit</button>
@@ -292,3 +293,5 @@ export function HabitBuilderView() {
         </div>
     );
 }
+
+    
