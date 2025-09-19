@@ -35,7 +35,6 @@ import { FriendFinderView } from "./FriendFinderView";
 import { QueryHubView } from "./QueryHubView";
 import { RoadmapsView } from "./RoadmapsView";
 import { WellnessView } from "./WellnessView";
-import { HabitBuilderView } from "./HabitBuilderView";
 import { MentorView } from "./MentorView";
 
 
@@ -124,7 +123,6 @@ export function ChatView() {
       { type: 'divider', label: 'Productivity' },
       { type: 'item', icon: Map, label: 'Roadmaps', tooltip: 'View your personalized goals and progress.' },
       { type: 'item', icon: BarChart3, label: 'My Journey', tooltip: "Shows XP bar + today's streak." },
-      { type: 'item', icon: Flame, label: 'Habits', tooltip: 'Track your daily habits and streaks.' },
       { type: 'divider', label: 'Wellness' },
       { type: 'item', icon: NotebookPen, label: 'Diary', tooltip: 'Your private, encrypted journal.' },
       { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
@@ -209,8 +207,6 @@ export function ChatView() {
         return <RoadmapsView />;
       case 'Wellness':
         return <WellnessView />;
-      case 'Habits':
-        return <HabitBuilderView />;
       case 'Mentors':
         return <MentorView />;
       default:
@@ -362,5 +358,3 @@ export function ChatView() {
     </TooltipProvider>
   );
 }
-
-    
