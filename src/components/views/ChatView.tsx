@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DiaryView } from "./DiaryView";
 
 
 export function ChatView() {
@@ -157,12 +158,63 @@ export function ChatView() {
     ripple.addEventListener('animationend', () => ripple.remove());
   };
 
+  const renderActiveView = () => {
+    if (activeView === 'Diary') {
+      return <DiaryView />;
+    }
+    if (activeView === 'Home') {
+      return (
+        <div id="chat-view" className="flex flex-col h-full overflow-hidden p-4 md:p-6">
+          <ScrollArea id="chat-container" className="flex-grow w-full max-w-4xl mx-auto pr-4" ref={scrollAreaRef}>
+            <div className="space-y-6">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex w-full items-start gap-3 animate-bubble-in ${
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  {message.role === 'assistant' && aiAvatar && (
+                      <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />
+                  )}
+                  <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-blue-500 text-white rounded-br-lg' : 'bg-white/80 rounded-bl-lg'}`}>
+                      <p>{message.content}</p>
+                  </div>
+                  {message.role === 'user' && userAvatar && (
+                      <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
+                  )}
+                </div>
+              ))}
+              {isPending && (
+                <div className="flex items-start gap-4 animate-bubble-in">
+                  {aiAvatar && <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />}
+                  <div className="p-4 rounded-lg bg-white/80">
+                    <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                  </div>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      );
+    }
+    return (
+        <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
+            <div className="glassmorphic-dark glowing-edge rounded-2xl p-8 max-w-3xl w-full">
+                <h2 className="text-3xl font-bold font-headline text-blue-800 mb-4">{activeView}</h2>
+                <p className="text-gray-600">This is the placeholder content for the {activeView} section. Dashboards, charts, and other components would be rendered here.</p>
+            </div>
+        </div>
+    );
+  };
+
+
   return (
     <TooltipProvider delayDuration={0}>
     <div className="h-screen w-screen flex flex-col font-body text-gray-800">
       {/* TOP BAR */}
       <header className="w-full h-16 flex-shrink-0 flex items-center justify-between px-6 glassmorphic border-b z-30">
-          <div className="flex items-center gap-2 cursor-pointer">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveView('Home')}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M2 7L12 12L22 7" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -181,77 +233,39 @@ export function ChatView() {
       <div className="flex flex-grow overflow-hidden">
           {/* CENTER PANEL */}
           <main className="flex-grow flex flex-col h-full relative">
-              {activeView === 'Home' ? (
-                <div id="chat-view" className="flex flex-col h-full overflow-hidden p-4 md:p-6">
-                  <ScrollArea id="chat-container" className="flex-grow w-full max-w-4xl mx-auto pr-4" ref={scrollAreaRef}>
-                    <div className="space-y-6">
-                      {messages.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`flex w-full items-start gap-3 animate-bubble-in ${
-                            message.role === "user" ? "justify-end" : "justify-start"
-                          }`}
-                        >
-                          {message.role === 'assistant' && aiAvatar && (
-                              <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />
-                          )}
-                          <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-blue-500 text-white rounded-br-lg' : 'bg-white/80 rounded-bl-lg'}`}>
-                              <p>{message.content}</p>
-                          </div>
-                          {message.role === 'user' && userAvatar && (
-                              <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
-                          )}
-                        </div>
-                      ))}
-                      {isPending && (
-                        <div className="flex items-start gap-4 animate-bubble-in">
-                          {aiAvatar && <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />}
-                          <div className="p-4 rounded-lg bg-white/80">
-                            <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </div>
-              ) : (
-                <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
-                  <div className="glassmorphic-dark glowing-edge rounded-2xl p-8 max-w-3xl w-full">
-                      <h2 className="text-3xl font-bold font-headline text-blue-800 mb-4">{activeView}</h2>
-                      <p className="text-gray-600">This is the placeholder content for the {activeView} section. Dashboards, charts, and other components would be rendered here.</p>
-                  </div>
+              {renderActiveView()}
+
+              {/* CHAT INPUT BAR - Only show if Home is active */}
+              {activeView === 'Home' && (
+                <div className="w-full flex-shrink-0 px-4 md:px-6 pb-4 md:pb-6 pt-2">
+                  <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto glassmorphic-dark glowing-edge rounded-full p-2 flex items-center gap-2 shadow-2xl shadow-black/10">
+                      <Button type="button" variant="ghost" size="icon" className="w-10 h-10 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                        <Paperclip className="w-5 h-5 text-blue-600" />
+                      </Button>
+                      <Textarea
+                        ref={inputRef}
+                        value={input}
+                        onChange={handleInputChange}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSubmit(e as any);
+                          }
+                        }}
+                        rows={1}
+                        placeholder="Type your message..."
+                        className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-2 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden"
+                        disabled={isPending}
+                      />
+                      <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-10 h-10 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                        <Mic className="w-5 h-5 text-blue-600" />
+                      </Button>
+                      <Button type="submit" size="icon" className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 text-white flex-shrink-0" disabled={isPending || !input.trim()}>
+                        <Send className="w-5 h-5" />
+                      </Button>
+                  </form>
                 </div>
               )}
-
-              {/* CHAT INPUT BAR */}
-              <div className="w-full flex-shrink-0 px-4 md:px-6 pb-4 md:pb-6 pt-2">
-                <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto glassmorphic-dark glowing-edge rounded-full p-2 flex items-center gap-2 shadow-2xl shadow-black/10">
-                    <Button type="button" variant="ghost" size="icon" className="w-10 h-10 rounded-full flex-shrink-0 hover:bg-blue-500/10">
-                      <Paperclip className="w-5 h-5 text-blue-600" />
-                    </Button>
-                    <Textarea
-                      ref={inputRef}
-                      value={input}
-                      onChange={handleInputChange}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSubmit(e as any);
-                        }
-                      }}
-                      rows={1}
-                      placeholder="Type your message..."
-                      className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-2 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden"
-                      disabled={isPending}
-                    />
-                    <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-10 h-10 rounded-full flex-shrink-0 hover:bg-blue-500/10">
-                      <Mic className="w-5 h-5 text-blue-600" />
-                    </Button>
-                    <Button type="submit" size="icon" className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 text-white flex-shrink-0" disabled={isPending || !input.trim()}>
-                      <Send className="w-5 h-5" />
-                    </Button>
-                </form>
-              </div>
           </main>
           
           {/* RIGHT SIDEBAR */}
