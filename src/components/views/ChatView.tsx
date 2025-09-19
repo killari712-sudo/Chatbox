@@ -131,7 +131,6 @@ export function ChatView() {
       { type: 'divider', label: 'Wellness' },
       { type: 'item', icon: NotebookPen, label: 'Diary', tooltip: 'Your private, encrypted journal.' },
       { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
-      { type: 'item', icon: BookOpen, label: 'Resources', tooltip: 'Access a library of helpful articles.' },
       { type: 'divider', label: 'Community' },
       { type: 'item', icon: Users, label: 'Support Circles', tooltip: 'Connect with peer support groups.' },
       { type: 'item', icon: MessageSquare, label: 'Query Hub', tooltip: 'Ask questions and get answers from the community.' },
@@ -366,5 +365,3 @@ export function ChatView() {
     </TooltipProvider>
   );
 }
-
-    
