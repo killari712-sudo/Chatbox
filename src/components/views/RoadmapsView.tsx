@@ -121,7 +121,6 @@ export function RoadmapsView() {
         const pathNodesContainer = document.getElementById('path-nodes');
         const progressBar = document.getElementById('progress-bar') as HTMLElement;
         const timeRemainingEl = document.getElementById('time-remaining');
-        const aiInsightText = document.getElementById('ai-insight-text');
         const roadmapTitleEl = document.getElementById('roadmap-title');
         const backButton = document.getElementById('back-to-selection-btn');
         const searchInput = document.getElementById('search-roadmaps') as HTMLInputElement;
@@ -159,7 +158,6 @@ export function RoadmapsView() {
             currentRoadmapId = null;
             selectionView?.classList.remove('hidden');
             detailView?.classList.add('hidden');
-            if (aiInsightText) aiInsightText.textContent = 'Select a roadmap to see personalized suggestions.';
             if (timeRemainingEl) timeRemainingEl.textContent = '-- min';
             if (progressBar) progressBar.style.width = '0%';
         }
@@ -199,7 +197,6 @@ export function RoadmapsView() {
             });
 
             updateUI();
-            if (aiInsightText) aiInsightText.textContent = roadmap.insight;
         }
 
         function updateUI() {
@@ -321,24 +318,6 @@ export function RoadmapsView() {
                 </div>
             </main>
 
-            <aside className="right-sidebar">
-                <div className="sidebar-panel ai-insights">
-                    <h4>🤖 AI Insights</h4>
-                    <p id="ai-insight-text">Select a roadmap to see personalized suggestions.</p>
-                </div>
-                <div className="sidebar-panel support-boosts">
-                    <h4>🤝 Support Boosts</h4>
-                    <p>32 peers are on this roadmap right now.</p>
-                    <ul>
-                        <li><img src="https://i.pravatar.cc/40?img=1" alt="avatar" /></li>
-                        <li><img src="https://i.pravatar.cc/40?img=2" alt="avatar" /></li>
-                        <li><img src="https://i.pravatar.cc/40?img=3" alt="avatar" /></li>
-                        <li><img src="https://i.pravatar.cc/40?img=4" alt="avatar" /></li>
-                    </ul>
-                    <button className="btn btn-primary" style={{ width: '100%', marginTop: '15px' }}>Join Study Circle</button>
-                </div>
-            </aside>
-
             <footer className="bottom-bar">
                 <div className="time-remaining">⏱️ Est. Time: <span id="time-remaining">-- min</span></div>
                 <div className="progress-bar-container">
@@ -353,5 +332,4 @@ export function RoadmapsView() {
         </div>
     );
 }
-
     
