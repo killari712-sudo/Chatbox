@@ -23,8 +23,18 @@ import {
   Book,
   Users,
 } from "lucide-react";
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
+} from "@/components/ui/sidebar";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Separator } from "@/components/ui/separator";
 
 export function ChatView() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -106,136 +116,168 @@ export function ChatView() {
     });
   };
 
-  const navIcons = [
-    { icon: Home, tooltip: "Home" },
-    { icon: Map, tooltip: "Explore" },
-    { icon: BarChart, tooltip: "Analytics" },
-    { icon: Flame, tooltip: "Streaks" },
-    { icon: Swords, tooltip: "Challenges" },
-    { icon: Pencil, tooltip: "Journal" },
-    { icon: Heart, tooltip: "Wellness" },
-    { icon: Book, tooltip: "Resources" },
-    { icon: Users, tooltip: "Community" },
+  const navItems = [
+    {
+      group: null,
+      items: [{ icon: Home, label: "Home" }],
+    },
+    {
+      group: "PRODUCTIVITY",
+      items: [
+        { icon: Map, label: "Roadmaps" },
+        { icon: BarChart, label: "My Journey" },
+        { icon: Flame, label: "Habits" },
+        { icon: Swords, label: "Challenges" },
+      ],
+    },
+    {
+      group: "WELLNESS",
+      items: [
+        { icon: Pencil, label: "Diary" },
+        { icon: Heart, label: "Wellness" },
+        { icon: Book, label: "Resources" },
+      ],
+    },
+    {
+      group: "COMMUNITY",
+      items: [{ icon: Users, label: "Support Circles" }],
+    },
   ];
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
-      <div className="w-16 flex flex-col items-center py-4 bg-card/30 border-l">
-        <div className="p-2 rounded-lg bg-white mb-4">
-          <Bot className="h-8 w-8 text-black" />
-        </div>
-      </div>
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-[60px] items-center justify-between border-b bg-card/30 px-6">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold">Ecosystem</h1>
+    <SidebarProvider defaultOpen={false}>
+      <div className="flex h-screen bg-background text-foreground">
+        <div className="w-16 flex flex-col items-center py-4 bg-card/30 border-r">
+          <div className="p-2 rounded-lg bg-white mb-4">
+            <Bot className="h-8 w-8 text-black" />
           </div>
-        </header>
-        <div className="flex-1 flex overflow-hidden">
-          <main className="flex-1 flex flex-col">
-            <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
-              <div className="space-y-6 max-w-4xl mx-auto">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex items-start gap-4 ${
-                      message.role === "user" ? "justify-end" : ""
-                    }`}
-                  >
-                    {message.role === "assistant" && (
-                       <p className="text-sm font-semibold">AI</p>
-                    )}
+        </div>
+        <div className="flex flex-1 flex-col">
+          <header className="flex h-[60px] items-center justify-between border-b bg-card/30 px-6">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold">Ecosystem</h1>
+            </div>
+          </header>
+          <div className="flex-1 flex overflow-hidden">
+            <main className="flex-1 flex flex-col">
+              <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
+                <div className="space-y-6 max-w-4xl mx-auto">
+                  {messages.map((message) => (
                     <div
-                      className={`flex flex-col gap-2 max-w-[75%] ${
-                        message.role === "user" ? "items-end" : "items-start"
+                      key={message.id}
+                      className={`flex items-start gap-4 ${
+                        message.role === "user" ? "justify-end" : ""
                       }`}
                     >
+                      {message.role === "assistant" && (
+                        <p className="text-sm font-semibold">AI</p>
+                      )}
                       <div
-                        className={`p-4 rounded-lg animate-bubble-in ${
+                        className={`flex flex-col gap-2 max-w-[75%] ${
                           message.role === "user"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-card"
+                            ? "items-end"
+                            : "items-start"
                         }`}
                       >
-                        <p>{message.content}</p>
+                        <div
+                          className={`p-4 rounded-lg animate-bubble-in ${
+                            message.role === "user"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-card"
+                          }`}
+                        >
+                          <p>{message.content}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-                {isPending && (
-                  <div className="flex items-start gap-4">
-                     <p className="text-sm font-semibold">AI</p>
-                    <div className="p-4 rounded-lg bg-card">
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                  ))}
+                  {isPending && (
+                    <div className="flex items-start gap-4">
+                      <p className="text-sm font-semibold">AI</p>
+                      <div className="p-4 rounded-lg bg-card">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              </ScrollArea>
+              <div className="p-4 bg-transparent">
+                <div className="relative max-w-4xl mx-auto">
+                  <form onSubmit={handleSubmit}>
+                    <Paperclip className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      value={input}
+                      onChange={handleInputChange}
+                      placeholder="Type your message..."
+                      className="h-14 pl-12 pr-24 rounded-full bg-card border-border text-base"
+                      disabled={isPending}
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full"
+                        disabled
+                      >
+                        <Mic className="h-5 w-5" />
+                      </Button>
+                      <Button
+                        type="submit"
+                        size="icon"
+                        className="w-10 h-10 rounded-full"
+                        disabled={isPending || !input.trim()}
+                      >
+                        <Send className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  </form>
+                </div>
               </div>
-            </ScrollArea>
-            <div className="p-4 bg-transparent">
-              <div className="relative max-w-4xl mx-auto">
-                <form onSubmit={handleSubmit}>
-                  <Paperclip className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    value={input}
-                    onChange={handleInputChange}
-                    placeholder="Type your message..."
-                    className="h-14 pl-12 pr-24 rounded-full bg-card border-border text-base"
-                    disabled={isPending}
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-full"
-                      disabled
-                    >
-                      <Mic className="h-5 w-5" />
-                    </Button>
-                    <Button
-                      type="submit"
-                      size="icon"
-                      className="w-10 h-10 rounded-full"
-                      disabled={isPending || !input.trim()}
-                    >
-                      <Send className="w-5 h-5" />
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </main>
-          <aside className="w-20 flex flex-col items-center gap-2 py-6 border-l bg-card/30">
-            <Avatar className="mb-4">
-              <AvatarFallback>A</AvatarFallback>
-            </Avatar>
-            {navIcons.slice(0, 3).map((item, i) => (
-                <Button key={i} variant="ghost" size="icon" className="rounded-lg h-10 w-10">
-                    <item.icon className="h-5 w-5" />
-                </Button>
-            ))}
-            <Separator className="my-2" />
-            {navIcons.slice(3, 5).map((item, i) => (
-                <Button key={i} variant="ghost" size="icon" className="rounded-lg h-10 w-10">
-                    <item.icon className="h-5 w-5" />
-                </Button>
-            ))}
-             <Separator className="my-2" />
-             {navIcons.slice(5, 8).map((item, i) => (
-                <Button key={i} variant="ghost" size="icon" className="rounded-lg h-10 w-10">
-                    <item.icon className="h-5 w-5" />
-                </Button>
-            ))}
-             <Separator className="my-2" />
-             {navIcons.slice(8).map((item, i) => (
-                <Button key={i} variant="ghost" size="icon" className="rounded-lg h-10 w-10">
-                    <item.icon className="h-5 w-5" />
-                </Button>
-            ))}
-          </aside>
+            </main>
+            <Sidebar side="right" collapsible="icon">
+              <SidebarHeader className="p-2 border-b">
+                <Avatar className="w-full h-10 border">
+                  {avatarImage && (
+                    <AvatarImage
+                      src={avatarImage.imageUrl}
+                      alt={avatarImage.description}
+                      width={40}
+                      height={40}
+                      data-ai-hint={avatarImage.imageHint}
+                    />
+                  )}
+                  <AvatarFallback>A</AvatarFallback>
+                </Avatar>
+              </SidebarHeader>
+              <SidebarContent className="p-2">
+                <SidebarMenu>
+                  {navItems.map((group, groupIndex) => (
+                    <SidebarGroup key={groupIndex} className="p-0">
+                      {group.group && (
+                        <SidebarGroupLabel className="px-2 text-xs uppercase tracking-wider text-muted-foreground">
+                          {group.group}
+                        </SidebarGroupLabel>
+                      )}
+                      {group.items.map((item, itemIndex) => (
+                        <SidebarMenuItem key={itemIndex}>
+                          <SidebarMenuButton
+                            tooltip={item.label}
+                            className="justify-start"
+                          >
+                            <item.icon className="shrink-0" />
+                            <span>{item.label}</span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarGroup>
+                  ))}
+                </SidebarMenu>
+              </SidebarContent>
+            </Sidebar>
+          </div>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
