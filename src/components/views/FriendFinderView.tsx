@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from 'react';
+import { SupportCirclesView } from './SupportCirclesView';
 
 export function FriendFinderView() {
     useEffect(() => {
@@ -68,7 +69,7 @@ export function FriendFinderView() {
             sections.forEach(section => {
                 section.classList.remove('active');
             });
-            const tabs = documentquerySelectorAll('.tab-btn');
+            const tabs = document.querySelectorAll('.tab-btn');
             tabs.forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -181,11 +182,7 @@ export function FriendFinderView() {
                         </div>
 
                         <div id="pods-groups" className="content-section">
-                            <div className="empty-state">
-                                <p>You are not a member of any pods or groups yet.</p>
-                                <p>Create a new pod or join one to start shared challenges.</p>
-                                <button className="cta-btn">Create a New Pod</button>
-                            </div>
+                           <SupportCirclesView />
                         </div>
                     </div>
 
