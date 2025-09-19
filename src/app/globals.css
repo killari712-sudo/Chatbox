@@ -355,6 +355,132 @@
   animation: confetti-fall 3s ease-out forwards;
 }
 
+/* QueryHubView styles */
+.query-hub-body {
+    --primary-bg: #f0f4f8;
+    --secondary-bg: #e2e8f0;
+    --text-color: #1a202c;
+    --secondary-text-color: #718096;
+    --glass-card-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(200, 200, 200, 0.4);
+    --accent-glow: #4a90e2;
+    --counselor-color: #2a7c49;
+    --mentor-color: #e24a90;
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    overflow-x: hidden;
+    background-image: radial-gradient(circle at 10% 20%, rgba(74, 144, 226, 0.1), transparent 30%),
+                      radial-gradient(circle at 90% 80%, rgba(226, 74, 144, 0.1), transparent 30%);
+}
+
+.frosted-card {
+    background: var(--glass-card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+.counselor-reply {
+    border: 2px solid var(--counselor-color);
+    background-color: rgba(42, 124, 73, 0.1);
+}
+
+.mentor-reply {
+    border: 2px solid var(--mentor-color);
+    background-color: rgba(226, 74, 144, 0.1);
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.badge-student { background-color: #cbd5e1; color: #4a5568; }
+.badge-alumni { background-color: #a0aec0; color: #2d3748; }
+.badge-mentor { background-color: #f7d2e4; color: #78244e; }
+.badge-counselor { background-color: #b0e5c9; color: #1e613b; }
+
+@keyframes glowing-title {
+    0%, 100% { text-shadow: 0 0 5px #fff, 0 0 10px var(--accent-glow); }
+    50% { text-shadow: 0 0 10px #fff, 0 0 20px var(--accent-glow), 0 0 30px var(--accent-glow); }
+}
+
+.glowing-title {
+    animation: none; /* Disable glowing on light theme for readability */
+    background: linear-gradient(45deg, var(--accent-glow), var(--mentor-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.ripple-effect {
+    position: relative;
+    overflow: hidden;
+    transform: translate3d(0, 0, 0);
+}
+
+.ripple-effect::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.2);
+    animation: ripple 1s forwards cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    transform: scale(0);
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.upvote-sparkle {
+    animation: sparkle-pulse 0.5s ease-out forwards;
+}
+
+@keyframes sparkle-pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); color: #FACC15; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.fade-slide-up {
+    animation: fade-slide-up 0.5s ease-out forwards;
+}
+
+@keyframes fade-slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.sos-btn {
+    animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+}
+
+@media (max-width: 768px) {
+    .mobile-hide {
+        display: none;
+    }
+    .mobile-full-width {
+        width: 100%;
+    }
+}
+
+
 /* FriendFinderView styles */
 .friend-finder-body {
     --bg-color: #f0f4f8;
