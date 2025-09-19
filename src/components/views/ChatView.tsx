@@ -32,6 +32,7 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DiaryView } from "./DiaryView";
 import { FriendFinderView } from "./FriendFinderView";
+import { ChallengesView } from "./ChallengesView";
 
 
 export function ChatView() {
@@ -42,6 +43,7 @@ export function ChatView() {
   const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
   const [isSosOverlayVisible, setSosOverlayVisible] = useState(false);
   const [isSidebarExpanded, setSidebarExpanded] = useState(false);
+  const [isChallengesModalOpen, setChallengesModalOpen] = useState(false);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -139,6 +141,8 @@ export function ChatView() {
 
     if (item.isSOS) {
       setSosOverlayVisible(true);
+    } else if (item.label === 'Challenges') {
+      setChallengesModalOpen(true);
     } else {
       setActiveView(item.label);
     }
@@ -315,7 +319,9 @@ export function ChatView() {
           </aside>
       </div>
       
-      {/* VOICE MODE OVERLAY */}
+      {/* OVERLAYS */}
+      <ChallengesView isOpen={isChallengesModalOpen} onClose={() => setChallengesModalOpen(false)} />
+
       {isVoiceOverlayVisible && (
         <div className="fixed inset-0 bg-white/80 backdrop-blur-xl z-50 flex flex-col items-center justify-center">
             <div style={{animation: 'avatar-float 5s ease-in-out infinite'}}>
@@ -329,7 +335,6 @@ export function ChatView() {
         </div>
       )}
 
-      {/* SOS CRISIS OVERLAY */}
       {isSosOverlayVisible && (
         <div className="fixed inset-0 bg-red-100/50 backdrop-blur-2xl z-50 flex items-center justify-center p-4">
             <div className="glassmorphic bg-red-500/10 border-red-500/30 rounded-3xl p-8 md:p-12 text-center max-w-lg w-full">
@@ -339,7 +344,7 @@ export function ChatView() {
                 <Button className="mt-10 bg-red-600/80 border-2 border-red-400 text-white font-bold text-xl py-4 px-10 rounded-full transition-transform hover:scale-105 h-auto" style={{animation: 'pulse-glow 2s infinite'}}>
                   Connect to Support
                 </Button>
-                <Button onClick={() => setSosOverlayVisible(false)} variant="link" className="mt-6 text-red-700 hover:text-red-900 underline text-sm">Cancel Alert</Button>
+                <Button onClick={() => setSosOverlayVisible(false)} variant="link" className="mt-6 text-red-700 hover:text-red-900 underline" />
             </div>
         </div>
       )}
