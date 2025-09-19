@@ -31,6 +31,7 @@ import {
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DiaryView } from "./DiaryView";
+import { FriendFinderView } from "./FriendFinderView";
 
 
 export function ChatView() {
@@ -161,6 +162,9 @@ export function ChatView() {
   const renderActiveView = () => {
     if (activeView === 'Diary') {
       return <DiaryView />;
+    }
+    if (activeView === 'Support Circles') {
+      return <FriendFinderView />;
     }
     if (activeView === 'Home') {
       return (
