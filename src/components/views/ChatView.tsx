@@ -18,6 +18,7 @@ import {
   Home,
   Loader2,
   Map,
+  MessageSquare,
   Mic,
   NotebookPen,
   Paperclip,
@@ -33,6 +34,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { DiaryView } from "./DiaryView";
 import { FriendFinderView } from "./FriendFinderView";
 import { ChallengesView } from "./ChallengesView";
+import { QueryHubView } from "./QueryHubView";
 
 
 export function ChatView() {
@@ -129,6 +131,7 @@ export function ChatView() {
       { type: 'item', icon: BookOpen, label: 'Resources', tooltip: 'Access a library of helpful articles.' },
       { type: 'divider', label: 'Community' },
       { type: 'item', icon: Users, label: 'Support Circles', tooltip: 'Connect with peer support groups.' },
+      { type: 'item', icon: MessageSquare, label: 'Query Hub', tooltip: 'Ask questions and get answers from the community.' },
       { type: 'item', icon: GraduationCap, label: 'Mentors', tooltip: 'Find and chat with mentors.' },
       { type: 'item', icon: ShieldHalf, label: 'Counselor', tooltip: 'Schedule a session with a professional.' },
       { type: 'divider', label: 'Settings' },
@@ -164,56 +167,58 @@ export function ChatView() {
   };
 
   const renderActiveView = () => {
-    if (activeView === 'Diary') {
-      return <DiaryView />;
-    }
-    if (activeView === 'Support Circles') {
-      return <FriendFinderView />;
-    }
-    if (activeView === 'Home') {
-      return (
-        <div id="chat-view" className="flex flex-col h-full overflow-hidden p-4 md:p-6">
-          <ScrollArea id="chat-container" className="flex-grow w-full max-w-4xl mx-auto pr-4" ref={scrollAreaRef}>
-            <div className="space-y-6">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex w-full items-start gap-3 animate-bubble-in ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {message.role === 'assistant' && aiAvatar && (
-                      <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />
-                  )}
-                  <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-blue-500 text-white rounded-br-lg' : 'bg-white/80 rounded-bl-lg'}`}>
-                      <p>{message.content}</p>
+    switch (activeView) {
+      case 'Diary':
+        return <DiaryView />;
+      case 'Support Circles':
+        return <FriendFinderView />;
+      case 'Query Hub':
+        return <QueryHubView />;
+      case 'Home':
+        return (
+          <div id="chat-view" className="flex flex-col h-full overflow-hidden p-4 md:p-6">
+            <ScrollArea id="chat-container" className="flex-grow w-full max-w-4xl mx-auto pr-4" ref={scrollAreaRef}>
+              <div className="space-y-6">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex w-full items-start gap-3 animate-bubble-in ${
+                      message.role === "user" ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    {message.role === 'assistant' && aiAvatar && (
+                        <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />
+                    )}
+                    <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-blue-500 text-white rounded-br-lg' : 'bg-white/80 rounded-bl-lg'}`}>
+                        <p>{message.content}</p>
+                    </div>
+                    {message.role === 'user' && userAvatar && (
+                        <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
+                    )}
                   </div>
-                  {message.role === 'user' && userAvatar && (
-                      <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
-                  )}
-                </div>
-              ))}
-              {isPending && (
-                <div className="flex items-start gap-4 animate-bubble-in">
-                  {aiAvatar && <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />}
-                  <div className="p-4 rounded-lg bg-white/80">
-                    <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                ))}
+                {isPending && (
+                  <div className="flex items-start gap-4 animate-bubble-in">
+                    {aiAvatar && <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />}
+                    <div className="p-4 rounded-lg bg-white/80">
+                      <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                    </div>
                   </div>
+                )}
+              </div>
+            </ScrollArea>
+          </div>
+        );
+      default:
+        return (
+            <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
+                <div className="glassmorphic-dark glowing-edge rounded-2xl p-8 max-w-3xl w-full">
+                    <h2 className="text-3xl font-bold font-headline text-blue-800 mb-4">{activeView}</h2>
+                    <p className="text-gray-600">This is the placeholder content for the {activeView} section. Dashboards, charts, and other components would be rendered here.</p>
                 </div>
-              )}
             </div>
-          </ScrollArea>
-        </div>
-      );
+        );
     }
-    return (
-        <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
-            <div className="glassmorphic-dark glowing-edge rounded-2xl p-8 max-w-3xl w-full">
-                <h2 className="text-3xl font-bold font-headline text-blue-800 mb-4">{activeView}</h2>
-                <p className="text-gray-600">This is the placeholder content for the {activeView} section. Dashboards, charts, and other components would be rendered here.</p>
-            </div>
-        </div>
-    );
   };
 
 
@@ -344,7 +349,7 @@ export function ChatView() {
                 <Button className="mt-10 bg-red-600/80 border-2 border-red-400 text-white font-bold text-xl py-4 px-10 rounded-full transition-transform hover:scale-105 h-auto" style={{animation: 'pulse-glow 2s infinite'}}>
                   Connect to Support
                 </Button>
-                <Button onClick={() => setSosOverlayVisible(false)} variant="link" className="mt-6 text-red-700 hover:text-red-900 underline" />
+                <Button onClick={() => setSosOverlayVisible(false)} variant="link" className="mt-6 text-red-700 hover:text-red-900 underline">Cancel Alert</Button>
             </div>
         </div>
       )}
