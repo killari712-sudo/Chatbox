@@ -25,7 +25,6 @@ import {
   Paperclip,
   Send,
   ShieldHalf,
-  Swords,
   Users,
   X,
   Flame,
@@ -34,7 +33,6 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DiaryView } from "./DiaryView";
 import { FriendFinderView } from "./FriendFinderView";
-import { ChallengesView } from "./ChallengesView";
 import { QueryHubView } from "./QueryHubView";
 import { RoadmapsView } from "./RoadmapsView";
 import { WellnessView } from "./WellnessView";
@@ -49,7 +47,6 @@ export function ChatView() {
   const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
   const [isSosOverlayVisible, setSosOverlayVisible] = useState(false);
   const [isSidebarExpanded, setSidebarExpanded] = useState(false);
-  const [isChallengesModalOpen, setChallengesModalOpen] = useState(false);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -128,7 +125,6 @@ export function ChatView() {
       { type: 'item', icon: Map, label: 'Roadmaps', tooltip: 'View your personalized goals and progress.' },
       { type: 'item', icon: BarChart3, label: 'My Journey', tooltip: "Shows XP bar + today's streak." },
       { type: 'item', icon: Flame, label: 'Habits', tooltip: 'Track your daily habits and streaks.' },
-      { type: 'item', icon: Swords, label: 'Challenges', tooltip: 'Engage in new skill challenges.' },
       { type: 'divider', label: 'Wellness' },
       { type: 'item', icon: NotebookPen, label: 'Diary', tooltip: 'Your private, encrypted journal.' },
       { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
@@ -147,8 +143,6 @@ export function ChatView() {
 
     if (item.isSOS) {
       setSosOverlayVisible(true);
-    } else if (item.label === 'Challenges') {
-      setChallengesModalOpen(true);
     } else {
       setActiveView(item.label);
     }
@@ -334,7 +328,6 @@ export function ChatView() {
         </div>
         
         {/* OVERLAYS */}
-        <ChallengesView isOpen={isChallengesModalOpen} onClose={() => setChallengesModalOpen(false)} />
 
         {isVoiceOverlayVisible && (
           <div className="fixed inset-0 bg-white/80 backdrop-blur-xl z-50 flex flex-col items-center justify-center">
