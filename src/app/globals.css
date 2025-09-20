@@ -309,7 +309,6 @@
 }
 .entry-pad:focus { outline: none; }
 .save-button {
-  margin-top: auto;
   background-color: var(--glow-color);
   color: white;
   border: none;
@@ -321,6 +320,38 @@
   transition: background-color 0.2s, transform 0.2s;
 }
 .save-button:hover { background-color: #67a9e6; transform: scale(1.05); }
+
+.mic-button {
+    background-color: rgba(0,0,0,0.05);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mic-button:hover {
+    background-color: rgba(0,0,0,0.1);
+    color: var(--text-color);
+}
+
+.mic-button.recording {
+    background-color: var(--mood-red);
+    color: white;
+    border-color: var(--mood-red);
+    animation: mic-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes mic-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
 
 .calendar-timeline { grid-area: calendar-timeline; }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
@@ -2597,5 +2628,6 @@ input:checked + .slider:before { transform: translateX(22px); }
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
 }
 .habit-btn-generate:hover { box-shadow: 0 0 30px rgba(99, 102, 241, 0.8); }
+
 
 

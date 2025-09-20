@@ -1,10 +1,35 @@
+
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Mic } from 'lucide-react';
+
+// Define the interface for the SpeechRecognition API
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onresult: ((this: SpeechRecognition, ev: any) => any) | null;
+  onerror: ((this: SpeechRecognition, ev: any) => any) | null;
+  onend: ((this: SpeechRecognition, ev: Event) => any) | null;
+}
+
+interface Window {
+  SpeechRecognition: new () => SpeechRecognition;
+  webkitSpeechRecognition: new () => SpeechRecognition;
+}
+
+declare var window: Window;
+
 
 export function DiaryView() {
   const entryAreaCardRef = useRef<HTMLDivElement>(null);
   const saveButtonRef = useRef<HTMLButtonElement>(null);
+  const entryPadRef = useRef<HTMLTextAreaElement>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
     const dateSubtext = document.getElementById('date-subtext');
@@ -27,14 +52,13 @@ export function DiaryView() {
     moodEmojis?.addEventListener('click', handleMoodClick);
 
     const promptsList = document.getElementById('prompts-list');
-    const entryPad = document.getElementById('entry-pad') as HTMLTextAreaElement;
     const handlePromptClick = (e: Event) => {
         const target = e.target as HTMLElement;
-        if (target.tagName === 'LI') {
-            const currentText = entryPad.value;
+        if (target.tagName === 'LI' && entryPadRef.current) {
+            const currentText = entryPadRef.current.value;
             const promptText = target.textContent || '';
-            entryPad.value = currentText ? `${currentText}\n\n${promptText}\n` : `${promptText}\n`;
-            entryPad.focus();
+            entryPadRef.current.value = currentText ? `${currentText}\n\n${promptText}\n` : `${promptText}\n`;
+            entryPadRef.current.focus();
         }
     };
     promptsList?.addEventListener('click', handlePromptClick);
@@ -115,12 +139,57 @@ export function DiaryView() {
     };
     saveButton?.addEventListener('click', handleSaveClick);
 
+    // Speech Recognition Setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        if (entryPadRef.current) {
+            const start = entryPadRef.current.selectionStart;
+            const end = entryPadRef.current.selectionEnd;
+            const text = entryPadRef.current.value;
+            entryPadRef.current.value = text.slice(0, start) + finalTranscript + interimTranscript + text.slice(end);
+        }
+      };
+      
+      recognitionRef.current.onend = () => {
+        if(isRecording){
+            recognitionRef.current?.start();
+        }
+      };
+    }
+
+
     return () => {
         moodEmojis?.removeEventListener('click', handleMoodClick);
         promptsList?.removeEventListener('click', handlePromptClick);
         saveButton?.removeEventListener('click', handleSaveClick);
+        recognitionRef.current?.stop();
     };
-  }, []);
+  }, [isRecording]);
+
+  const handleMicClick = () => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+    } else {
+      recognitionRef.current?.start();
+      setIsRecording(true);
+    }
+  };
 
   return (
     <div className='diary-body-styles'>
@@ -157,8 +226,17 @@ export function DiaryView() {
             <div className="entry-toolbar">
                 <span>🧠</span><span>💡</span><span>#️⃣</span>
             </div>
-            <textarea className="entry-pad" id="entry-pad" placeholder="You didn’t write an entry on this day. Click to start."></textarea>
-            <button className="save-button" id="save-button" ref={saveButtonRef}>Save</button>
+            <textarea className="entry-pad" id="entry-pad" ref={entryPadRef} placeholder="You didn’t write an entry on this day. Click to start."></textarea>
+            <div className="flex items-center justify-end mt-auto gap-4">
+              <button
+                  onClick={handleMicClick}
+                  className={`mic-button ${isRecording ? 'recording' : ''}`}
+                  title={isRecording ? 'Stop Recording' : 'Start Recording'}
+              >
+                  <Mic className="w-5 h-5" />
+              </button>
+              <button className="save-button" id="save-button" ref={saveButtonRef}>Save</button>
+            </div>
         </section>
 
         <section className="card calendar-timeline">
