@@ -32,7 +32,6 @@ import {
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DiaryView } from "./DiaryView";
-import { FriendFinderView } from "./FriendFinderView";
 import { QueryHubView } from "./QueryHubView";
 import { WellnessView } from "./WellnessView";
 import { MentorView } from "./MentorView";
@@ -134,7 +133,6 @@ export function ChatView() {
       { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
       { type: 'divider', label: 'Community' },
       { type: 'item', icon: MessageSquare, label: 'Query Hub', tooltip: 'Ask questions and get answers from the community.' },
-      { type: 'item', icon: Users, label: 'Support', tooltip: 'Connect with friends and support groups.' },
       { type: 'divider', label: 'Settings' },
       { type: 'item', icon: Bot, label: 'Avatar & Voice', tooltip: 'Customize your AI assistant.' },
       { type: 'item', icon: AlertOctagon, label: 'SOS Crisis', isSOS: true, tooltip: 'Immediate crisis support.' }
@@ -167,7 +165,6 @@ export function ChatView() {
 
   const suggestionButtons = [
     { label: 'Query Hub', icon: HelpCircle, view: 'Query Hub' },
-    { label: 'Support', icon: Users, view: 'Support' },
     { label: 'Diary', icon: NotebookPen, view: 'Diary' },
     { label: 'Wellness', icon: HeartPulse, view: 'Wellness' },
     { label: 'Habit Builder', icon: BarChart3, view: 'Habit Builder' },
@@ -244,8 +241,6 @@ export function ChatView() {
         return <MentorView onNavigate={setActiveView} />;
       case 'Habit Builder':
         return <HabitBuilderView />;
-      case 'Support':
-        return <FriendFinderView />;
       case 'Roadmaps':
         return <RoadmapsView onNavigate={setActiveView} />;
       default:
