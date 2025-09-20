@@ -251,7 +251,14 @@ export function DiaryView() {
                             >
                                 <Mic className="w-5 h-5" />
                             </button>
-                            <button className="save-button" ref={saveButtonRef} onClick={handleSave}>Save</button>
+                            <button 
+                                className="save-button" 
+                                ref={saveButtonRef} 
+                                onClick={handleSave}
+                                disabled={!entryText.trim()}
+                            >
+                                Save
+                            </button>
                         </div>
                     </section>
 

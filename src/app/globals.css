@@ -320,9 +320,16 @@
   font-weight: 500;
   cursor: pointer;
   align-self: flex-end;
-  transition: background-color 0.2s, transform 0.2s;
+  transition: background-color 0.2s, transform 0.2s, opacity 0.2s;
 }
 .save-button:hover { background-color: #67a9e6; transform: scale(1.05); }
+.save-button:disabled {
+    background-color: #a0aec0; /* Muted gray */
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+}
+
 
 .mic-button {
     background-color: rgba(0,0,0,0.05);
