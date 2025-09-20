@@ -53,7 +53,7 @@ export function ChatView() {
   const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
   const [isSosOverlayVisible, setSosOverlayVisible] = useState(false);
   const [isSidebarExpanded, setSidebarExpanded] = useState(true);
-  const { user, auth } = useAuth();
+  const { user, auth, loading } = useAuth();
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -92,13 +92,7 @@ export function ChatView() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      // This will clear all data, adjust if more granular control is needed
-      if (typeof window !== 'undefined') {
-        window.localStorage.clear();
-      }
-      setActiveView('Home');
-      // Optionally, you might want to reload the page or reset component states
-      // window.location.reload(); 
+      setActiveView('Home'); 
     } catch (error) {
       console.error("Error signing out: ", error);
     }
@@ -162,8 +156,15 @@ export function ChatView() {
   const handleSidebarClick = (item: (typeof sidebarItems)[number]) => {
     if (item.type !== 'item') return;
 
+    const requiresAuth = ['Diary', 'Habit Builder', 'Query Hub', 'Support', 'Mentors'];
+
     if (item.isSOS) {
-      setSosOverlayVisible(true);
+        setSosOverlayVisible(true);
+        return;
+    }
+
+    if (requiresAuth.includes(item.label) && !user) {
+        setActiveView(item.label);
     } else {
         setActiveView(item.label);
     }
@@ -183,15 +184,6 @@ export function ChatView() {
     btn.appendChild(ripple);
     ripple.addEventListener('animationend', () => ripple.remove());
   };
-
-  const suggestionButtons = [
-    { label: 'Query Hub', icon: HelpCircle, view: 'Query Hub' },
-    { label: 'Diary', icon: NotebookPen, view: 'Diary' },
-    { label: 'Wellness', icon: HeartPulse, view: 'Wellness' },
-    { label: 'Habit Builder', icon: BarChart3, view: 'Habit Builder' },
-    { label: 'Mentors', icon: GraduationCap, view: 'Mentors' },
-    { label: 'Support', icon: Users, view: 'Support' },
-  ];
 
   const renderActiveView = () => {
     switch (activeView) {
@@ -277,7 +269,7 @@ export function ChatView() {
                 <span className="font-bold text-lg font-headline text-gray-800">EcosystemAI</span>
             </div>
             <div className="relative">
-                {!user ? (
+                {!user && !loading && (
                     <Button onClick={handleSignIn} size="sm" className="rounded-full bg-blue-500 hover:bg-blue-600 text-white">
                         <svg className="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px">
                             <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
@@ -286,7 +278,7 @@ export function ChatView() {
                         </svg>
                         Sign in with Google
                     </Button>
-                ): null}
+                )}
             </div>
         </header>
 
@@ -340,8 +332,7 @@ export function ChatView() {
                     if (item.type === 'divider') {
                       return (
                         <div key={index} className="flex items-center gap-4 px-4 py-2 transition-opacity duration-300">
-                          <div className="h-px bg-gray-300/80 w-6 flex-shrink-0"></div>
-                          <span className={`text-xs text-gray-500 uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
+                          <div className="h-px bg-gray-300/80 w-full flex-shrink-0"></div>
                         </div>
                       )
                     }
