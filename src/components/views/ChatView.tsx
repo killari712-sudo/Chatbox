@@ -34,7 +34,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { DiaryView } from "./DiaryView";
 import { FriendFinderView } from "./FriendFinderView";
 import { QueryHubView } from "./QueryHubView";
-import { RoadmapsView } from "./RoadmapsView";
 import { WellnessView } from "./WellnessView";
 import { MentorView } from "./MentorView";
 import { useAuth } from "@/hooks/useAuth";
@@ -127,7 +126,6 @@ export function ChatView() {
   const sidebarItems = [
       { type: 'item', icon: Home, label: 'Home', tooltip: 'Return to the main chat view.' },
       { type: 'divider', label: 'Productivity' },
-      { type: 'item', icon: Map, label: 'Roadmaps', tooltip: 'View your personalized goals and progress.' },
       { type: 'item', icon: BarChart3, label: 'Habit Builder', tooltip: "Build and track your habits." },
       { type: 'divider', label: 'Wellness' },
       { type: 'item', icon: NotebookPen, label: 'Diary', tooltip: 'Your private, encrypted journal.' },
@@ -170,7 +168,6 @@ export function ChatView() {
     { label: 'Query Hub', icon: HelpCircle, view: 'Query Hub' },
     { label: 'Support', icon: Users, view: 'Support' },
     { label: 'Diary', icon: NotebookPen, view: 'Diary' },
-    { label: 'My Journey', icon: Route, view: 'Roadmaps' },
   ];
 
   const renderActiveView = () => {
@@ -235,8 +232,6 @@ export function ChatView() {
         return <DiaryView />;
       case 'Query Hub':
         return <QueryHubView />;
-      case 'Roadmaps':
-        return <RoadmapsView />;
       case 'Wellness':
         return <WellnessView />;
       case 'Mentors':
