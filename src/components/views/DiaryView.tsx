@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Button } from "@/components/ui/button";
+import { getSummary } from "@/app/actions";
 
 
 // Define interfaces for data structures
@@ -82,6 +83,7 @@ export function DiaryView() {
     const [warningMessage, setWarningMessage] = useState('');
     const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
     const [transcript, setTranscript] = useState('');
+    const [isSummarizing, setIsSummarizing] = useState(false);
 
 
     // Load entries from localStorage on initial render
@@ -176,11 +178,11 @@ export function DiaryView() {
             confettiPiece.className = 'confetti-piece';
             const colors = ['#4a90e2', '#e24a90', '#facc15', '#ef4444', '#3b82f6'];
             confettiPiece.style.background = colors[Math.floor(Math.random() * colors.length)];
-            confettiPiece.style.left = `${saveButton.offsetLeft + (saveButton.offsetWidth / 2)}px`;
-            confettiPiece.style.top = `${saveButton.offsetTop}px`;
-            const transform = `rotate(${Math.random() * 360}deg) translateX(${ (Math.random() - 0.5) * 300 }px)`;
+            confettiPiece.style.left = `${'${saveButton.offsetLeft + (saveButton.offsetWidth / 2)}'}px`;
+            confettiPiece.style.top = `${'${saveButton.offsetTop}'}px`;
+            const transform = `rotate(${'${Math.random() * 360}'}deg) translateX(${'${ (Math.random() - 0.5) * 300 }'}px)`;
             confettiPiece.style.transform = transform;
-            confettiPiece.style.animationDelay = `${Math.random() * 0.2}s`;
+            confettiPiece.style.animationDelay = `${'${Math.random() * 0.2}'}s`;
             entryAreaCard.appendChild(confettiPiece);
             setTimeout(() => confettiPiece.remove(), 3000);
         }
@@ -188,7 +190,7 @@ export function DiaryView() {
 
     const handlePromptClick = (prompt: string) => {
         if (!isToday(selectedDate) || !entryPadRef.current) return;
-        const promptHtml = `<p><span class="diary-prompt-text">${prompt}</span></p>`;
+        const promptHtml = `<p><span class="diary-prompt-text" style="color: darkblue;">${prompt}</span></p>`;
         entryPadRef.current.innerHTML += entryPadRef.current.innerHTML ? `<br>${promptHtml}`: promptHtml;
         setEntryHtml(entryPadRef.current.innerHTML);
     };
@@ -221,6 +223,21 @@ export function DiaryView() {
     
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
         setEntryHtml(e.currentTarget.innerHTML);
+    };
+
+    const handleSummarize = async () => {
+        if (!entryPadRef.current || !entryHtml.trim() || isSummarizing) return;
+        setIsSummarizing(true);
+        const textToSummarize = entryPadRef.current.innerText; // Use innerText to get clean text without HTML
+        const result = await getSummary(textToSummarize);
+        setIsSummarizing(false);
+
+        if (result.summary && entryPadRef.current) {
+            entryPadRef.current.innerHTML = `<p>${result.summary}</p>`;
+            setEntryHtml(entryPadRef.current.innerHTML);
+        } else if (result.error) {
+            alert(`Summarization failed: ${result.error}`);
+        }
     };
 
 
@@ -296,7 +313,9 @@ export function DiaryView() {
 
                     <section className="card entry-area" ref={entryAreaCardRef}>
                         <div className="entry-toolbar">
-                            <Brain size={18} />
+                            <button onClick={handleSummarize} disabled={isSummarizing} className="disabled:opacity-50">
+                                <Brain size={18} className={isSummarizing ? 'animate-pulse' : ''}/>
+                            </button>
                             <Lightbulb size={18} />
                             <Hash size={18} />
                         </div>

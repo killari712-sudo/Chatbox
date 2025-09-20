@@ -6,6 +6,7 @@ import { inputSuggestionAlternatives } from "@/ai/flows/input-suggestion-alterna
 import { analyzeMoodAndSuggestResources } from "@/ai/flows/mood-tracking-and-ui-adaptation";
 import { getProactiveSuggestions } from "@/ai/flows/proactive-suggestions";
 import { getNutritionInfo as getNutritionInfoFlow } from "@/ai/flows/nutrition-analysis";
+import { summarizeText as summarizeTextFlow } from "@/ai/flows/summarize-text";
 import { z } from "zod";
 
 export async function getChatResponse(userInput: string) {
@@ -56,5 +57,18 @@ export async function getNutritionInfo(foodItem: string) {
     } catch (error) {
         console.error("Error in getNutritionInfo action:", error);
         return { error: "Failed to get nutrition information from AI." };
+    }
+}
+
+export async function getSummary(text: string) {
+    if (!text.trim()) {
+        return { summary: "" };
+    }
+    try {
+        const result = await summarizeTextFlow({ text });
+        return { summary: result.summary };
+    } catch (error) {
+        console.error("Error in getSummary action:", error);
+        return { error: "Failed to get summary from AI." };
     }
 }
