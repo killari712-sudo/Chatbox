@@ -1,8 +1,12 @@
 
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 export function QueryHubView() {
+    const { user } = useAuth();
+    const [queries, setQueries] = useState<any[]>([]);
+
     useEffect(() => {
         const queryFeed = document.getElementById('query-feed');
         const newQueryModal = document.getElementById('new-query-modal');
@@ -11,28 +15,6 @@ export function QueryHubView() {
         const newQueryForm = document.getElementById('new-query-form');
         const crisisOverlay = document.getElementById('crisis-overlay');
         const expandedQueryContent = document.getElementById('expanded-query-content');
-
-        let mockQueries: any[] = [
-            {
-                id: 'q1',
-                title: 'How to cope with exam anxiety?',
-                description: 'I have a big exam coming up and I am feeling super stressed. Any tips on how to stay calm and focused? I have tried deep breathing but it is not helping much. I feel like my heart is always racing and I can\'t concentrate on my studies.',
-                user: 'Alex Smith',
-                type: 'Student',
-                views: 125,
-                replies: 12,
-                upvotes: 42,
-                time: '2h ago',
-                tags: ['#ExamStress', '#Anxiety', '#Focus'],
-                mood: 'anxious',
-                verified: true,
-                isAnonymous: false,
-                repliesData: [
-                    { user: 'Dr. Evelyn', type: 'Counselor', verified: true, text: 'It\'s completely normal to feel this way. Have you tried the 5-4-3-2-1 grounding technique? It can be very effective. Also, ensure you\'re getting enough sleep.', upvotes: 15 },
-                    { user: 'Sarah J.', type: 'Alumni', verified: false, text: 'I used to get this a lot! Pomodoro technique (25 min study, 5 min break) really helped me. Good luck!', upvotes: 9 }
-                ]
-            }
-        ];
 
         const moodEmojis: { [key: string]: string } = {
             'anxious': '😥', 'stressed': '😰', 'sad': '😔', 'happy': '😊'
@@ -154,7 +136,7 @@ export function QueryHubView() {
                 
                 <h3 class="text-xl font-semibold mb-4">Replies (${query.replies})</h3>
                 <div class="space-y-4" id="replies-container">
-                    ${query.repliesData.map((reply: any) => {
+                    ${query.repliesData?.map((reply: any) => {
                         const isCounselor = reply.type === 'Counselor';
                         const isMentor = reply.type === 'Mentor' || reply.type === 'Alumni';
                         const replyClasses = `p-4 rounded-xl frosted-card ${isCounselor ? 'counselor-reply' : ''} ${isMentor ? 'mentor-reply' : ''}`;
@@ -171,7 +153,7 @@ export function QueryHubView() {
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+                    }).join('') || '<p class="text-gray-500">No replies yet. Be the first to respond!</p>'}
                 </div>
             `;
             if (expandedQueryContent) expandedQueryContent.innerHTML = queryHtml;
@@ -179,11 +161,19 @@ export function QueryHubView() {
         }
 
         askButton?.addEventListener('click', () => {
-            showModal('new-query-modal');
+            if (user) {
+                showModal('new-query-modal');
+            } else {
+                alert("Please sign in to ask a question.");
+            }
         });
 
-        newQueryForm?.addEventListener('submit', (e) => {
+        const handleFormSubmit = (e: Event) => {
             e.preventDefault();
+            if (!user) {
+                alert("You must be logged in to post.");
+                return;
+            }
             const description = (document.getElementById('query-description') as HTMLTextAreaElement).value;
             const isCrisis = crisisWords.some(word => description.toLowerCase().includes(word));
             
@@ -192,10 +182,10 @@ export function QueryHubView() {
                 showCrisisOverlay();
             } else {
                 const newQuery = {
-                    id: `q${mockQueries.length + 1}`,
+                    id: `q${queries.length + 1}`,
                     title: (document.getElementById('query-title') as HTMLInputElement).value,
                     description: description,
-                    user: 'John Doe',
+                    user: user.displayName || 'User',
                     type: 'Student',
                     views: 0,
                     replies: 0,
@@ -206,19 +196,30 @@ export function QueryHubView() {
                     repliesData: []
                 };
                 
-                mockQueries.unshift(newQuery);
+                setQueries(prev => [newQuery, ...prev]);
 
                 hideModal('new-query-modal');
-                renderQueries();
+                 if(newQueryForm) {
+                    (newQueryForm as HTMLFormElement).reset();
+                 }
             }
-        });
+        };
 
-        function renderQueries() {
+        newQueryForm?.addEventListener('submit', handleFormSubmit);
+
+        function renderQueries(queriesToRender: any[]) {
             if (!queryFeed) return;
             queryFeed.innerHTML = '';
-            mockQueries.forEach(query => {
-                queryFeed.appendChild(renderQueryCard(query));
-            });
+            if (queriesToRender.length === 0) {
+                queryFeed.innerHTML = `<div class="text-center py-16">
+                    <p class="text-gray-500 text-xl">No queries yet.</p>
+                    <p class="text-gray-400 mt-2">Be the first one to ask a question!</p>
+                </div>`;
+            } else {
+                queriesToRender.forEach(query => {
+                    queryFeed.appendChild(renderQueryCard(query));
+                });
+            }
         }
 
         function renderHashtags() {
@@ -246,7 +247,7 @@ export function QueryHubView() {
         
         (window as any).hideModal = hideModal;
 
-        renderQueries();
+        renderQueries(queries);
         renderHashtags();
 
         const resizeHandler = () => {
@@ -272,9 +273,32 @@ export function QueryHubView() {
         
         return () => {
           window.removeEventListener('resize', resizeHandler);
+          newQueryForm?.removeEventListener('submit', handleFormSubmit);
         }
 
-    }, []);
+    }, [user, queries]);
+
+    useEffect(() => {
+        const queryFeed = document.getElementById('query-feed');
+        if (!queryFeed) return;
+        queryFeed.innerHTML = '';
+        if (queries.length === 0) {
+            queryFeed.innerHTML = `<div class="text-center py-16">
+                <p class="text-gray-500 text-xl">No queries yet.</p>
+                <p class="text-gray-400 mt-2">Be the first one to ask a question!</p>
+            </div>`;
+        } else {
+            queries.forEach(query => {
+                // This is a simplified render; the full render logic is in the other useEffect
+                const card = document.createElement('div');
+                card.className = 'frosted-card p-6 rounded-2xl flex flex-col space-y-4 cursor-pointer hover:border-gray-500 transition-colors fade-slide-up';
+                card.innerHTML = `<h2 class="text-xl font-bold text-gray-800 mb-2">${query.title}</h2><p class="text-gray-600 line-clamp-2">${query.description}</p>`;
+                card.onclick = () => { /* Logic to show expanded view is in other useEffect */ };
+                queryFeed.appendChild(card);
+            });
+        }
+    }, [queries]);
+
 
     return (
         <div className='query-hub-body'>
@@ -312,7 +336,7 @@ export function QueryHubView() {
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                                 </div>
                             </div>
-                            <button id="ask-button" className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-2 px-6 rounded-full transition-transform transform hover:scale-105 ripple-effect">
+                            <button id="ask-button" className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-2 px-6 rounded-full transition-transform transform hover:scale-105 ripple-effect disabled:opacity-50 disabled:cursor-not-allowed" disabled={!user}>
                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-plus inline-block mr-1"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Ask
                             </button>
                         </div>
@@ -334,7 +358,7 @@ export function QueryHubView() {
                     <div className="frosted-card p-6 rounded-2xl border-red-300/50">
                         <div className="flex items-center space-x-3 mb-4">
                             <span className="text-3xl">🚨</span>
-                            <h3 className="text-xl font-semibold">Crisis Detected</h3>
+                            <h3 className="text-xl font-semibold">Crisis Detection</h3>
                         </div>
                         <p className="text-gray-500 mb-4">Our AI has flagged a post that may need urgent attention. We are here to help.</p>
                         <button className="sos-btn w-full bg-red-600 text-white font-bold py-3 px-6 rounded-full transition-colors hover:bg-red-700">
@@ -392,13 +416,13 @@ export function QueryHubView() {
                     <div id="expanded-query-content">
                     </div>
                     <div id="reply-tools" className="mt-6">
-                        <textarea id="reply-textarea" placeholder="Write a reply..." rows={3} className="w-full p-3 rounded-xl frosted-card border-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-gray-800 placeholder-gray-500"></textarea>
+                        <textarea id="reply-textarea" placeholder="Write a reply..." rows={3} className="w-full p-3 rounded-xl frosted-card border-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-gray-800 placeholder-gray-500" disabled={!user}></textarea>
                         <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center space-x-2 text-sm text-gray-600">
                                 <label htmlFor="reply-anonymous">Reply anonymously</label>
                                 <input type="checkbox" id="reply-anonymous" className="form-checkbox rounded text-blue-500" />
                             </div>
-                            <button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors hover:bg-blue-700">Post Reply</button>
+                            <button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors hover:bg-blue-700 disabled:opacity-50" disabled={!user}>Post Reply</button>
                         </div>
                     </div>
                 </div>
