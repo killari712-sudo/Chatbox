@@ -256,8 +256,8 @@ export function ChatView() {
                 {/* CHAT INPUT BAR - Only show if Home is active */}
                 {activeView === 'Home' && (
                   <div className="w-full flex-shrink-0 px-4 md:px-6 pb-4 md:pb-6 pt-2">
-                    <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto glassmorphic-dark glowing-edge rounded-full p-2 flex items-center gap-2 shadow-2xl shadow-black/10">
-                        <Button type="button" variant="ghost" size="icon" className="w-10 h-10 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                    <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto glassmorphic-dark glowing-edge rounded-full p-1.5 flex items-center gap-2 shadow-2xl shadow-black/10">
+                        <Button type="button" variant="ghost" size="icon" className="w-9 h-9 rounded-full flex-shrink-0 hover:bg-blue-500/10">
                           <Paperclip className="w-5 h-5 text-blue-600" />
                         </Button>
                         <Textarea
@@ -272,13 +272,13 @@ export function ChatView() {
                           }}
                           rows={1}
                           placeholder="Type your message..."
-                          className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-2 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden"
+                          className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-1.5 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden"
                           disabled={isPending}
                         />
-                        <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-10 h-10 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                        <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-9 h-9 rounded-full flex-shrink-0 hover:bg-blue-500/10">
                           <Mic className="w-5 h-5 text-blue-600" />
                         </Button>
-                        <Button type="submit" size="icon" className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 text-white flex-shrink-0" disabled={isPending || !input.trim()}>
+                        <Button type="submit" size="icon" className="w-9 h-9 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 text-white flex-shrink-0" disabled={isPending || !input.trim()}>
                           <Send className="w-5 h-5" />
                         </Button>
                     </form>
