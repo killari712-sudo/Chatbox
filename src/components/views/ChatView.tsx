@@ -39,7 +39,6 @@ import { WellnessView } from "./WellnessView";
 import { MentorView } from "./MentorView";
 import { useAuth } from "@/hooks/useAuth";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { SupportCirclesView } from "./SupportCirclesView";
 import { HabitBuilderView } from "./HabitBuilderView";
 
 
@@ -140,7 +139,6 @@ export function ChatView() {
       { type: 'item', icon: NotebookPen, label: 'Diary', tooltip: 'Your private, encrypted journal.' },
       { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
       { type: 'divider', label: 'Community' },
-      { type: 'item', icon: Users, label: 'Support Circles', tooltip: 'Connect with peer support groups.' },
       { type: 'item', icon: MessageSquare, label: 'Query Hub', tooltip: 'Ask questions and get answers from the community.' },
       { type: 'item', icon: GraduationCap, label: 'Mentors', tooltip: 'Find and chat with mentors.' },
       { type: 'divider', label: 'Settings' },
@@ -212,8 +210,6 @@ export function ChatView() {
         );
       case 'Diary':
         return <DiaryView />;
-      case 'Support Circles':
-        return <SupportCirclesView />;
       case 'Query Hub':
         return <QueryHubView />;
       case 'Roadmaps':
