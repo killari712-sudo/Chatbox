@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {getCurrentDate} from '@/ai/tools/date';
 
 const MoodBasedResponseInputSchema = z.object({
   userInput: z
@@ -39,6 +40,7 @@ Text: {{{text}}}`,
 
 const generateResponsePrompt = ai.definePrompt({
   name: 'generateResponsePrompt',
+  tools: [getCurrentDate],
   input: {
     schema: z.object({
       userInput: z.string(),
@@ -47,6 +49,7 @@ const generateResponsePrompt = ai.definePrompt({
   },
   output: {schema: MoodBasedResponseOutputSchema},
   prompt: `You are an AI assistant that responds to user input with a tone appropriate to their mood.
+If the user asks for the current date, use the provided tool to get it.
 
 User Input: {{{userInput}}}
 
