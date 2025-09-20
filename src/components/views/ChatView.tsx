@@ -68,12 +68,6 @@ export function ChatView() {
     }
   }, [messages]);
 
-  useEffect(() => {
-    setMessages([
-        { id: '1', role: 'assistant', content: 'Hello! Welcome to your personal ecosystem. How can I assist you today?' },
-    ]);
-  }, []);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
     // Auto-resize textarea
