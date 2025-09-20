@@ -135,7 +135,6 @@ export function ChatView() {
       { type: 'divider', label: 'Community' },
       { type: 'item', icon: MessageSquare, label: 'Query Hub', tooltip: 'Ask questions and get answers from the community.' },
       { type: 'item', icon: Users, label: 'Support', tooltip: 'Connect with friends and support groups.' },
-      { type: 'item', icon: GraduationCap, label: 'Mentors', tooltip: 'Find and chat with mentors.' },
       { type: 'divider', label: 'Settings' },
       { type: 'item', icon: Bot, label: 'Avatar & Voice', tooltip: 'Customize your AI assistant.' },
       { type: 'item', icon: AlertOctagon, label: 'SOS Crisis', isSOS: true, tooltip: 'Immediate crisis support.' }
