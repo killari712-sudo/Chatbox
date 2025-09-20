@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Brain, X } from 'lucide-react';
+import { Brain, X, Mic } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getSummary, analyzeMood } from "@/app/actions";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -87,6 +87,8 @@ export function DiaryView() {
     const entryAreaCardRef = useRef<HTMLDivElement>(null);
     const saveButtonRef = useRef<HTMLButtonElement>(null);
     const entryPadRef = useRef<HTMLDivElement>(null);
+    const recognitionRef = useRef<any>(null);
+
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -97,6 +99,7 @@ export function DiaryView() {
     const [isSaving, setIsSaving] = useState(false);
     const [isTrendsModalOpen, setIsTrendsModalOpen] = useState(false);
     const [moodData, setMoodData] = useState<any[]>([]);
+    const [isRecording, setIsRecording] = useState(false);
     
 
     // Load entries from localStorage on initial render
@@ -109,6 +112,39 @@ export function DiaryView() {
         } catch (error) {
             console.error("Failed to parse diary entries from localStorage", error);
         }
+        
+        // Setup Speech Recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            recognitionRef.current = new SpeechRecognition();
+            recognitionRef.current.continuous = true;
+            recognitionRef.current.interimResults = true;
+
+            recognitionRef.current.onresult = (event: any) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                if (entryPadRef.current) {
+                    // This is a simplified way to append text.
+                    // A more robust solution would handle cursor position.
+                    entryPadRef.current.innerHTML = entryHtml + finalTranscript + interimTranscript;
+                }
+            };
+            
+            recognitionRef.current.onend = () => {
+                setIsRecording(false);
+                if (entryPadRef.current) {
+                    setEntryHtml(entryPadRef.current.innerHTML);
+                }
+            };
+        }
+
     }, []);
 
 
@@ -238,6 +274,20 @@ export function DiaryView() {
         setIsTrendsModalOpen(true);
     };
 
+    const toggleRecording = () => {
+        if (!isEditable) return;
+        if (isRecording) {
+            recognitionRef.current?.stop();
+            setIsRecording(false);
+        } else {
+            if (entryPadRef.current) {
+                setEntryHtml(entryPadRef.current.innerHTML); // Save current content before recording
+            }
+            recognitionRef.current?.start();
+            setIsRecording(true);
+        }
+    };
+
 
     const renderCalendar = () => {
         const year = currentMonth.getFullYear();
@@ -343,6 +393,14 @@ export function DiaryView() {
                         </div>
 
                         <div className="flex items-center justify-end mt-auto gap-4">
+                             <button
+                                onClick={toggleRecording}
+                                disabled={!isEditable}
+                                className={`mic-button ${isRecording ? 'recording' : ''}`}
+                                title={isRecording ? "Stop recording" : "Start recording"}
+                            >
+                                <Mic size={20} />
+                            </button>
                             <button 
                                 className="save-button" 
                                 ref={saveButtonRef} 
