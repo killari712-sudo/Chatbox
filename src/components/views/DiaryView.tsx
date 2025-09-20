@@ -72,6 +72,8 @@ export function DiaryView() {
     const [entryText, setEntryText] = useState('');
     const [allEntries, setAllEntries] = useState<AllEntries>({});
     const [isRecording, setIsRecording] = useState(false);
+    const [warningMessage, setWarningMessage] = useState('');
+
 
     // Load entries from localStorage on initial render
     useEffect(() => {
@@ -117,18 +119,27 @@ export function DiaryView() {
         } else {
             console.log("Speech Recognition not supported in this browser.");
         }
-    }, []);
+    }, [isRecording]);
 
     // Update view when selectedDate or allEntries change
     useEffect(() => {
         const dateKey = selectedDate.toDateString();
         const entry = allEntries[dateKey];
         setEntryText(entry?.text || '');
+
+        if (!entry && isPast(selectedDate)) {
+            const dateString = selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const warning = `⚠️ Warning: No data saved on ${dateString}.`;
+            setWarningMessage(warning);
+            alert(warning);
+        } else {
+            setWarningMessage('');
+        }
     }, [selectedDate, allEntries]);
 
 
     const handleSave = () => {
-        if (isPast(selectedDate) || isFuture(selectedDate)) return; // Should not be possible but as a safeguard
+        if (!isToday(selectedDate)) return; // Should not be possible but as a safeguard
 
         const dateKey = selectedDate.toDateString();
         const newEntries: AllEntries = {
@@ -263,13 +274,21 @@ export function DiaryView() {
                             <Lightbulb size={18} />
                             <Hash size={18} />
                         </div>
-                        <textarea 
-                            className="entry-pad" 
-                            placeholder={isEditable ? "Start writing your entry..." : "This entry is read-only."}
-                            value={entryText}
-                            onChange={(e) => isEditable && setEntryText(e.target.value)}
-                            readOnly={!isEditable}
-                        />
+                        <div className="entry-pad-container">
+                            <textarea 
+                                className="entry-pad" 
+                                placeholder={isEditable ? "Start writing your entry..." : ""}
+                                value={entryText}
+                                onChange={(e) => isEditable && setEntryText(e.target.value)}
+                                readOnly={!isEditable}
+                            />
+                            {warningMessage && (
+                                <div className="entry-pad-overlay">
+                                    {warningMessage}
+                                </div>
+                            )}
+                        </div>
+
                         <div className="flex items-center justify-end mt-auto gap-4">
                             {isEditable && (
                                 <button
@@ -308,5 +327,3 @@ export function DiaryView() {
         </ScrollArea>
     );
 }
-
-    
