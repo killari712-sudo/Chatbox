@@ -39,6 +39,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { HabitBuilderView } from "./HabitBuilderView";
 import { RoadmapsView } from "./RoadmapsView";
+import { FriendFinderView } from "./FriendFinderView";
 
 
 export function ChatView() {
@@ -133,6 +134,7 @@ export function ChatView() {
       { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
       { type: 'divider', label: 'Community' },
       { type: 'item', icon: MessageSquare, label: 'Query Hub', tooltip: 'Ask questions and get answers from the community.' },
+      { type: 'item', icon: Users, label: 'Support', tooltip: 'Chat with friends and support groups.' },
       { type: 'divider', label: 'Settings' },
       { type: 'item', icon: Bot, label: 'Avatar & Voice', tooltip: 'Customize your AI assistant.' },
       { type: 'item', icon: AlertOctagon, label: 'SOS Crisis', isSOS: true, tooltip: 'Immediate crisis support.' }
@@ -169,6 +171,7 @@ export function ChatView() {
     { label: 'Wellness', icon: HeartPulse, view: 'Wellness' },
     { label: 'Habit Builder', icon: BarChart3, view: 'Habit Builder' },
     { label: 'Mentors', icon: GraduationCap, view: 'Mentors' },
+    { label: 'Support', icon: Users, view: 'Support' },
   ];
 
   const renderActiveView = () => {
@@ -243,6 +246,8 @@ export function ChatView() {
         return <HabitBuilderView />;
       case 'Roadmaps':
         return <RoadmapsView onNavigate={setActiveView} />;
+      case 'Support':
+        return <FriendFinderView onNavigate={setActiveView} />;
       default:
         return (
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
@@ -409,3 +414,4 @@ export function ChatView() {
     
 
     
+
