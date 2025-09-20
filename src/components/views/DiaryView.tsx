@@ -316,8 +316,6 @@ export function DiaryView() {
                             <button onClick={handleSummarize} disabled={isSummarizing} className="disabled:opacity-50">
                                 <Brain size={18} className={isSummarizing ? 'animate-pulse' : ''}/>
                             </button>
-                            <Lightbulb size={18} />
-                            <Hash size={18} />
                         </div>
                         <div className="entry-pad-container">
                             <div 
