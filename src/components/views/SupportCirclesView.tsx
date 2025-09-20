@@ -146,10 +146,6 @@ export function SupportCirclesView() {
 
     return (
         <div className="support-circles-body">
-            <header className="top-nav">
-                <h1 className="title">Support Circles</h1>
-            </header>
-
             <main id="circle-page" className={isChatActive ? 'hidden' : ''}>
                 <h2 className="grid-header">✨ Discover Circles</h2>
                 <div className="circle-grid">

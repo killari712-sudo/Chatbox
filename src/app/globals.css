@@ -1799,26 +1799,27 @@
 
 /* --- SupportCirclesView styles --- */
 .support-circles-body {
-    --bg-color: #0c0a18;
-    --primary-glow: #00ffff;
-    --secondary-glow: #ff00c1;
-    --card-bg: rgba(22, 22, 49, 0.4);
-    --card-border: rgba(0, 255, 255, 0.2);
-    --text-color: #e0e0e0;
-    --text-muted: #a0a0c0;
-    --error-color: #ff4d6d;
-    --chat-bg-color: #120f26;
-    --message-bg: #22213d;
-    --input-bg: #2e2d46;
+    --bg-color: #f0f4f8;
+    --primary-glow: #4a90e2;
+    --secondary-glow: #8B5CF6;
+    --card-bg: rgba(255, 255, 255, 0.6);
+    --card-border: rgba(200, 200, 200, 0.4);
+    --text-color: #1a202c;
+    --text-muted: #718096;
+    --error-color: #ef4444;
+    --chat-bg-color: #e2e8f0;
+    --message-bg: #ffffff;
+    --input-bg: #ffffff;
     font-family: 'Poppins', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
-    background-image: radial-gradient(circle at 1% 1%, rgba(0, 255, 255, 0.15) 0%, transparent 30%), radial-gradient(circle at 99% 99%, rgba(255, 0, 193, 0.15) 0%, transparent 40%);
+    background-image: radial-gradient(circle at 1% 1%, rgba(74, 144, 226, 0.1), transparent 30%), radial-gradient(circle at 99% 99%, rgba(139, 92, 246, 0.1), transparent 40%);
     min-height: 100%;
     width: 100%;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    padding: 2rem;
 }
 
 .support-circles-body .top-nav {
@@ -1830,15 +1831,15 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(12, 10, 24, 0.5);
+    background: rgba(240, 244, 248, 0.5);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(200, 200, 200, 0.2);
 }
 
 .support-circles-body .title {
     font-size: 2rem;
     font-weight: 700;
-    background: linear-gradient(90deg, var(--primary-glow), var(--secondary-glow), var(--primary-glow));
+    background: linear-gradient(90deg, var(--primary-glow), var(--secondary-glow));
     background-size: 200% auto;
     color: #fff;
     background-clip: text;
@@ -1852,7 +1853,7 @@
 }
 
 .support-circles-body main {
-    padding: 2rem 5%;
+    padding: 0;
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -1868,6 +1869,7 @@
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
     font-weight: 600;
+    color: var(--text-color);
 }
 
 .support-circles-body .circle-grid {
@@ -1887,6 +1889,7 @@
     border: 2px dashed var(--card-border);
     border-radius: 16px;
     align-self: center;
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .support-circles-body .circle-card {
@@ -1901,41 +1904,46 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
 }
 
 .support-circles-body .circle-card:hover {
-    transform: scale(1.05) rotateX(10deg) rotateY(5deg);
-    animation: pulse-glow-circle 2s infinite alternate;
+    transform: scale(1.05);
+    box-shadow: 0 10px 40px -10px var(--primary-glow);
 }
 
 @keyframes pulse-glow-circle {
-    from { box-shadow: 0 0 40px -10px var(--primary-glow); }
-    to { box-shadow: 0 0 50px 0px var(--primary-glow); }
+    from { box-shadow: 0 0 20px -10px var(--primary-glow); }
+    to { box-shadow: 0 0 30px 0px var(--primary-glow); }
 }
 
-.support-circles-body .card-header { display: flex; align-items: center; gap: 1rem; position: relative; padding-bottom: 1rem; }
-.support-circles-body .card-header::after { content: ''; position: absolute; bottom: 0; left: -1.5rem; right: -1.5rem; height: 4px; background: linear-gradient(90deg, var(--primary-glow), var(--secondary-glow)); }
+.support-circles-body .card-header { display: flex; align-items: center; gap: 1rem; position: relative; padding-bottom: 1rem; border-bottom: 1px solid var(--card-border); }
 .support-circles-body .card-icon { font-size: 2.5rem; }
-.support-circles-body .circle-name { font-size: 1.25rem; font-weight: 600; }
+.support-circles-body .circle-name { font-size: 1.25rem; font-weight: 600; color: var(--text-color); }
 .support-circles-body .circle-tagline { color: var(--text-muted); font-size: 0.9rem; }
 .support-circles-body .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
 .support-circles-body .member-info { display: flex; align-items: center; gap: 0.5rem; }
 .support-circles-body .avatars { display: flex; }
 .support-circles-body .avatars img { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--bg-color); margin-left: -10px; }
 .support-circles-body .avatars img:first-child { margin-left: 0; }
-.support-circles-body .activity-status { font-size: 0.8rem; color: #39ff14; font-weight: 600; }
+.support-circles-body .activity-status { font-size: 0.8rem; color: #16a34a; font-weight: 600; }
 .support-circles-body .join-btn {
-    background: transparent;
-    border: 2px solid var(--primary-glow);
-    color: var(--primary-glow);
+    background: var(--primary-glow);
+    border: none;
+    color: white;
     padding: 0.6rem 1.2rem;
     border-radius: 50px;
     cursor: pointer;
     font-weight: 600;
     position: relative;
     overflow: hidden;
-    transition: color 0.3s ease, background 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     z-index: 1;
+}
+
+.support-circles-body .join-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px var(--primary-glow);
 }
 
 .support-circles-body .create-circle-fab {
@@ -1953,13 +1961,13 @@
     color: white;
     cursor: pointer;
     z-index: 999;
-    box-shadow: 0 0 20px var(--primary-glow), 0 0 30px var(--secondary-glow);
+    box-shadow: 0 10px 20px rgba(74, 144, 226, 0.4);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .support-circles-body .create-circle-fab:hover {
     transform: scale(1.1) rotate(90deg);
-    box-shadow: 0 0 30px var(--primary-glow), 0 0 40px var(--secondary-glow);
+    box-shadow: 0 15px 30px rgba(74, 144, 226, 0.5);
 }
 
 .support-circles-body .modal-backdrop {
@@ -1968,7 +1976,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(12, 10, 24, 0.5);
+    background: rgba(240, 244, 248, 0.5);
     backdrop-filter: blur(10px);
     z-index: 1000;
     display: flex;
@@ -1996,6 +2004,7 @@
     transform: scale(0.9);
     transition: transform 0.25s ease;
     position: relative;
+    color: var(--text-color);
 }
 
 .support-circles-body .modal-backdrop.active .modal-content {
@@ -2010,12 +2019,13 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
+    color: var(--text-color);
 }
 
 .support-circles-body .form-step input[type="text"],
 .support-circles-body .form-step textarea {
     width: 100%;
-    background: rgba(0,0,0,0.2);
+    background: rgba(255,255,255,0.7);
     border: 1px solid var(--card-border);
     border-radius: 50px;
     padding: 0.75rem 1rem;
@@ -2050,28 +2060,28 @@
 }
 
 .support-circles-body .photo-upload-area { display: flex; align-items: center; gap: 1rem; }
-.support-circles-body .avatar-placeholder { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(45deg, #1e1e4b, #3b3b7b); position: relative; cursor: pointer; border: 2px dashed var(--card-border); }
+.support-circles-body .avatar-placeholder { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(45deg, #dbeafe, #e0e7ff); position: relative; cursor: pointer; border: 2px dashed var(--card-border); }
 .support-circles-body .avatar-placeholder .camera-icon { position: absolute; bottom: 0; right: 0; width: 30px; height: 30px; background: var(--bg-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; border: 1px solid var(--card-border); }
 
 .support-circles-body .category-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.support-circles-body .chip { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); padding: 0.5rem 1rem; border-radius: 50px; cursor: pointer; transition: all 0.2s ease; }
+.support-circles-body .chip { background: rgba(255,255,255,0.8); border: 1px solid var(--card-border); padding: 0.5rem 1rem; border-radius: 50px; cursor: pointer; transition: all 0.2s ease; color: var(--text-muted); }
 .support-circles-body .chip:hover { transform: scale(1.05); }
-.support-circles-body .chip.selected { background: var(--primary-glow); color: var(--bg-color); border-color: var(--primary-glow); box-shadow: 0 0 10px var(--primary-glow); font-weight: 600; }
+.support-circles-body .chip.selected { background: var(--primary-glow); color: white; border-color: var(--primary-glow); box-shadow: 0 0 10px var(--primary-glow); font-weight: 600; }
 
-.support-circles-body .privacy-toggle { display: flex; background: rgba(0,0,0,0.3); border-radius: 50px; padding: 0.25rem; border: 1px solid var(--card-border); }
-.support-circles-body .privacy-option { flex: 1; text-align: center; padding: 0.5rem; border-radius: 50px; cursor: pointer; transition: background 0.2s; }
-.support-circles-body .privacy-option.selected { background: var(--primary-glow); color: var(--bg-color); font-weight: 600; }
+.support-circles-body .privacy-toggle { display: flex; background: rgba(236, 239, 241, 0.8); border-radius: 50px; padding: 0.25rem; border: 1px solid var(--card-border); }
+.support-circles-body .privacy-option { flex: 1; text-align: center; padding: 0.5rem; border-radius: 50px; cursor: pointer; transition: background 0.2s; color: var(--text-muted); }
+.support-circles-body .privacy-option.selected { background: var(--primary-glow); color: white; font-weight: 600; }
 
 .support-circles-body .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; }
 .support-circles-body .modal-btn { padding: 0.75rem 1.5rem; border-radius: 50px; border: none; font-weight: 600; font-size: 1rem; cursor: pointer; transition: transform 0.2s; }
 .support-circles-body .modal-btn:hover { transform: scale(1.05); }
-.support-circles-body .btn-cancel { background: rgba(255,255,255,0.1); color: var(--text-color); }
-.support-circles-body .btn-create { background: linear-gradient(90deg, var(--primary-glow), #00aaff); color: var(--bg-color); position: relative; }
+.support-circles-body .btn-cancel { background: #e2e8f0; color: var(--text-color); }
+.support-circles-body .btn-create { background: linear-gradient(90deg, var(--primary-glow), #6366f1); color: white; position: relative; }
 
 .support-circles-body .loading-spinner {
-    border: 3px solid rgba(0, 0, 0, 0.3);
+    border: 3px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    border-top: 3px solid var(--bg-color);
+    border-top: 3px solid white;
     width: 20px;
     height: 20px;
     animation: spin 1s linear infinite;
@@ -2095,28 +2105,28 @@
 
 .support-circles-body .success-checkmark {
     width: 80px; height: 80px; border-radius: 50%;
-    stroke-width: 4; stroke: #39ff14;
+    stroke-width: 4; stroke: #16a34a;
     stroke-miterlimit: 10;
-    box-shadow: inset 0px 0px 0px #39ff14;
+    box-shadow: inset 0px 0px 0px #16a34a;
     animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;
 }
-.support-circles-body .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 4; stroke-miterlimit: 10; stroke: #39ff14; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
+.support-circles-body .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 4; stroke-miterlimit: 10; stroke: #16a34a; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
 .support-circles-body .checkmark-check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
 @keyframes stroke { 100% { stroke-dashoffset: 0; } }
 @keyframes scale { 0%, 100% { transform: translate(-50%, -50%) scale3d(1, 1, 1); } 50% { transform: translate(-50%, -50%) scale3d(1.1, 1.1, 1); } }
-@keyframes fill { 100% { box-shadow: inset 0px 0px 0px 40px #39ff14; } }
+@keyframes fill { 100% { box-shadow: inset 0px 0px 0px 40px #16a34a; } }
 
 .support-circles-body .snackbar {
     position: fixed;
     bottom: -100px;
     left: 50%;
     transform: translateX(-50%);
-    background: #2a2a50;
+    background: #2c3e50;
     color: white;
     padding: 1rem 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     transition: bottom 0.5s ease-in-out;
     z-index: 2000;
 }
@@ -2148,7 +2158,7 @@
     display: flex;
     align-items: center;
     padding: 1.25rem 5%;
-    background: var(--card-bg);
+    background: rgba(255, 255, 255, 0.6);
     border-bottom: 1px solid var(--card-border);
     backdrop-filter: blur(10px);
     z-index: 10;
@@ -2158,6 +2168,7 @@
     font-size: 1.5rem;
     cursor: pointer;
     margin-right: 1rem;
+    color: var(--text-color);
 }
 
 .support-circles-body .chat-header .circle-info {
@@ -2167,6 +2178,7 @@
 
 .support-circles-body .chat-header .circle-name {
     font-weight: 600;
+    color: var(--text-color);
 }
 
 .support-circles-body .chat-messages {
@@ -2185,11 +2197,12 @@
     border-radius: 18px;
     max-width: 80%;
     align-self: flex-start;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .support-circles-body .my-message {
     background-color: var(--primary-glow);
-    color: var(--bg-color);
+    color: white;
     align-self: flex-end;
 }
 
@@ -2201,14 +2214,14 @@
 .support-circles-body .chat-input-area {
     display: flex;
     padding: 1rem;
-    background: var(--chat-bg-color);
+    background: var(--bg-color);
     border-top: 1px solid var(--card-border);
 }
 
 .support-circles-body .chat-input-area input {
     flex-grow: 1;
     background-color: var(--input-bg);
-    border: none;
+    border: 1px solid var(--card-border);
     border-radius: 25px;
     padding: 10px 15px;
     color: var(--text-color);
@@ -2216,6 +2229,8 @@
 
 .support-circles-body .chat-input-area input:focus {
     outline: none;
+    border-color: var(--primary-glow);
+    box-shadow: 0 0 5px var(--primary-glow);
 }
 
 .support-circles-body .chat-input-area button {
@@ -2582,4 +2597,5 @@ input:checked + .slider:before { transform: translateX(22px); }
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
 }
 .habit-btn-generate:hover { box-shadow: 0 0 30px rgba(99, 102, 241, 0.8); }
+
 
