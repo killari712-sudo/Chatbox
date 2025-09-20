@@ -162,6 +162,11 @@
     50% { transform: translateY(-15px); }
 }
 
+.suggestion-button {
+    @apply flex items-center justify-start gap-3 p-4 bg-white/60 backdrop-blur-sm border border-gray-200/80 rounded-full text-gray-700 font-medium transition-all duration-200;
+    @apply hover:bg-white hover:border-gray-300 hover:shadow-lg hover:-translate-y-1;
+}
+
 /* DiaryView styles */
 
 .diary-body-styles {
@@ -1732,6 +1737,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 
   
+
 
 
 

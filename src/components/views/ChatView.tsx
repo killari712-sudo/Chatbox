@@ -16,6 +16,7 @@ import {
   Bot,
   GraduationCap,
   HeartPulse,
+  HelpCircle,
   Home,
   Loader2,
   Map,
@@ -23,11 +24,10 @@ import {
   Mic,
   NotebookPen,
   Paperclip,
+  Route,
   Send,
   Users,
   X,
-  Flame,
-  ClipboardList,
 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -166,40 +166,68 @@ export function ChatView() {
     ripple.addEventListener('animationend', () => ripple.remove());
   };
 
+  const suggestionButtons = [
+    { label: 'Query Hub', icon: HelpCircle, view: 'Query Hub' },
+    { label: 'Support', icon: Users, view: 'Support' },
+    { label: 'Diary', icon: NotebookPen, view: 'Diary' },
+    { label: 'My Journey', icon: Route, view: 'Roadmaps' },
+  ];
+
   const renderActiveView = () => {
     switch (activeView) {
       case 'Home':
         return (
           <div id="chat-view" className="flex flex-col h-full overflow-hidden p-4 md:p-6">
             <ScrollArea id="chat-container" className="flex-grow w-full max-w-4xl mx-auto pr-4" ref={scrollAreaRef}>
-              <div className="space-y-6">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex w-full items-start gap-3 animate-bubble-in ${
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    {message.role === 'assistant' && aiAvatar && (
-                        <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />
-                    )}
-                    <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-blue-500 text-white rounded-br-lg' : 'bg-white/80 rounded-bl-lg'}`}>
-                        <p>{message.content}</p>
-                    </div>
-                    {message.role === 'user' && user && user.photoURL && (
-                         <Image src={user.photoURL} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
-                    )}
+              {messages.length === 0 && !isPending ? (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <h2 className="text-2xl font-semibold text-gray-600 mb-6">What can I help with?</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md">
+                    {suggestionButtons.map((btn) => {
+                      const Icon = btn.icon;
+                      return (
+                        <button
+                          key={btn.label}
+                          onClick={() => setActiveView(btn.view)}
+                          className="suggestion-button"
+                        >
+                          <Icon className="w-5 h-5" />
+                          <span>{btn.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
-                ))}
-                {isPending && (
-                  <div className="flex items-start gap-4 animate-bubble-in">
-                    {aiAvatar && <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />}
-                    <div className="p-4 rounded-lg bg-white/80">
-                      <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex w-full items-start gap-3 animate-bubble-in ${
+                        message.role === "user" ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      {message.role === 'assistant' && aiAvatar && (
+                          <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />
+                      )}
+                      <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-blue-500 text-white rounded-br-lg' : 'bg-white/80 rounded-bl-lg'}`}>
+                          <p>{message.content}</p>
+                      </div>
+                      {message.role === 'user' && user && user.photoURL && (
+                           <Image src={user.photoURL} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
+                      )}
                     </div>
-                  </div>
-                )}
-              </div>
+                  ))}
+                  {isPending && (
+                    <div className="flex items-start gap-4 animate-bubble-in">
+                      {aiAvatar && <Image src={aiAvatar.imageUrl} alt="AI Avatar" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-gray-300" />}
+                      <div className="p-4 rounded-lg bg-white/80">
+                        <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </ScrollArea>
           </div>
         );
