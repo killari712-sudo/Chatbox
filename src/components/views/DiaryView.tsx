@@ -3,6 +3,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Mic } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Define the interface for the SpeechRecognition API
 interface SpeechRecognition extends EventTarget {
@@ -192,68 +193,72 @@ export function DiaryView() {
   };
 
   return (
-    <div className='diary-body-styles'>
-      <header className="header">
-        <h1 className="header-title">📓 Digital Diary</h1>
-        <p className="header-subtext" id="date-subtext"></p>
-      </header>
+    <ScrollArea className="h-full">
+      <div className='diary-body-styles'>
+        <header className="header">
+          <h1 className="header-title">📓 Digital Diary</h1>
+          <p className="header-subtext" id="date-subtext"></p>
+        </header>
 
-      <main className="dashboard-grid">
-        <section className="card mood-tracker">
-            <h2 className="card-title">How are you feeling today?</h2>
-            <div className="mood-emojis" id="mood-emojis">
-                <span className="mood-emoji">🙂</span>
-                <span className="mood-emoji">😐</span>
-                <span className="mood-emoji">😢</span>
-                <span className="mood-emoji">😍</span>
-                <span className="mood-emoji">❤️</span>
-            </div>
-        </section>
+        <main className="dashboard-grid">
+          <section className="card mood-tracker">
+              <h2 className="card-title">How are you feeling today?</h2>
+              <div className="mood-emojis" id="mood-emojis">
+                  <span className="mood-emoji">🙂</span>
+                  <span className="mood-emoji">😐</span>
+                  <span className="mood-emoji">😢</span>
+                  <span className="mood-emoji">😍</span>
+                  <span className="mood-emoji">❤️</span>
+              </div>
+          </section>
 
-        <section className="card daily-prompts">
-            <h2 className="card-title">Daily Prompts</h2>
-            <ul className="prompts-list" id="prompts-list">
-                <li>What made you smile today?</li>
-                <li>One challenge you faced?</li>
-                <li>What are you grateful for?</li>
-                <li>A small, happy moment from today…</li>
-                <li>What’s on your mind right now?</li>
-            </ul>
-            <button className="trends-button">📊 View Mood Trends</button>
-        </section>
+          <section className="card daily-prompts">
+              <h2 className="card-title">Daily Prompts</h2>
+              <ul className="prompts-list" id="prompts-list">
+                  <li>What made you smile today?</li>
+                  <li>One challenge you faced?</li>
+                  <li>What are you grateful for?</li>
+                  <li>A small, happy moment from today…</li>
+                  <li>What’s on your mind right now?</li>
+              </ul>
+              <button className="trends-button">📊 View Mood Trends</button>
+          </section>
 
-        <section className="card entry-area" id="entry-area-card" ref={entryAreaCardRef}>
-            <div className="entry-toolbar">
-                <span>🧠</span><span>💡</span><span>#️⃣</span>
-            </div>
-            <textarea className="entry-pad" id="entry-pad" ref={entryPadRef} placeholder="You didn’t write an entry on this day. Click to start."></textarea>
-            <div className="flex items-center justify-end mt-auto gap-4">
-              <button
-                  onClick={handleMicClick}
-                  className={`mic-button ${isRecording ? 'recording' : ''}`}
-                  title={isRecording ? 'Stop Recording' : 'Start Recording'}
-              >
-                  <Mic className="w-5 h-5" />
-              </button>
-              <button className="save-button" id="save-button" ref={saveButtonRef}>Save</button>
-            </div>
-        </section>
+          <section className="card entry-area" id="entry-area-card" ref={entryAreaCardRef}>
+              <div className="entry-toolbar">
+                  <span>🧠</span><span>💡</span><span>#️⃣</span>
+              </div>
+              <textarea className="entry-pad" id="entry-pad" ref={entryPadRef} placeholder="You didn’t write an entry on this day. Click to start."></textarea>
+              <div className="flex items-center justify-end mt-auto gap-4">
+                <button
+                    onClick={handleMicClick}
+                    className={`mic-button ${isRecording ? 'recording' : ''}`}
+                    title={isRecording ? 'Stop Recording' : 'Start Recording'}
+                >
+                    <Mic className="w-5 h-5" />
+                </button>
+                <button className="save-button" id="save-button" ref={saveButtonRef}>Save</button>
+              </div>
+          </section>
 
-        <section className="card calendar-timeline">
-            <h2 className="card-title" id="calendar-title"></h2>
-            <div className="calendar-grid" id="calendar-grid">
-            </div>
-        </section>
-      </main>
-    
-      <div className="fab-container">
-        <div className="fab-options">
-            <div className="fab-option" title="Text Entry">✍️</div>
-            <div className="fab-option" title="Voice Entry">🎤</div>
-            <div className="fab-option" title="Add Photo/Doodle">📷</div>
+          <section className="card calendar-timeline">
+              <h2 className="card-title" id="calendar-title"></h2>
+              <div className="calendar-grid" id="calendar-grid">
+              </div>
+          </section>
+        </main>
+      
+        <div className="fab-container">
+          <div className="fab-options">
+              <div className="fab-option" title="Text Entry">✍️</div>
+              <div className="fab-option" title="Voice Entry">🎤</div>
+              <div className="fab-option" title="Add Photo/Doodle">📷</div>
+          </div>
+          <div className="fab">+</div>
         </div>
-        <div className="fab">+</div>
       </div>
-    </div>
+    </ScrollArea>
   );
 }
+
+  
