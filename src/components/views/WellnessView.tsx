@@ -7,11 +7,6 @@ import { XCircle, ChevronLeft, ChevronRight, Lightbulb, Search, Save, Moon, Sun,
 import { getNutritionInfo } from '@/app/actions';
 
 // Utility functions
-const getBackgroundGradient = (hour: number) => {
-  if (hour >= 5 && hour < 12) return 'bg-gradient-to-br from-yellow-200 to-yellow-500';
-  if (hour >= 12 && hour < 18) return 'bg-gradient-to-br from-blue-400 to-blue-600';
-  return 'bg-gradient-to-br from-purple-900 to-indigo-900';
-};
 const getGreeting = (hour: number, name: string) => {
   if (hour >= 5 && hour < 12) return `Good Morning, ${name} ☀️`;
   if (hour >= 12 && hour < 18) return `Good Afternoon, ${name} 👋`;
@@ -64,15 +59,15 @@ const BreathingCoach = ({ onClose }: { onClose: () => void }) => {
 
     const aiSuggestion = "You seem stressed. Want to start a 5-min breathing session?";
     return (
-      <div className="modal-overlay wellness-modal-overlay">
+      <div className="wellness-modal-overlay">
         <motion.div 
-            className="modal-content wellness-modal-content bg-gradient-to-br from-gray-900/80 to-blue-900/70 backdrop-blur-md text-white"
+            className="wellness-modal-content text-slate-800"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
         >
           <h2 className="text-3xl font-bold mb-6 text-center">Breathing Coach</h2>
-          <p className="text-center text-white/70 mb-4">{aiSuggestion}</p>
+          <p className="text-center text-slate-600 mb-4">{aiSuggestion}</p>
           <div className="flex flex-col items-center justify-center my-8">
             <motion.div 
                 className="w-48 h-48 rounded-full bg-blue-400/50" 
@@ -80,15 +75,15 @@ const BreathingCoach = ({ onClose }: { onClose: () => void }) => {
                 initial="initial" 
                 animate={isBreathing ? breathingState : 'done'}
             />
-            <p className="mt-4 text-xl text-white capitalize">{isBreathing ? (<span className="animate-pulse">{breathingState}</span>) : ('Ready?')}</p>
-            <p className="text-white/70">{timer > 0 && `Time remaining: ${timer}s`}</p>
+            <p className="mt-4 text-xl capitalize">{isBreathing ? (<span className="animate-pulse">{breathingState}</span>) : ('Ready?')}</p>
+            <p className="text-slate-500">{timer > 0 && `Time remaining: ${timer}s`}</p>
           </div>
           <div className="flex justify-center space-x-4 mb-4">
-            <button className="btn-primary" onClick={() => startBreathing(60)}>1 min</button>
-            <button className="btn-primary" onClick={() => startBreathing(300)}>5 min</button>
-            <button className="btn-primary" onClick={() => startBreathing(600)}>10 min</button>
+            <button className="wellness-btn-primary" onClick={() => startBreathing(60)}>1 min</button>
+            <button className="wellness-btn-primary" onClick={() => startBreathing(300)}>5 min</button>
+            <button className="wellness-btn-primary" onClick={() => startBreathing(600)}>10 min</button>
           </div>
-          <button className="btn-secondary w-full" onClick={onClose}>Close</button>
+          <button className="wellness-btn-secondary w-full" onClick={onClose}>Close</button>
         </motion.div>
       </div>
     );
@@ -100,21 +95,21 @@ const WorkoutPlanner = ({ onClose }: { onClose: () => void }) => {
     const handleDrop = (e: React.DragEvent<HTMLDivElement>, day: string) => { const session = e.dataTransfer.getData('session'); console.log(`Dropped ${session} on ${day}`); };
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => e.preventDefault();
     return (
-      <div className="modal-overlay wellness-modal-overlay">
+      <div className="wellness-modal-overlay">
         <motion.div 
-            className="modal-content wellness-modal-content bg-gradient-to-br from-gray-900/80 to-indigo-900/70 backdrop-blur-md text-white"
+            className="wellness-modal-content text-slate-800"
             initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
         >
           <h2 className="text-3xl font-bold mb-6 text-center">Workout Planner</h2>
           <div className="grid grid-cols-2 md:grid-cols-7 gap-2 text-center">
             {Object.entries(workoutPlan).map(([day, session]) => (
-              <div key={day} className="bg-white/10 p-4 rounded-lg" onDrop={(e) => handleDrop(e, day)} onDragOver={handleDragOver}>
+              <div key={day} className="bg-slate-100 p-4 rounded-lg" onDrop={(e) => handleDrop(e, day)} onDragOver={handleDragOver}>
                 <h4 className="font-semibold text-sm md:text-base">{day}</h4>
-                <p className="text-xs md:text-sm mt-2 cursor-grab" draggable onDragStart={(e) => handleDragStart(e, session)}>{session}</p>
+                <p className="text-xs md:text-sm mt-2 cursor-grab text-slate-600" draggable onDragStart={(e) => handleDragStart(e, session)}>{session}</p>
               </div>
             ))}
           </div>
-          <button className="btn-secondary mt-6 w-full" onClick={onClose}>Close</button>
+          <button className="wellness-btn-secondary mt-6 w-full" onClick={onClose}>Close</button>
         </motion.div>
       </div>
     );
@@ -139,9 +134,9 @@ const BMICalculator = ({ onClose }: { onClose: () => void }) => {
     }, [age, height, weight, gender, activity]);
 
     return (
-      <div className="modal-overlay wellness-modal-overlay">
+      <div className="wellness-modal-overlay">
         <motion.div 
-            className="modal-content wellness-modal-content bg-gradient-to-br from-gray-900/80 to-purple-900/70 backdrop-blur-md text-white"
+            className="wellness-modal-content text-slate-800"
             initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
         >
           <h2 className="text-3xl font-bold mb-6 text-center">BMR & Body Fat Calculator</h2>
@@ -151,13 +146,13 @@ const BMICalculator = ({ onClose }: { onClose: () => void }) => {
             <div><label className="block">Weight: {weight} kg</label><input type="range" min="30" max="150" value={weight} onChange={(e) => setWeight(Number(e.target.value))} className="w-full wellness-range" /></div>
             <div className="flex space-x-4"><label><input type="radio" value="male" checked={gender === 'male'} onChange={(e) => setGender(e.target.value)} /> Male</label><label><input type="radio" value="female" checked={gender === 'female'} onChange={(e) => setGender(e.target.value)} /> Female</label></div>
             <div><label className="block">Activity Level</label>
-              <select value={activity} onChange={(e) => setActivity(parseFloat(e.target.value))} className="w-full bg-white/10 p-2 rounded-md mt-2 border border-white/20">
+              <select value={activity} onChange={(e) => setActivity(parseFloat(e.target.value))} className="w-full bg-slate-100 p-2 rounded-md mt-2 border border-slate-300">
                 <option value="1.2">Sedentary</option><option value="1.375">Lightly Active</option><option value="1.55">Moderately Active</option><option value="1.725">Very Active</option><option value="1.9">Extra Active</option>
               </select>
             </div>
           </div>
-          <div className="mt-8 text-center"><h3 className="text-4xl font-extrabold">BMR: {bmr} kcal/day</h3></div>
-          <button className="btn-secondary mt-6 w-full" onClick={onClose}>Close</button>
+          <div className="mt-8 text-center"><h3 className="text-4xl font-extrabold text-blue-600">BMR: {bmr} kcal/day</h3></div>
+          <button className="wellness-btn-secondary mt-6 w-full" onClick={onClose}>Close</button>
         </motion.div>
       </div>
     );
@@ -211,41 +206,41 @@ const NutritionDatabase = ({ onClose }: { onClose: () => void }) => {
     };
 
     return (
-      <div className="modal-overlay wellness-modal-overlay">
+      <div className="wellness-modal-overlay">
         <motion.div
-          className="modal-content wellness-modal-content relative flex flex-col p-6 rounded-2xl shadow-2xl bg-gradient-to-br from-gray-900/90 to-blue-900/80 backdrop-blur-md"
+          className="wellness-modal-content relative flex flex-col p-6 rounded-2xl shadow-2xl"
           initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.3 }}
           style={{ width: '95%', maxWidth: '800px', height: '90vh' }}
         >
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-3xl font-bold text-white">Nutrition Database</h2>
-            <motion.button className="text-white hover:text-red-400 transition-colors" onClick={onClose} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}><XCircle size={32} /></motion.button>
+            <h2 className="text-3xl font-bold">Nutrition Database</h2>
+            <motion.button className="text-slate-500 hover:text-red-500 transition-colors" onClick={onClose} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}><XCircle size={32} /></motion.button>
           </div>
-          <p className="text-white/70 mb-6 text-lg">Search for foods to see their nutritional information.</p>
+          <p className="text-slate-600 mb-6 text-lg">Search for foods to see their nutritional information.</p>
           <form onSubmit={handleSearch} className="flex gap-4 mb-8">
-            <input type="text" className="flex-grow p-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 text-lg" placeholder="e.g., 'high protein snacks', 'apple'" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            <input type="text" className="flex-grow p-3 rounded-full bg-slate-100 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-lg" placeholder="e.g., 'high protein snacks', 'apple'" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
             <motion.button type="submit" className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center justify-center" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} disabled={loading}>
               {loading ? <Loader2 className="animate-spin" size={28} /> : <Search size={28} />}
             </motion.button>
           </form>
           <div className="flex-grow overflow-y-auto pr-2 custom-scrollbar">
-            {error && <p className="text-red-400 text-center text-lg">{error}</p>}
+            {error && <p className="text-red-500 text-center text-lg">{error}</p>}
             <AnimatePresence>
               {searchResults.map((meal, index) => (
-                <motion.div key={index} className="bg-white/10 backdrop-blur-lg rounded-xl p-5 mb-4 flex flex-col md:flex-row items-center gap-6 shadow-xl border border-white/20" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
+                <motion.div key={index} className="bg-white rounded-xl p-5 mb-4 flex flex-col md:flex-row items-center gap-6 shadow-lg border border-slate-200" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
                   <img src={meal.image} alt={meal.label} className="w-24 h-24 object-cover rounded-lg flex-shrink-0 shadow-md" />
-                  <div className="flex-grow text-white text-center md:text-left">
-                    <h3 className="text-2xl font-bold mb-2">{meal.label}</h3>
-                    <p className="text-lg text-white/90 mb-3"><span className="font-semibold">Macros:</span> {meal.macros.protein}g Protein, {meal.macros.carbs}g Carbs, {meal.macros.fat}g Fat</p>
+                  <div className="flex-grow text-center md:text-left">
+                    <h3 className="text-2xl font-bold mb-2 text-slate-800">{meal.label}</h3>
+                    <p className="text-lg text-slate-600 mb-3"><span className="font-semibold">Macros:</span> {meal.macros.protein}g Protein, {meal.macros.carbs}g Carbs, {meal.macros.fat}g Fat</p>
                     <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                      {meal.tags.map((tag: string, i: number) => (<span key={i} className="bg-purple-600/50 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">{tag}</span>))}
+                      {meal.tags.map((tag: string, i: number) => (<span key={i} className="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">{tag}</span>))}
                     </div>
                   </div>
-                  <motion.button className="btn-primary w-full md:w-auto flex items-center justify-center gap-2" onClick={() => handleSaveMeal(meal)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}><Save size={20} /> Save to My Meals</motion.button>
+                  <motion.button className="wellness-btn-primary w-full md:w-auto flex items-center justify-center gap-2" onClick={() => handleSaveMeal(meal)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}><Save size={20} /> Save to My Meals</motion.button>
                 </motion.div>
               ))}
             </AnimatePresence>
-            {searchResults.length === 0 && !loading && !error && (<p className="text-white/50 text-center text-lg mt-8">Start by searching for a food item (e.g., "apple", "chicken breast").</p>)}
+            {searchResults.length === 0 && !loading && !error && (<p className="text-slate-400 text-center text-lg mt-8">Start by searching for a food item (e.g., "apple", "chicken breast").</p>)}
           </div>
         </motion.div>
       </div>
@@ -268,10 +263,10 @@ const WellnessFactsCarousel = ({ onClose, userData }: { onClose: () => void, use
     const currentFact = facts[currentIndex];
 
     return (
-      <div className="modal-overlay wellness-modal-overlay">
-        <motion.div className="modal-content wellness-modal-content relative flex flex-col p-6 rounded-2xl shadow-2xl bg-gradient-to-br from-gray-900/90 to-blue-900/80 backdrop-blur-md" initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.3 }} style={{ width: '90%', maxWidth: '768px', height: 'auto', minHeight: '450px' }}>
-          <div className="flex justify-between items-center mb-4"><h2 className="text-3xl font-bold text-white">Daily Wellness Facts</h2><motion.button className="text-white hover:text-red-400" onClick={onClose} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}><XCircle size={32} /></motion.button></div>
-          <p className="text-white/70 mb-6 text-lg">Swipe through for tips to enhance your well-being.</p>
+      <div className="wellness-modal-overlay">
+        <motion.div className="wellness-modal-content relative flex flex-col p-6 rounded-2xl shadow-2xl" initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.3 }} style={{ width: '90%', maxWidth: '768px', height: 'auto', minHeight: '450px' }}>
+          <div className="flex justify-between items-center mb-4"><h2 className="text-3xl font-bold">Daily Wellness Facts</h2><motion.button className="text-slate-500 hover:text-red-500" onClick={onClose} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}><XCircle size={32} /></motion.button></div>
+          <p className="text-slate-600 mb-6 text-lg">Swipe through for tips to enhance your well-being.</p>
           <div className="relative flex-grow flex items-center justify-center overflow-hidden rounded-xl shadow-lg mb-8" style={{ minHeight: '250px' }}>
             <AnimatePresence initial={false} custom={currentIndex}>
               <motion.div key={currentIndex} className="absolute inset-0 flex items-center justify-center bg-cover bg-center rounded-xl" style={{ backgroundImage: `url(${currentFact.image})` }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
@@ -284,9 +279,9 @@ const WellnessFactsCarousel = ({ onClose, userData }: { onClose: () => void, use
             <motion.button className="absolute left-4 p-3 bg-white/20 hover:bg-white/40 rounded-full text-white z-10" onClick={handlePrev} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}><ChevronLeft size={28} /></motion.button>
             <motion.button className="absolute right-4 p-3 bg-white/20 hover:bg-white/40 rounded-full text-white z-10" onClick={handleNext} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}><ChevronRight size={28} /></motion.button>
           </div>
-          <motion.div className="bg-purple-800/40 border border-purple-600 rounded-xl p-6 text-white text-lg flex items-start space-x-4 shadow-inner" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.3 }}>
-            <Lightbulb size={28} className="flex-shrink-0 mt-1 text-yellow-300" />
-            <div><h4 className="font-semibold text-xl mb-2 text-yellow-200">Your Personalized Tip</h4><p className="leading-relaxed">{personalizedTip}</p></div>
+          <motion.div className="bg-purple-100 border border-purple-200 text-purple-800 rounded-xl p-6 text-lg flex items-start space-x-4 shadow-inner" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.3 }}>
+            <Lightbulb size={28} className="flex-shrink-0 mt-1 text-purple-600" />
+            <div><h4 className="font-semibold text-xl mb-2 text-purple-700">Your Personalized Tip</h4><p className="leading-relaxed">{personalizedTip}</p></div>
           </motion.div>
         </motion.div>
       </div>
@@ -296,20 +291,20 @@ const WellnessFactsCarousel = ({ onClose, userData }: { onClose: () => void, use
 const MicroGoalsWidget = ({ onClose, userData }: { onClose: () => void, userData: any }) => {
     const { goals } = userData;
     return (
-      <div className="modal-overlay wellness-modal-overlay">
+      <div className="wellness-modal-overlay">
         <motion.div 
-            className="modal-content wellness-modal-content bg-gradient-to-br from-gray-900/80 to-green-900/70 backdrop-blur-md text-white"
+            className="wellness-modal-content text-slate-800"
             initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}
         >
           <h2 className="text-3xl font-bold mb-6 text-center">Your Micro Goals</h2>
           {goals.map((goal: any, index: number) => (
-            <div key={index} className="bg-white/10 p-6 rounded-lg mb-4">
+            <div key={index} className="bg-slate-100 p-6 rounded-lg mb-4">
               <h3 className="text-xl font-semibold mb-2">{goal.goal}</h3>
-              <div className="w-full bg-white/20 h-2 rounded-full mt-4"><motion.div className="h-full rounded-full bg-green-400" initial={{ width: 0 }} animate={{ width: `${goal.progress * 100}%` }} transition={{ duration: 0.8 }} /></div>
-              <p className="text-sm mt-2 text-white/70">{Math.round(goal.progress * 100)}% Complete</p>
+              <div className="w-full bg-slate-200 h-2 rounded-full mt-4"><motion.div className="h-full rounded-full bg-green-500" initial={{ width: 0 }} animate={{ width: `${goal.progress * 100}%` }} transition={{ duration: 0.8 }} /></div>
+              <p className="text-sm mt-2 text-slate-500">{Math.round(goal.progress * 100)}% Complete</p>
             </div>
           ))}
-          <button className="btn-secondary mt-6 w-full" onClick={onClose}>Close</button>
+          <button className="wellness-btn-secondary mt-6 w-full" onClick={onClose}>Close</button>
         </motion.div>
       </div>
     );
@@ -317,8 +312,8 @@ const MicroGoalsWidget = ({ onClose, userData }: { onClose: () => void, userData
 
 const MoodMiniGraph = ({ data }: { data: any[] }) => {
     return (
-      <div className="relative w-full h-48 bg-white/10 backdrop-blur-lg rounded-3xl p-6 shadow-xl overflow-hidden text-white" style={{ border: `1px solid #ff5e62` }}>
-        <h3 className="text-xl font-semibold mb-2">Mood Trend</h3>
+      <div className="relative w-full h-48 bg-white/60 backdrop-blur-lg rounded-3xl p-6 shadow-xl overflow-hidden border border-slate-200">
+        <h3 className="text-xl font-semibold mb-2 text-slate-800">Mood Trend</h3>
         <div className="flex justify-between items-end h-24 mt-4">
           {data.map((log, index) => (
             <motion.div key={index} className="w-8 flex flex-col items-center" initial={{ height: 0, opacity: 0 }} animate={{ height: `${log.value * 10}%`, opacity: 1 }} transition={{ duration: 0.5, delay: index * 0.1 }}>
@@ -335,14 +330,13 @@ const Dashboard = ({ userData, handleUpdateUserData }: { userData: any, handleUp
     const handleLogWater = () => handleUpdateUserData('hydrationCount', hydrationCount + 1);
 
     const StatCard = ({ title, value, unit, icon, color, animate }: { title: string, value: number, unit: string, icon: React.ReactNode, color: string, animate: boolean }) => (
-      <motion.div className="relative w-full h-48 bg-white/10 backdrop-blur-lg rounded-3xl p-6 shadow-xl overflow-hidden cursor-pointer" style={{ border: `1px solid ${color}` }} initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} whileHover={{ scale: 1.05 }}>
+      <motion.div className="relative w-full h-48 bg-white/60 backdrop-blur-lg rounded-3xl p-6 shadow-xl overflow-hidden cursor-pointer border border-slate-200" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} whileHover={{ scale: 1.05 }}>
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/0 opacity-0 transition-opacity duration-300 hover:opacity-100" />
-        <motion.div className="absolute inset-0 z-0" style={{ backgroundColor: color, opacity: 0.1 }} />
-        <div className="relative z-10 flex flex-col h-full justify-between text-white">
-          <div className="flex items-center space-x-2">{icon}<h3 className="text-xl font-semibold">{title}</h3></div>
+        <div className="relative z-10 flex flex-col h-full justify-between">
+          <div className="flex items-center space-x-2 text-slate-800">{icon}<h3 className="text-xl font-semibold">{title}</h3></div>
           <AnimatePresence mode="wait">
-            <motion.div key={value} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="text-6xl font-extrabold">
-              {value}<span className="text-2xl ml-2">{unit}</span>
+            <motion.div key={value} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="text-6xl font-extrabold text-slate-800">
+              {value}<span className="text-2xl ml-2 text-slate-500">{unit}</span>
             </motion.div>
           </AnimatePresence>
         </div>
@@ -351,13 +345,13 @@ const Dashboard = ({ userData, handleUpdateUserData }: { userData: any, handleUp
 
     return (
       <div className="grid grid-cols-1 gap-8 w-full max-w-lg">
-        <StatCard title="Calories Burned" value={caloriesBurned} unit="kcal" icon={<Activity size={32} color="#ff7e5f" />} color="#ff7e5f" animate />
-        <StatCard title="Sleep Hours" value={sleepHours} unit="hrs" icon={<MoonStar size={32} color="#7f00ff" />} color="#7f00ff" animate />
-        <div className="relative w-full h-48 bg-white/10 backdrop-blur-lg rounded-3xl p-6 shadow-xl cursor-pointer" style={{ border: `1px solid #00c6ff` }} onClick={handleLogWater}>
-          <div className="relative z-10 flex flex-col h-full justify-between text-white">
-            <div className="flex items-center space-x-2"><Droplet size={32} color="#00c6ff" /><h3 className="text-xl font-semibold">Hydration</h3></div>
-            <div className="text-6xl font-extrabold">{hydrationCount}<span className="text-2xl ml-2">cups</span></div>
-            <div className="w-full bg-white/20 h-2 rounded-full mt-4"><motion.div className="h-full rounded-full bg-blue-400" initial={{ width: 0 }} animate={{ width: `${(hydrationCount / 8) * 100}%` }} transition={{ duration: 0.5 }} /></div>
+        <StatCard title="Calories Burned" value={caloriesBurned} unit="kcal" icon={<Activity size={32} className="text-orange-500" />} color="#ff7e5f" animate />
+        <StatCard title="Sleep Hours" value={sleepHours} unit="hrs" icon={<MoonStar size={32} className="text-purple-500"/>} color="#7f00ff" animate />
+        <div className="relative w-full h-48 bg-white/60 backdrop-blur-lg rounded-3xl p-6 shadow-xl cursor-pointer border border-slate-200" onClick={handleLogWater}>
+          <div className="relative z-10 flex flex-col h-full justify-between">
+            <div className="flex items-center space-x-2 text-slate-800"><Droplet size={32} className="text-blue-500" /><h3 className="text-xl font-semibold">Hydration</h3></div>
+            <div className="text-6xl font-extrabold text-slate-800">{hydrationCount}<span className="text-2xl ml-2 text-slate-500">cups</span></div>
+            <div className="w-full bg-slate-200 h-2 rounded-full mt-4"><motion.div className="h-full rounded-full bg-blue-500" initial={{ width: 0 }} animate={{ width: `${(hydrationCount / 8) * 100}%` }} transition={{ duration: 0.5 }} /></div>
           </div>
         </div>
         <MoodMiniGraph data={moodLogs} />
@@ -379,9 +373,9 @@ const FeatureGrid = ({ userData }: { userData: any }) => {
       }
     };
     const FeatureCard = ({ title, icon, onClick }: { title: string, icon: React.ReactNode, onClick: () => void }) => (
-      <motion.div className="relative w-full h-48 bg-white/10 backdrop-blur-lg rounded-3xl p-6 shadow-xl cursor-pointer flex flex-col items-center justify-center text-white" whileHover={{ scale: 1.05 }} onClick={onClick}>
+      <motion.div className="relative w-full h-48 bg-white/60 backdrop-blur-lg rounded-3xl p-6 shadow-xl cursor-pointer flex flex-col items-center justify-center border border-slate-200" whileHover={{ scale: 1.05 }} onClick={onClick}>
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/0 opacity-0 transition-opacity duration-300 hover:opacity-100" />
-        <div className="relative z-10">{icon}<h3 className="text-xl font-semibold mt-4 text-center">{title}</h3></div>
+        <div className="relative z-10 text-slate-800">{icon}<h3 className="text-xl font-semibold mt-4 text-center">{title}</h3></div>
       </motion.div>
     );
 
@@ -412,7 +406,6 @@ export function WellnessView() {
     const [currentTime, setCurrentTime] = useState(new Date());
 
     useEffect(() => {
-      // In a real app, this would be a fetch call.
       const fetchData = () => {
         setUserData({
           name: 'Alex',
@@ -432,12 +425,11 @@ export function WellnessView() {
       setUserData((prev) => ({ ...prev, [key]: value }));
     };
     
-    const gradient = getBackgroundGradient(currentTime.getHours());
     const greeting = getGreeting(currentTime.getHours(), userData.name);
 
     return (
-        <div className={`wellness-body min-h-screen flex flex-col md:flex-row transition-colors duration-1000 ${gradient}`}>
-            <header className="absolute top-4 left-4 p-4 text-white text-2xl font-bold z-10">
+        <div className="wellness-body min-h-screen flex flex-col md:flex-row transition-colors duration-1000">
+            <header className="absolute top-4 left-4 p-4 text-2xl font-bold z-10">
                 {greeting}
             </header>
             <div className="flex-1 p-8 md:p-16 flex flex-col justify-center items-center">
@@ -446,8 +438,8 @@ export function WellnessView() {
             <div className="flex-1 p-8 md:p-16 flex flex-col justify-center items-center">
                 <FeatureGrid userData={userData} />
             </div>
-            <button className="fixed bottom-4 right-4 p-4 rounded-full bg-red-600 text-white shadow-xl z-20 transition-transform hover:scale-110">
-                SOS 🆘
+            <button className="fixed bottom-4 right-4 p-4 rounded-full bg-white/70 text-red-600 backdrop-blur-sm shadow-xl z-20 transition-transform hover:scale-110">
+                SOS
             </button>
         </div>
     );
