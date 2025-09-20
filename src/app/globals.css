@@ -303,6 +303,41 @@
     pointer-events: none; /* Allow clicks to pass through to the textarea */
 }
 
+.voice-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(200, 200, 200, 0.4);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.voice-overlay-content {
+  text-align: center;
+  color: #1a202c;
+}
+.voice-listening-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.voice-transcript {
+  margin-top: 1rem;
+  min-height: 2rem;
+  font-size: 1rem;
+  color: #4a5568;
+}
+
 .entry-pad {
   width: 100%;
   height: 100%;

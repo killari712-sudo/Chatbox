@@ -309,6 +309,17 @@ export function DiaryView() {
                                 dangerouslySetInnerHTML={{ __html: entryHtml }}
                                 suppressContentEditableWarning={true}
                             />
+                             {isVoiceOverlayVisible && (
+                                <div className="voice-overlay">
+                                    <div className="voice-overlay-content">
+                                        <p className="voice-listening-text">Listening...</p>
+                                        <p className="voice-transcript">{transcript}</p>
+                                        <Button onClick={stopRecording} variant="destructive" size="sm" className="mt-4">
+                                            Stop
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
                             {warningMessage && (
                                 <div className="entry-pad-overlay">
                                     {warningMessage}
@@ -350,20 +361,6 @@ export function DiaryView() {
                     </div>
                     <div className="fab">+</div>
                 </div>
-
-                {isVoiceOverlayVisible && (
-                  <div className="fixed inset-0 bg-white/80 backdrop-blur-xl z-50 flex flex-col items-center justify-center">
-                      <div style={{animation: 'avatar-float 5s ease-in-out infinite'}}>
-                        <div className="absolute inset-0 bg-blue-400 rounded-full blur-3xl opacity-40"></div>
-                        {aiAvatar && <Image src={aiAvatar.imageUrl} alt="Assistant Avatar" width={144} height={144} className="w-36 h-36 rounded-full border-4 border-blue-400 shadow-2xl shadow-blue-500/50" />}
-                      </div>
-                      <p className="mt-8 text-2xl font-medium text-gray-600 tracking-wider">Listening...</p>
-                      <p className="mt-4 text-xl text-gray-800 h-12">{transcript}</p>
-                      <Button onClick={stopRecording} variant="ghost" size="icon" className="absolute top-8 right-8 text-gray-500 hover:text-gray-800 w-10 h-10">
-                        <X className="w-8 h-8" />
-                      </Button>
-                  </div>
-                )}
             </div>
         </ScrollArea>
     );
