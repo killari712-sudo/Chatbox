@@ -72,8 +72,6 @@ export function ChatView() {
   useEffect(() => {
     setMessages([
         { id: '1', role: 'assistant', content: 'Hello! Welcome to your personal ecosystem. How can I assist you today?' },
-        { id: '2', role: 'user', content: 'Hey! Just wanted to check my progress for the day.' },
-        { id: '3', role: 'assistant', content: "Of course. You've completed 3 of your 5 habits and maintained a 14-day streak. Your wellness score is up by 5% since yesterday. Fantastic work!" },
     ]);
   }, []);
 
@@ -195,8 +193,8 @@ export function ChatView() {
                     <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-blue-500 text-white rounded-br-lg' : 'bg-white/80 rounded-bl-lg'}`}>
                         <p>{message.content}</p>
                     </div>
-                    {message.role === 'user' && userAvatar && (
-                         <Image src={user?.photoURL || userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
+                    {message.role === 'user' && user && (
+                         <Image src={user?.photoURL || userAvatar!.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
                     )}
                   </div>
                 ))}
@@ -387,5 +385,3 @@ export function ChatView() {
     </TooltipProvider>
   );
 }
-
-    
