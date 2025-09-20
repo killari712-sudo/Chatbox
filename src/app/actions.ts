@@ -58,5 +58,3 @@ export async function getNutritionInfo(foodItem: string) {
         return { error: "Failed to get nutrition information from AI." };
     }
 }
-
-    
