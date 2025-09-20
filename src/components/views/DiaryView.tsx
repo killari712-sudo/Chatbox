@@ -100,6 +100,7 @@ export function DiaryView() {
     const [isTrendsModalOpen, setIsTrendsModalOpen] = useState(false);
     const [moodData, setMoodData] = useState<any[]>([]);
     const [isRecording, setIsRecording] = useState(false);
+    const [isVoicePopupVisible, setIsVoicePopupVisible] = useState(false);
     
 
     // Load entries from localStorage on initial render
@@ -120,32 +121,32 @@ export function DiaryView() {
             recognitionRef.current.continuous = true;
             recognitionRef.current.interimResults = true;
 
+            let finalTranscript = '';
+
             recognitionRef.current.onresult = (event: any) => {
                 let interimTranscript = '';
-                let finalTranscript = '';
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
+                        finalTranscript += event.results[i][0].transcript + ' ';
                     } else {
                         interimTranscript += event.results[i][0].transcript;
                     }
                 }
                 if (entryPadRef.current) {
-                    // This is a simplified way to append text.
-                    // A more robust solution would handle cursor position.
                     entryPadRef.current.innerHTML = entryHtml + finalTranscript + interimTranscript;
                 }
             };
             
             recognitionRef.current.onend = () => {
                 setIsRecording(false);
+                setIsVoicePopupVisible(false);
                 if (entryPadRef.current) {
                     setEntryHtml(entryPadRef.current.innerHTML);
                 }
             };
         }
 
-    }, []);
+    }, [entryHtml]);
 
 
     // Update view when selectedDate or allEntries change
@@ -274,18 +275,24 @@ export function DiaryView() {
         setIsTrendsModalOpen(true);
     };
 
-    const toggleRecording = () => {
-        if (!isEditable) return;
-        if (isRecording) {
-            recognitionRef.current?.stop();
-            setIsRecording(false);
-        } else {
-            if (entryPadRef.current) {
-                setEntryHtml(entryPadRef.current.innerHTML); // Save current content before recording
-            }
-            recognitionRef.current?.start();
-            setIsRecording(true);
+    const startRecording = () => {
+        if (!isEditable || isRecording) return;
+        
+        if (entryPadRef.current) {
+            // Save current content before starting new recording session
+            setEntryHtml(entryPadRef.current.innerHTML);
         }
+        
+        recognitionRef.current?.start();
+        setIsRecording(true);
+        setIsVoicePopupVisible(true);
+    };
+
+    const stopRecording = () => {
+        if (!isRecording) return;
+        recognitionRef.current?.stop();
+        setIsRecording(false);
+        setIsVoicePopupVisible(false);
     };
 
 
@@ -377,6 +384,19 @@ export function DiaryView() {
                             </button>
                         </div>
                         <div className="entry-pad-container">
+                            {isVoicePopupVisible && (
+                                <div className="voice-popup-overlay">
+                                    <div className="voice-popup-content">
+                                        <div className="mic-listening-indicator">
+                                            <Mic size={32} />
+                                        </div>
+                                        <p className="listening-text">Listening...</p>
+                                        <button className="stop-listening-btn" onClick={stopRecording}>
+                                            Stop
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                             <div 
                                 ref={entryPadRef}
                                 className="entry-pad"
@@ -394,10 +414,10 @@ export function DiaryView() {
 
                         <div className="flex items-center justify-end mt-auto gap-4">
                              <button
-                                onClick={toggleRecording}
-                                disabled={!isEditable}
-                                className={`mic-button ${isRecording ? 'recording' : ''}`}
-                                title={isRecording ? "Stop recording" : "Start recording"}
+                                onClick={startRecording}
+                                disabled={!isEditable || isRecording}
+                                className="mic-button"
+                                title="Start recording"
                             >
                                 <Mic size={20} />
                             </button>
@@ -434,3 +454,5 @@ export function DiaryView() {
         </ScrollArea>
     );
 }
+
+    
