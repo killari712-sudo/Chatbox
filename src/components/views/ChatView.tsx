@@ -14,11 +14,13 @@ import {
   BarChart3,
   BookOpen,
   Bot,
+  ChevronDown,
   GraduationCap,
   HeartPulse,
   HelpCircle,
   Home,
   Loader2,
+  LogOut,
   Map,
   MessageSquare,
   Mic,
@@ -36,10 +38,11 @@ import { QueryHubView } from "./QueryHubView";
 import { WellnessView } from "./WellnessView";
 import { MentorView } from "./MentorView";
 import { useAuth } from "@/hooks/useAuth";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { HabitBuilderView } from "./HabitBuilderView";
 import { RoadmapsView } from "./RoadmapsView";
 import { FriendFinderView } from "./FriendFinderView";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 
 export function ChatView() {
@@ -49,7 +52,7 @@ export function ChatView() {
   const [activeView, setActiveView] = useState("Home");
   const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
   const [isSosOverlayVisible, setSosOverlayVisible] = useState(false);
-  const [isSidebarExpanded, setSidebarExpanded] = useState(false);
+  const [isSidebarExpanded, setSidebarExpanded] = useState(true);
   const { user, auth } = useAuth();
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -85,6 +88,22 @@ export function ChatView() {
       console.error("Error signing in with Google: ", error);
     }
   };
+  
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      // This will clear all data, adjust if more granular control is needed
+      if (typeof window !== 'undefined') {
+        window.localStorage.clear();
+      }
+      setActiveView('Home');
+      // Optionally, you might want to reload the page or reset component states
+      // window.location.reload(); 
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
+
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -146,7 +165,7 @@ export function ChatView() {
     if (item.isSOS) {
       setSosOverlayVisible(true);
     } else {
-      setActiveView(item.label);
+        setActiveView(item.label);
     }
   };
 
@@ -179,23 +198,6 @@ export function ChatView() {
       case 'Home':
         return (
           <div id="chat-view" className="flex flex-col h-full overflow-hidden p-4 md:p-6">
-             <div className="w-full flex-shrink-0 pb-4">
-              <div className="flex justify-center gap-2 max-w-2xl mx-auto">
-                {suggestionButtons.map((btn) => {
-                  const Icon = btn.icon;
-                  return (
-                    <button
-                      key={btn.label}
-                      onClick={() => setActiveView(btn.view)}
-                      className="suggestion-button flex-col h-auto py-2 px-3 text-xs"
-                    >
-                      <Icon className="w-5 h-5 mb-1" />
-                      <span>{btn.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
             <ScrollArea id="chat-container" className="flex-grow w-full max-w-4xl mx-auto pr-4" ref={scrollAreaRef}>
               {messages.length === 0 && !isPending ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
@@ -275,12 +277,7 @@ export function ChatView() {
                 <span className="font-bold text-lg font-headline text-gray-800">EcosystemAI</span>
             </div>
             <div className="relative">
-                {user ? (
-                   <div className="flex items-center gap-3">
-                        {user.photoURL && <Image src={user.photoURL} alt="Avatar" width={32} height={32} className="w-8 h-8 rounded-full" />}
-                        <span className="font-semibold text-gray-700 hidden sm:inline">{user.displayName}</span>
-                   </div>
-                ) : (
+                {!user ? (
                     <Button onClick={handleSignIn} size="sm" className="rounded-full bg-blue-500 hover:bg-blue-600 text-white">
                         <svg className="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px">
                             <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
@@ -289,7 +286,7 @@ export function ChatView() {
                         </svg>
                         Sign in with Google
                     </Button>
-                )}
+                ): null}
             </div>
         </header>
 
@@ -336,9 +333,9 @@ export function ChatView() {
             <aside 
               onMouseEnter={() => setSidebarExpanded(true)}
               onMouseLeave={() => setSidebarExpanded(false)}
-              className="group flex-shrink-0 w-20 hover:w-64 bg-white/30 backdrop-blur-lg border-l h-full overflow-y-auto overflow-x-hidden p-2 transition-all duration-300 ease-in-out"
+              className="group flex-shrink-0 w-20 hover:w-64 bg-white/30 backdrop-blur-lg border-l h-full flex flex-col p-2 transition-all duration-300 ease-in-out"
             >
-              <nav className="flex flex-col gap-2">
+              <nav className="flex flex-col gap-2 flex-grow">
                   {sidebarItems.map((item, index) => {
                     if (item.type === 'divider') {
                       return (
@@ -372,6 +369,27 @@ export function ChatView() {
                     )
                   })}
               </nav>
+                {user && (
+                    <div className="mt-auto">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <div className="w-full h-16 flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-gray-500/10">
+                                    {user.photoURL && <Image src={user.photoURL} alt="Avatar" width={40} height={40} className="w-10 h-10 rounded-full flex-shrink-0" />}
+                                    <div className={`flex-grow overflow-hidden transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>
+                                        <p className="font-semibold text-sm truncate">{user.displayName}</p>
+                                    </div>
+                                    <ChevronDown className={`w-5 h-5 flex-shrink-0 transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`} />
+                                </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent side="top" align="start" className="w-56 mb-2">
+                                <DropdownMenuItem onClick={handleSignOut}>
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Sign Out</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                )}
             </aside>
         </div>
         
@@ -411,7 +429,3 @@ export function ChatView() {
 }
 
     
-    
-
-    
-
