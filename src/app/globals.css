@@ -921,10 +921,8 @@
     font-family: 'Inter', sans-serif;
     background-color: #f0f4f8; /* Light gray-blue */
     color: #1a202c; /* Dark text */
-    height: 100%;
+    min-height: 100vh;
     width: 100%;
-    overflow-y: auto;
-    padding: 2rem;
     background-image: radial-gradient(circle at 10% 20%, rgba(74, 144, 226, 0.1), transparent 30%),
                       radial-gradient(circle at 90% 80%, rgba(226, 74, 144, 0.1), transparent 30%);
 }
@@ -943,14 +941,14 @@
 .wellness-modal-content {
     position: relative;
     padding: 2rem;
-    border-radius: 2rem;
-    background: rgba(255, 255, 255, 0.6); /* Translucent white */
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.7); /* Translucent white */
     border: 1px solid rgba(200, 200, 200, 0.4);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
     max-height: 90vh;
     width: 90%;
-    max-width: 800px;
+    max-width: 600px;
     color: #1a202c;
 }
 
@@ -963,10 +961,16 @@
     transition-property: background-color, transform;
     transition-duration: 300ms;
     border: none;
+    cursor: pointer;
 }
 .wellness-btn-primary:hover {
     background-color: #2563eb;
     transform: scale(1.05);
+}
+.wellness-btn-primary:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .wellness-btn-secondary {
@@ -978,6 +982,7 @@
     transition-property: background-color;
     transition-duration: 300ms;
     border: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
 }
 .wellness-btn-secondary:hover {
     background-color: rgba(0, 0, 0, 0.1);
@@ -1015,6 +1020,7 @@
   cursor: pointer;
   border-radius: 50%;
 }
+
 /* Mentor View styles */
 .mentor-view-body {
     font-family: 'Inter', sans-serif;
@@ -1344,7 +1350,7 @@
     display: flex; justify-content: space-between; align-items: center;
     padding: 0.75rem 1.25rem;
     background: rgba(255, 255, 255, 0.5);
-    border-radius: 999px;
+    border-radius: 9999px;
     border: 1px solid #cbd5e1;
 }
 .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
