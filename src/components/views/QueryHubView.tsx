@@ -3,13 +3,22 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
-// In-memory "database" to simulate shared state across all users.
-// In a real application, this would be replaced by Firestore.
-const sharedQueries: any[] = [];
-
 export function QueryHubView() {
     const { user } = useAuth();
-    const [queries, setQueries] = useState<any[]>(sharedQueries);
+    const [queries, setQueries] = useState<any[]>([]);
+
+    useEffect(() => {
+        // Load queries from localStorage on initial render
+        try {
+            const savedQueries = localStorage.getItem('queryHubQueries');
+            if (savedQueries) {
+                setQueries(JSON.parse(savedQueries));
+            }
+        } catch (error) {
+            console.error("Failed to parse queries from localStorage", error);
+            localStorage.removeItem('queryHubQueries');
+        }
+    }, []);
 
     useEffect(() => {
         const queryFeed = document.getElementById('query-feed');
@@ -200,11 +209,9 @@ export function QueryHubView() {
                     repliesData: []
                 };
                 
-                // Add to the shared "database"
-                sharedQueries.unshift(newQuery);
-                // Update the state for all components
-                setQueries([...sharedQueries]);
-
+                const updatedQueries = [newQuery, ...queries];
+                setQueries(updatedQueries);
+                localStorage.setItem('queryHubQueries', JSON.stringify(updatedQueries));
 
                 hideModal('new-query-modal');
                  if(newQueryForm) {
@@ -371,7 +378,7 @@ export function QueryHubView() {
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold">Ask a Question</h2>
                         <button onClick={() => hideModal('new-query-modal')} className="text-gray-400 hover:text-gray-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                         </button>
                     </div>
                     <form id="new-query-form" className="space-y-4">
@@ -416,7 +423,5 @@ export function QueryHubView() {
         </div>
     );
 }
-
-    
 
     
