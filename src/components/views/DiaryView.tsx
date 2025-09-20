@@ -2,9 +2,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic, Brain } from 'lucide-react';
+import { Mic, Brain, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { getSummary } from "@/app/actions";
+import { getSummary, analyzeMood } from "@/app/actions";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 
 // Define interfaces for data structures
@@ -28,6 +29,7 @@ declare var window: Window;
 
 interface DiaryEntry {
     text: string;
+    mood: string;
 }
 
 interface AllEntries {
@@ -64,6 +66,41 @@ const isFuture = (someDate: Date) => {
     return someDate > today;
 };
 
+const MoodTrendsModal = ({ isOpen, onClose, data }: { isOpen: boolean, onClose: () => void, data: any[] }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white/70 backdrop-blur-lg rounded-2xl p-8 max-w-2xl w-full relative shadow-2xl border border-white/20">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+                    <X size={24} />
+                </button>
+                <h2 className="text-2xl font-bold text-center mb-6">Your Mood Trends (Last 30 Days)</h2>
+                <div style={{ width: '100%', height: 300 }}>
+                    <ResponsiveContainer>
+                        <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 200, 200, 0.4)" />
+                            <XAxis dataKey="name" stroke="#4a5568" />
+                            <YAxis stroke="#4a5568" allowDecimals={false}/>
+                            <Tooltip
+                                contentStyle={{
+                                    background: 'rgba(255, 255, 255, 0.8)',
+                                    backdropFilter: 'blur(5px)',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(200, 200, 200, 0.4)',
+                                }}
+                            />
+                            <Legend />
+                            <Bar dataKey="count" fill="rgba(74, 144, 226, 0.6)" name="Mood Count" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 export function DiaryView() {
     const entryAreaCardRef = useRef<HTMLDivElement>(null);
     const saveButtonRef = useRef<HTMLButtonElement>(null);
@@ -78,6 +115,9 @@ export function DiaryView() {
     const [warningMessage, setWarningMessage] = useState('');
     const [isVoicePopupVisible, setVoicePopupVisible] = useState(false);
     const [isSummarizing, setIsSummarizing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isTrendsModalOpen, setIsTrendsModalOpen] = useState(false);
+    const [moodData, setMoodData] = useState<any[]>([]);
     
     // This effect should run only once to set up speech recognition
     useEffect(() => {
@@ -122,7 +162,7 @@ export function DiaryView() {
         } else {
             console.warn("Speech Recognition not supported in this browser.");
         }
-    }, []); // Empty dependency array ensures this runs only once.
+    }, [isRecording]); // Added isRecording to dependencies
 
 
     // Load entries from localStorage on initial render
@@ -158,41 +198,59 @@ export function DiaryView() {
     }, [selectedDate, allEntries]);
 
 
-    const handleSave = () => {
-        if (!isToday(selectedDate) || !entryPadRef.current) return;
+    const handleSave = async () => {
+        if (!isToday(selectedDate) || !entryPadRef.current || !entryHtml.trim()) return;
 
+        setIsSaving(true);
         const currentHtml = entryPadRef.current.innerHTML;
-        const dateKey = selectedDate.toDateString();
-        const newEntries: AllEntries = {
-            ...allEntries,
-            [dateKey]: { text: currentHtml }
-        };
-        setAllEntries(newEntries);
-        localStorage.setItem('diaryEntries', JSON.stringify(newEntries));
-        
-        // Confetti effect
-        const saveButton = saveButtonRef.current;
-        const entryAreaCard = entryAreaCardRef.current;
-        if (!saveButton || !entryAreaCard) return;
+        const currentText = entryPadRef.current.innerText;
 
-        for (let i = 0; i < 50; i++) {
-            const confettiPiece = document.createElement('div');
-            confettiPiece.className = 'confetti-piece';
-            const colors = ['#4a90e2', '#e24a90', '#facc15', '#ef4444', '#3b82f6'];
-            confettiPiece.style.background = colors[Math.floor(Math.random() * colors.length)];
-            confettiPiece.style.left = `${saveButton.offsetLeft + (saveButton.offsetWidth / 2)}px`;
-            confettiPiece.style.top = `${saveButton.offsetTop}px`;
-            const transform = `rotate(${Math.random() * 360}deg) translateX(${ (Math.random() - 0.5) * 300 }px)`;
-            confettiPiece.style.transform = transform;
-            confettiPiece.style.animationDelay = `${Math.random() * 0.2}s`;
-            entryAreaCard.appendChild(confettiPiece);
-            setTimeout(() => confettiPiece.remove(), 3000);
+        try {
+            const moodResult = await analyzeMood(currentText);
+            const mood = moodResult.mood?.toLowerCase() || 'neutral';
+            
+            const dateKey = selectedDate.toDateString();
+            const newEntries: AllEntries = {
+                ...allEntries,
+                [dateKey]: { text: currentHtml, mood: mood }
+            };
+            setAllEntries(newEntries);
+            localStorage.setItem('diaryEntries', JSON.stringify(newEntries));
+
+            // Confetti effect
+            const saveButton = saveButtonRef.current;
+            const entryAreaCard = entryAreaCardRef.current;
+            if (!saveButton || !entryAreaCard) return;
+
+            for (let i = 0; i < 50; i++) {
+                const confettiPiece = document.createElement('div');
+                confettiPiece.className = 'confetti-piece';
+                const colors = ['#4a90e2', '#e24a90', '#facc15', '#ef4444', '#3b82f6'];
+                confettiPiece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confettiPiece.style.left = `${saveButton.offsetLeft + (saveButton.offsetWidth / 2)}px`;
+                confettiPiece.style.top = `${saveButton.offsetTop}px`;
+                const transform = `rotate(${Math.random() * 360}deg) translateX(${ (Math.random() - 0.5) * 300 }px)`;
+                confettiPiece.style.transform = transform;
+                confettiPiece.style.animationDelay = `${Math.random() * 0.2}s`;
+                entryAreaCard.appendChild(confettiPiece);
+                setTimeout(() => confettiPiece.remove(), 3000);
+            }
+        } catch (error) {
+            console.error("Failed to analyze mood and save entry", error);
+            alert("Could not analyze mood. Entry saved without mood data.");
+            // Optionally save without mood
+            const dateKey = selectedDate.toDateString();
+            const newEntries: AllEntries = { ...allEntries, [dateKey]: { text: currentHtml, mood: 'unknown' } };
+            setAllEntries(newEntries);
+            localStorage.setItem('diaryEntries', JSON.stringify(newEntries));
+        } finally {
+            setIsSaving(false);
         }
     };
 
     const handlePromptClick = (prompt: string) => {
         if (!isToday(selectedDate) || !entryPadRef.current) return;
-        const promptHtml = `<p><span class="diary-prompt-text">${prompt}</span></p>`;
+        const promptHtml = `<p><span class="diary-prompt-text">${prompt}</span>&nbsp;</p>`;
         entryPadRef.current.innerHTML += entryPadRef.current.innerHTML ? `<br>${promptHtml}`: promptHtml;
         handleInput({ currentTarget: entryPadRef.current } as React.FormEvent<HTMLDivElement>);
     };
@@ -248,6 +306,24 @@ export function DiaryView() {
         }
     };
 
+    const handleViewTrends = () => {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const recentEntries = Object.entries(allEntries).filter(([dateKey]) => new Date(dateKey) >= thirtyDaysAgo);
+
+        const moodCounts: { [mood: string]: number } = {};
+        recentEntries.forEach(([, entry]) => {
+            if (entry.mood) {
+                moodCounts[entry.mood] = (moodCounts[entry.mood] || 0) + 1;
+            }
+        });
+
+        const formattedData = Object.entries(moodCounts).map(([name, count]) => ({ name, count }));
+        setMoodData(formattedData);
+        setIsTrendsModalOpen(true);
+    };
+
 
     const renderCalendar = () => {
         const year = currentMonth.getFullYear();
@@ -270,10 +346,21 @@ export function DiaryView() {
             if (date.toDateString() === selectedDate.toDateString()) dayClass += ' selected';
             if (isFuture(date)) dayClass += ' disabled';
 
+            let moodColor;
+            if (entry && entry.mood) {
+                const mood = entry.mood.toLowerCase();
+                if (mood.includes('happy')) moodColor = 'var(--mood-happy)';
+                else if (mood.includes('sad') || mood.includes('blue')) moodColor = 'var(--mood-blue)';
+                else if (mood.includes('grateful') || mood.includes('love')) moodColor = 'var(--mood-loving)';
+                else if (mood.includes('angry') || mood.includes('stressed')) moodColor = 'var(--mood-red)';
+                else moodColor = 'var(--mood-neutral)';
+            }
+
+
             days.push(
                 <div key={i} className={dayClass} onClick={() => handleDayClick(date)}>
                     {i}
-                    {entry && <div className="mood-dot" style={{ backgroundColor: `var(--mood-blue)` }}></div>}
+                    {moodColor && <div className="mood-dot" style={{ backgroundColor: moodColor }}></div>}
                 </div>
             );
         }
@@ -316,7 +403,7 @@ export function DiaryView() {
                                 <li key={i} onClick={() => handlePromptClick(prompt)}>{prompt}</li>
                             ))}
                         </ul>
-                        <button className="trends-button">📊 View Mood Trends</button>
+                        <button className="trends-button" onClick={handleViewTrends}>📊 View Mood Trends</button>
                     </section>
 
                     <section className="card entry-area" ref={entryAreaCardRef}>
@@ -332,6 +419,7 @@ export function DiaryView() {
                                 contentEditable={isEditable}
                                 onInput={handleInput}
                                 suppressContentEditableWarning={true}
+                                style={{ WebkitUserModify: isEditable ? 'read-write' : 'read-only' }}
                             />
                             {isVoicePopupVisible && (
                                 <div className={`voice-popup ${isVoicePopupVisible ? 'visible' : ''}`}>
@@ -363,9 +451,9 @@ export function DiaryView() {
                                 className="save-button" 
                                 ref={saveButtonRef} 
                                 onClick={handleSave}
-                                disabled={!isEditable || !entryHtml.trim()}
+                                disabled={!isEditable || !entryHtml.trim() || isSaving}
                             >
-                                Save
+                                {isSaving ? 'Saving...' : 'Save'}
                             </button>
                         </div>
                     </section>
@@ -383,6 +471,12 @@ export function DiaryView() {
                     </div>
                     <div className="fab">+</div>
                 </div>
+
+                <MoodTrendsModal 
+                    isOpen={isTrendsModalOpen} 
+                    onClose={() => setIsTrendsModalOpen(false)}
+                    data={moodData}
+                />
             </div>
         </ScrollArea>
     );

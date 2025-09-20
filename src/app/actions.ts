@@ -72,3 +72,13 @@ export async function getSummary(text: string) {
         return { error: "Failed to get summary from AI." };
     }
 }
+
+export async function analyzeMood(userInput: string) {
+    try {
+        const result = await analyzeMoodAndSuggestResources({ userInput });
+        return { mood: result.mood, suggestedResources: result.suggestedResources };
+    } catch (error) {
+        console.error("Error in analyzeMood action:", error);
+        return { error: "Failed to analyze mood from AI." };
+    }
+}
