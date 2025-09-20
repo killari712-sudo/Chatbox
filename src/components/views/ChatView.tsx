@@ -134,6 +134,7 @@ export function ChatView() {
       { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
       { type: 'divider', label: 'Community' },
       { type: 'item', icon: MessageSquare, label: 'Query Hub', tooltip: 'Ask questions and get answers from the community.' },
+      { type: 'item', icon: Users, label: 'Support', tooltip: 'Connect with friends and support groups.' },
       { type: 'item', icon: GraduationCap, label: 'Mentors', tooltip: 'Find and chat with mentors.' },
       { type: 'divider', label: 'Settings' },
       { type: 'item', icon: Bot, label: 'Avatar & Voice', tooltip: 'Customize your AI assistant.' },
@@ -185,8 +186,8 @@ export function ChatView() {
                     <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-blue-500 text-white rounded-br-lg' : 'bg-white/80 rounded-bl-lg'}`}>
                         <p>{message.content}</p>
                     </div>
-                    {message.role === 'user' && user && (
-                         <Image src={user?.photoURL || userAvatar!.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
+                    {message.role === 'user' && user && user.photoURL && (
+                         <Image src={user.photoURL} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
                     )}
                   </div>
                 ))}
@@ -214,6 +215,8 @@ export function ChatView() {
         return <MentorView />;
       case 'Habit Builder':
         return <HabitBuilderView />;
+      case 'Support':
+        return <FriendFinderView />;
       default:
         return (
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
