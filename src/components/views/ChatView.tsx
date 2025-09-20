@@ -37,7 +37,6 @@ import { QueryHubView } from "./QueryHubView";
 import { RoadmapsView } from "./RoadmapsView";
 import { WellnessView } from "./WellnessView";
 import { MentorView } from "./MentorView";
-import { HabitBuilderView } from "./HabitBuilderView";
 
 
 export function ChatView() {
@@ -125,7 +124,6 @@ export function ChatView() {
       { type: 'divider', label: 'Productivity' },
       { type: 'item', icon: Map, label: 'Roadmaps', tooltip: 'View your personalized goals and progress.' },
       { type: 'item', icon: BarChart3, label: 'My Journey', tooltip: "Shows XP bar + today's streak." },
-      { type: 'item', icon: ClipboardList, label: 'Habits', tooltip: 'Build and track your habits.' },
       { type: 'divider', label: 'Wellness' },
       { type: 'item', icon: NotebookPen, label: 'Diary', tooltip: 'Your private, encrypted journal.' },
       { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
@@ -212,8 +210,6 @@ export function ChatView() {
         return <WellnessView />;
       case 'Mentors':
         return <MentorView />;
-      case 'Habits':
-        return <HabitBuilderView />;
       default:
         return (
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
@@ -256,9 +252,9 @@ export function ChatView() {
                 {/* CHAT INPUT BAR - Only show if Home is active */}
                 {activeView === 'Home' && (
                   <div className="w-full flex-shrink-0 px-4 md:px-6 pb-4 md:pb-6 pt-2">
-                    <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto glassmorphic-dark glowing-edge rounded-full p-1.5 flex items-center gap-2 shadow-2xl shadow-black/10">
-                        <Button type="button" variant="ghost" size="icon" className="w-9 h-9 rounded-full flex-shrink-0 hover:bg-blue-500/10">
-                          <Paperclip className="w-5 h-5 text-blue-600" />
+                    <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto glassmorphic-dark glowing-edge rounded-full p-1 flex items-center gap-2 shadow-2xl shadow-black/10">
+                        <Button type="button" variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                          <Paperclip className="w-4 h-4 text-blue-600" />
                         </Button>
                         <Textarea
                           ref={inputRef}
@@ -272,14 +268,14 @@ export function ChatView() {
                           }}
                           rows={1}
                           placeholder="Type your message..."
-                          className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-1.5 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden"
+                          className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-1.5 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden text-sm"
                           disabled={isPending}
                         />
-                        <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-9 h-9 rounded-full flex-shrink-0 hover:bg-blue-500/10">
-                          <Mic className="w-5 h-5 text-blue-600" />
+                        <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                          <Mic className="w-4 h-4 text-blue-600" />
                         </Button>
-                        <Button type="submit" size="icon" className="w-9 h-9 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 text-white flex-shrink-0" disabled={isPending || !input.trim()}>
-                          <Send className="w-5 h-5" />
+                        <Button type="submit" size="icon" className="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 text-white flex-shrink-0" disabled={isPending || !input.trim()}>
+                          <Send className="w-4 h-4" />
                         </Button>
                     </form>
                   </div>
@@ -363,5 +359,7 @@ export function ChatView() {
     </TooltipProvider>
   );
 }
+
+    
 
     
