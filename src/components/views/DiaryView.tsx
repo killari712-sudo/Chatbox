@@ -2,11 +2,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic, Brain, Lightbulb, Hash, X } from 'lucide-react';
+import { Mic, Brain } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import Image from 'next/image';
-import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Button } from "@/components/ui/button";
 import { getSummary } from "@/app/actions";
 
 
@@ -72,8 +69,6 @@ export function DiaryView() {
     const saveButtonRef = useRef<HTMLButtonElement>(null);
     const recognitionRef = useRef<SpeechRecognition | null>(null);
     const entryPadRef = useRef<HTMLDivElement>(null);
-    const aiAvatar = PlaceHolderImages.find((p) => p.id === "ai-avatar");
-
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -81,75 +76,82 @@ export function DiaryView() {
     const [allEntries, setAllEntries] = useState<AllEntries>({});
     const [isRecording, setIsRecording] = useState(false);
     const [warningMessage, setWarningMessage] = useState('');
-    const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
-    const [transcript, setTranscript] = useState('');
+    const [isVoicePopupVisible, setVoicePopupVisible] = useState(false);
     const [isSummarizing, setIsSummarizing] = useState(false);
+    
+    // This effect should run only once to set up speech recognition
+    useEffect(() => {
+        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognitionAPI) {
+          recognitionRef.current = new SpeechRecognitionAPI();
+          const recognition = recognitionRef.current;
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          // Not setting `lang` makes it auto-detect the language
+    
+          recognition.onresult = (event) => {
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                }
+            }
+
+            if(finalTranscript && entryPadRef.current) {
+                // Append the new transcript with a space
+                entryPadRef.current.innerHTML += finalTranscript + ' ';
+                // Manually trigger the input event to update state
+                const event = new Event('input', { bubbles: true, cancelable: true });
+                entryPadRef.current.dispatchEvent(event);
+            }
+          };
+          
+          recognition.onend = () => {
+             // The onend event can fire unexpectedly. Only stop if it wasn't a manual stop.
+             if (isRecording) {
+                recognition.start();
+             }
+          };
+
+          recognition.onerror = (event) => {
+            console.error('Speech recognition error', event.error);
+            setIsRecording(false);
+            setVoicePopupVisible(false);
+          };
+
+        } else {
+            console.warn("Speech Recognition not supported in this browser.");
+        }
+    }, []); // Empty dependency array ensures this runs only once.
 
 
     // Load entries from localStorage on initial render
     useEffect(() => {
-        const savedEntries = localStorage.getItem('diaryEntries');
-        if (savedEntries) {
-            setAllEntries(JSON.parse(savedEntries));
-        }
-
-        // Speech Recognition Setup
-        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognitionAPI) {
-          recognitionRef.current = new SpeechRecognitionAPI();
-          recognitionRef.current.continuous = true;
-          recognitionRef.current.interimResults = true;
-          // By not setting lang, it uses the browser's default, allowing for multiple languages
-    
-          recognitionRef.current.onresult = (event) => {
-            let interimTranscript = '';
-            let finalTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-              if (event.results[i].isFinal) {
-                finalTranscript += event.results[i][0].transcript;
-              } else {
-                interimTranscript += event.results[i][0].transcript;
-              }
+        try {
+            const savedEntries = localStorage.getItem('diaryEntries');
+            if (savedEntries) {
+                setAllEntries(JSON.parse(savedEntries));
             }
-            setTranscript(interimTranscript); // Show real-time transcription in overlay
-            if(finalTranscript && entryPadRef.current) {
-                entryPadRef.current.innerHTML += finalTranscript.trim() + '. ';
-                setEntryHtml(entryPadRef.current.innerHTML);
-            }
-          };
-          
-          recognitionRef.current.onend = () => {
-             if (isRecording) { // Automatically restart if it was supposed to be recording
-                recognitionRef.current?.start();
-             }
-          };
-
-          recognitionRef.current.onerror = (event) => {
-            console.error('Speech recognition error', event.error);
-            setIsRecording(false);
-            setVoiceOverlayVisible(false);
-          };
-
-        } else {
-            console.log("Speech Recognition not supported in this browser.");
+        } catch (error) {
+            console.error("Failed to parse diary entries from localStorage", error);
         }
-    }, [isRecording]);
+    }, []);
+
 
     // Update view when selectedDate or allEntries change
     useEffect(() => {
         const dateKey = selectedDate.toDateString();
         const entry = allEntries[dateKey];
-        setEntryHtml(entry?.text || '');
+        const newHtml = entry?.text || '';
+        setEntryHtml(newHtml);
         if (entryPadRef.current) {
-            entryPadRef.current.innerHTML = entry?.text || '';
+            entryPadRef.current.innerHTML = newHtml;
         }
-
 
         if (!entry && isPast(selectedDate)) {
             const dateString = selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             const warning = `⚠️ Warning: No data saved on ${dateString}.`;
             setWarningMessage(warning);
-            alert(warning);
         } else {
             setWarningMessage('');
         }
@@ -178,11 +180,11 @@ export function DiaryView() {
             confettiPiece.className = 'confetti-piece';
             const colors = ['#4a90e2', '#e24a90', '#facc15', '#ef4444', '#3b82f6'];
             confettiPiece.style.background = colors[Math.floor(Math.random() * colors.length)];
-            confettiPiece.style.left = `${'${saveButton.offsetLeft + (saveButton.offsetWidth / 2)}'}px`;
-            confettiPiece.style.top = `${'${saveButton.offsetTop}'}px`;
-            const transform = `rotate(${'${Math.random() * 360}'}deg) translateX(${'${ (Math.random() - 0.5) * 300 }'}px)`;
+            confettiPiece.style.left = `${saveButton.offsetLeft + (saveButton.offsetWidth / 2)}px`;
+            confettiPiece.style.top = `${saveButton.offsetTop}px`;
+            const transform = `rotate(${Math.random() * 360}deg) translateX(${ (Math.random() - 0.5) * 300 }px)`;
             confettiPiece.style.transform = transform;
-            confettiPiece.style.animationDelay = `${'${Math.random() * 0.2}'}s`;
+            confettiPiece.style.animationDelay = `${Math.random() * 0.2}s`;
             entryAreaCard.appendChild(confettiPiece);
             setTimeout(() => confettiPiece.remove(), 3000);
         }
@@ -190,29 +192,28 @@ export function DiaryView() {
 
     const handlePromptClick = (prompt: string) => {
         if (!isToday(selectedDate) || !entryPadRef.current) return;
-        const promptHtml = `<p><span class="diary-prompt-text" style="color: darkblue;">${prompt}</span></p>`;
+        const promptHtml = `<p><span class="diary-prompt-text">${prompt}</span></p>`;
         entryPadRef.current.innerHTML += entryPadRef.current.innerHTML ? `<br>${promptHtml}`: promptHtml;
-        setEntryHtml(entryPadRef.current.innerHTML);
+        handleInput({ currentTarget: entryPadRef.current } as React.FormEvent<HTMLDivElement>);
     };
 
     const handleMicClick = () => {
         if (!recognitionRef.current) return;
+
         if (isRecording) {
             stopRecording();
         } else {
-            setVoiceOverlayVisible(true);
             setIsRecording(true);
+            setVoicePopupVisible(true);
             recognitionRef.current.start();
         }
     };
     
-    // This is a manual stop, so we tell the onend handler not to restart
     const stopRecording = () => {
         if (recognitionRef.current) {
-            setIsRecording(false); // Set state first to prevent restart
-            setVoiceOverlayVisible(false);
+            setIsRecording(false); 
+            setVoicePopupVisible(false);
             recognitionRef.current.stop();
-            setTranscript(''); // Clear transcript on close
         }
     };
 
@@ -229,14 +230,21 @@ export function DiaryView() {
         if (!entryPadRef.current || !entryHtml.trim() || isSummarizing) return;
         setIsSummarizing(true);
         const textToSummarize = entryPadRef.current.innerText; // Use innerText to get clean text without HTML
-        const result = await getSummary(textToSummarize);
-        setIsSummarizing(false);
+        try {
+            const result = await getSummary(textToSummarize);
 
-        if (result.summary && entryPadRef.current) {
-            entryPadRef.current.innerHTML = `<p>${result.summary}</p>`;
-            setEntryHtml(entryPadRef.current.innerHTML);
-        } else if (result.error) {
-            alert(`Summarization failed: ${result.error}`);
+            if (result.summary && entryPadRef.current) {
+                const summaryHtml = `<p>${result.summary}</p>`;
+                entryPadRef.current.innerHTML = summaryHtml;
+                setEntryHtml(summaryHtml);
+            } else if (result.error) {
+                alert(`Summarization failed: ${result.error}`);
+            }
+        } catch (error) {
+            console.error("Summarization error:", error);
+            alert("An error occurred while summarizing.");
+        } finally {
+            setIsSummarizing(false);
         }
     };
 
@@ -313,7 +321,7 @@ export function DiaryView() {
 
                     <section className="card entry-area" ref={entryAreaCardRef}>
                         <div className="entry-toolbar">
-                            <button onClick={handleSummarize} disabled={isSummarizing} className="disabled:opacity-50">
+                             <button onClick={handleSummarize} disabled={isSummarizing || !isEditable} className="disabled:opacity-50 disabled:cursor-not-allowed hover:text-[--glow-color] transition-colors">
                                 <Brain size={18} className={isSummarizing ? 'animate-pulse' : ''}/>
                             </button>
                         </div>
@@ -323,21 +331,17 @@ export function DiaryView() {
                                 className="entry-pad"
                                 contentEditable={isEditable}
                                 onInput={handleInput}
-                                dangerouslySetInnerHTML={{ __html: entryHtml }}
                                 suppressContentEditableWarning={true}
                             />
-                             {isVoiceOverlayVisible && (
-                                <div className="voice-overlay">
-                                    <div className="voice-overlay-content">
-                                        <p className="voice-listening-text">Listening...</p>
-                                        <p className="voice-transcript">{transcript}</p>
-                                        <Button onClick={stopRecording} variant="destructive" size="sm" className="mt-4">
-                                            Stop
-                                        </Button>
-                                    </div>
+                            {isVoicePopupVisible && (
+                                <div className={`voice-popup ${isVoicePopupVisible ? 'visible' : ''}`}>
+                                    <p className="voice-popup-text">🎤 Listening...</p>
+                                    <button onClick={stopRecording} className="voice-popup-stop-button">
+                                        Stop
+                                    </button>
                                 </div>
                             )}
-                            {warningMessage && (
+                            {warningMessage && !isEditable && (
                                 <div className="entry-pad-overlay">
                                     {warningMessage}
                                 </div>
@@ -350,6 +354,7 @@ export function DiaryView() {
                                     onClick={handleMicClick}
                                     className={`mic-button ${isRecording ? 'recording' : ''}`}
                                     title={isRecording ? 'Stop Recording' : 'Start Recording'}
+                                    disabled={!isEditable}
                                 >
                                     <Mic className="w-5 h-5" />
                                 </button>

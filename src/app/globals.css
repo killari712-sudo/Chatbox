@@ -303,39 +303,51 @@
     pointer-events: none; /* Allow clicks to pass through to the textarea */
 }
 
-.voice-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  max-width: 400px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(200, 200, 200, 0.4);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
+.voice-popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 20;
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
 }
-.voice-overlay-content {
-  text-align: center;
-  color: #1a202c;
+
+.voice-popup.visible {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
 }
-.voice-listening-text {
-  font-size: 1.25rem;
-  font-weight: 600;
-  animation: pulse 1.5s infinite ease-in-out;
+
+.voice-popup-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    animation: pulse 1.5s infinite ease-in-out;
 }
-.voice-transcript {
-  margin-top: 1rem;
-  min-height: 2rem;
-  font-size: 1rem;
-  color: #4a5568;
+
+.voice-popup-stop-button {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.voice-popup-stop-button:hover {
+    background-color: #dc2626;
 }
 
 .entry-pad {
@@ -1572,3 +1584,4 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 
   
+
