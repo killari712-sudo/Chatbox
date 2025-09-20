@@ -180,25 +180,27 @@ export function ChatView() {
       case 'Home':
         return (
           <div id="chat-view" className="flex flex-col h-full overflow-hidden p-4 md:p-6">
+             <div className="w-full flex-shrink-0 pb-4">
+              <div className="flex justify-center gap-2 max-w-2xl mx-auto">
+                {suggestionButtons.map((btn) => {
+                  const Icon = btn.icon;
+                  return (
+                    <button
+                      key={btn.label}
+                      onClick={() => setActiveView(btn.view)}
+                      className="suggestion-button flex-col h-auto py-2 px-3 text-xs"
+                    >
+                      <Icon className="w-5 h-5 mb-1" />
+                      <span>{btn.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <ScrollArea id="chat-container" className="flex-grow w-full max-w-4xl mx-auto pr-4" ref={scrollAreaRef}>
               {messages.length === 0 && !isPending ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <h2 className="text-2xl font-semibold text-gray-600 mb-6">What can I help with?</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full max-w-2xl">
-                    {suggestionButtons.map((btn) => {
-                      const Icon = btn.icon;
-                      return (
-                        <button
-                          key={btn.label}
-                          onClick={() => setActiveView(btn.view)}
-                          className="suggestion-button"
-                        >
-                          <Icon className="w-5 h-5" />
-                          <span>{btn.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -246,7 +248,7 @@ export function ChatView() {
       case 'Support':
         return <FriendFinderView />;
       case 'Roadmaps':
-        return <RoadmapsView />;
+        return <RoadmapsView onNavigate={setActiveView} />;
       default:
         return (
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
@@ -408,3 +410,5 @@ export function ChatView() {
     </TooltipProvider>
   );
 }
+
+    

@@ -140,7 +140,11 @@ const RoadmapCard = ({ roadmap, onOpen }: { roadmap: any; onOpen: (id: string) =
     );
 };
 
-export function RoadmapsView() {
+interface RoadmapsViewProps {
+    onNavigate: (view: string) => void;
+}
+
+export function RoadmapsView({ onNavigate }: RoadmapsViewProps) {
     const [activeFilter, setActiveFilter] = useState('All');
     const [activeRoadmap, setActiveRoadmap] = useState<any | null>(null);
     const [currentRoadmaps, setCurrentRoadmaps] = useState(roadmapData);
@@ -212,15 +216,21 @@ export function RoadmapsView() {
                 ))}
             </div>
 
+            <div className="flex justify-end mt-8">
+                <button
+                    onClick={() => onNavigate('Mentors')}
+                    className="bg-indigo-600 text-white p-4 rounded-full shadow-lg flex items-center gap-2 hover:bg-indigo-700 transition-colors"
+                >
+                    <User size={24} />
+                    <span className="font-semibold">Mentor</span>
+                </button>
+            </div>
+
             <AnimatePresence>
                 {activeRoadmap && (
                     <RoadmapDetailsModal roadmap={activeRoadmap} onClose={handleCloseRoadmap} onStepComplete={handleStepComplete} />
                 )}
             </AnimatePresence>
-            <button className="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg flex items-center gap-2 hover:bg-indigo-700 transition-colors">
-                <User size={24} />
-                <span className="font-semibold">Mentor</span>
-            </button>
         </div>
     );
 }
