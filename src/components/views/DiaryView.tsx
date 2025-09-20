@@ -2,8 +2,12 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic, Brain, Lightbulb, Hash } from 'lucide-react';
+import { Mic, Brain, Lightbulb, Hash, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import Image from 'next/image';
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Button } from "@/components/ui/button";
+
 
 // Define interfaces for data structures
 interface SpeechRecognition extends EventTarget {
@@ -67,6 +71,8 @@ export function DiaryView() {
     const saveButtonRef = useRef<HTMLButtonElement>(null);
     const recognitionRef = useRef<SpeechRecognition | null>(null);
     const entryPadRef = useRef<HTMLDivElement>(null);
+    const aiAvatar = PlaceHolderImages.find((p) => p.id === "ai-avatar");
+
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -74,6 +80,8 @@ export function DiaryView() {
     const [allEntries, setAllEntries] = useState<AllEntries>({});
     const [isRecording, setIsRecording] = useState(false);
     const [warningMessage, setWarningMessage] = useState('');
+    const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
+    const [transcript, setTranscript] = useState('');
 
 
     // Load entries from localStorage on initial render
@@ -89,7 +97,7 @@ export function DiaryView() {
           recognitionRef.current = new SpeechRecognitionAPI();
           recognitionRef.current.continuous = true;
           recognitionRef.current.interimResults = true;
-          recognitionRef.current.lang = 'en-US';
+          // By not setting lang, it uses the browser's default, allowing for multiple languages
     
           recognitionRef.current.onresult = (event) => {
             let interimTranscript = '';
@@ -101,6 +109,7 @@ export function DiaryView() {
                 interimTranscript += event.results[i][0].transcript;
               }
             }
+            setTranscript(interimTranscript); // Show real-time transcription in overlay
             if(finalTranscript && entryPadRef.current) {
                 entryPadRef.current.innerHTML += finalTranscript.trim() + '. ';
                 setEntryHtml(entryPadRef.current.innerHTML);
@@ -116,6 +125,7 @@ export function DiaryView() {
           recognitionRef.current.onerror = (event) => {
             console.error('Speech recognition error', event.error);
             setIsRecording(false);
+            setVoiceOverlayVisible(false);
           };
 
         } else {
@@ -186,11 +196,11 @@ export function DiaryView() {
     const handleMicClick = () => {
         if (!recognitionRef.current) return;
         if (isRecording) {
-            recognitionRef.current.stop();
-            setIsRecording(false);
+            stopRecording();
         } else {
-            recognitionRef.current.start();
+            setVoiceOverlayVisible(true);
             setIsRecording(true);
+            recognitionRef.current.start();
         }
     };
     
@@ -198,7 +208,9 @@ export function DiaryView() {
     const stopRecording = () => {
         if (recognitionRef.current) {
             setIsRecording(false); // Set state first to prevent restart
+            setVoiceOverlayVisible(false);
             recognitionRef.current.stop();
+            setTranscript(''); // Clear transcript on close
         }
     };
 
@@ -307,7 +319,7 @@ export function DiaryView() {
                         <div className="flex items-center justify-end mt-auto gap-4">
                             {isEditable && (
                                 <button
-                                    onClick={isRecording ? stopRecording : handleMicClick}
+                                    onClick={handleMicClick}
                                     className={`mic-button ${isRecording ? 'recording' : ''}`}
                                     title={isRecording ? 'Stop Recording' : 'Start Recording'}
                                 >
@@ -333,14 +345,26 @@ export function DiaryView() {
                 <div className="fab-container">
                     <div className="fab-options">
                         <div className="fab-option" title="Text Entry">✍️</div>
-                        <div className="fab-option" title="Voice Entry">🎤</div>
+                        <div className="fab-option" title="Voice Entry" onClick={handleMicClick}>🎤</div>
                         <div className="fab-option" title="Add Photo/Doodle">📷</div>
                     </div>
                     <div className="fab">+</div>
                 </div>
+
+                {isVoiceOverlayVisible && (
+                  <div className="fixed inset-0 bg-white/80 backdrop-blur-xl z-50 flex flex-col items-center justify-center">
+                      <div style={{animation: 'avatar-float 5s ease-in-out infinite'}}>
+                        <div className="absolute inset-0 bg-blue-400 rounded-full blur-3xl opacity-40"></div>
+                        {aiAvatar && <Image src={aiAvatar.imageUrl} alt="Assistant Avatar" width={144} height={144} className="w-36 h-36 rounded-full border-4 border-blue-400 shadow-2xl shadow-blue-500/50" />}
+                      </div>
+                      <p className="mt-8 text-2xl font-medium text-gray-600 tracking-wider">Listening...</p>
+                      <p className="mt-4 text-xl text-gray-800 h-12">{transcript}</p>
+                      <Button onClick={stopRecording} variant="ghost" size="icon" className="absolute top-8 right-8 text-gray-500 hover:text-gray-800 w-10 h-10">
+                        <X className="w-8 h-8" />
+                      </Button>
+                  </div>
+                )}
             </div>
         </ScrollArea>
     );
 }
-
-  
