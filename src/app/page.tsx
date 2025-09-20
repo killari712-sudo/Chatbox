@@ -1,21 +1,11 @@
 
 "use client";
 
-import { AuthView } from "@/components/views/AuthView";
 import { ChatView } from "@/components/views/ChatView";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
-
 
 export default function Home() {
-  const { user, loading, auth } = useAuth();
-  
-  useEffect(() => {
-    if (!loading && !user) {
-        // Here you could redirect or handle unauthenticated users.
-        // For now, we'll just show the AuthView.
-    }
-  }, [user, loading, auth]);
+  const { loading } = useAuth();
 
   if (loading) {
     return (
@@ -25,5 +15,5 @@ export default function Home() {
     );
   }
 
-  return user ? <ChatView /> : <AuthView />;
+  return <ChatView />;
 }

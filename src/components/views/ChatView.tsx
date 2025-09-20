@@ -37,6 +37,8 @@ import { QueryHubView } from "./QueryHubView";
 import { RoadmapsView } from "./RoadmapsView";
 import { WellnessView } from "./WellnessView";
 import { MentorView } from "./MentorView";
+import { useAuth } from "@/hooks/useAuth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 
 export function ChatView() {
@@ -47,6 +49,7 @@ export function ChatView() {
   const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
   const [isSosOverlayVisible, setSosOverlayVisible] = useState(false);
   const [isSidebarExpanded, setSidebarExpanded] = useState(false);
+  const { user, auth } = useAuth();
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -78,6 +81,15 @@ export function ChatView() {
     if (inputRef.current) {
       inputRef.current.style.height = 'auto';
       inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+    }
+  };
+
+  const handleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error("Error signing in with Google: ", error);
     }
   };
 
@@ -182,7 +194,7 @@ export function ChatView() {
                         <p>{message.content}</p>
                     </div>
                     {message.role === 'user' && userAvatar && (
-                        <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
+                         <Image src={user?.photoURL || userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
                     )}
                   </div>
                 ))}
@@ -237,8 +249,12 @@ export function ChatView() {
                 <span className="font-bold text-lg font-headline text-gray-800">EcosystemAI</span>
             </div>
             <div className="relative">
-                {userAvatar && (
-                  <Image src={userAvatar.imageUrl} alt="Avatar" width={40} height={40} className="w-10 h-10 rounded-full cursor-pointer border-2 border-blue-200 hover:border-blue-400 transition" />
+                {user ? (
+                   user.photoURL && <Image src={user.photoURL} alt="Avatar" width={40} height={40} className="w-10 h-10 rounded-full cursor-pointer border-2 border-blue-200 hover:border-blue-400 transition" />
+                ) : (
+                    <Button onClick={handleSignIn} size="sm" className="rounded-full">
+                        Sign in
+                    </Button>
                 )}
             </div>
         </header>
@@ -359,7 +375,3 @@ export function ChatView() {
     </TooltipProvider>
   );
 }
-
-    
-
-    
