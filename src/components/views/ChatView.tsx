@@ -39,6 +39,7 @@ import { MentorView } from "./MentorView";
 import { useAuth } from "@/hooks/useAuth";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { HabitBuilderView } from "./HabitBuilderView";
+import { RoadmapsView } from "./RoadmapsView";
 
 
 export function ChatView() {
@@ -126,6 +127,7 @@ export function ChatView() {
   const sidebarItems = [
       { type: 'item', icon: Home, label: 'Home', tooltip: 'Return to the main chat view.' },
       { type: 'divider', label: 'Productivity' },
+      { type: 'item', icon: Map, label: 'Roadmaps', tooltip: 'View your personalized goals and progress.' },
       { type: 'item', icon: BarChart3, label: 'Habit Builder', tooltip: "Build and track your habits." },
       { type: 'divider', label: 'Wellness' },
       { type: 'item', icon: NotebookPen, label: 'Diary', tooltip: 'Your private, encrypted journal.' },
@@ -168,6 +170,9 @@ export function ChatView() {
     { label: 'Query Hub', icon: HelpCircle, view: 'Query Hub' },
     { label: 'Support', icon: Users, view: 'Support' },
     { label: 'Diary', icon: NotebookPen, view: 'Diary' },
+    { label: 'Wellness', icon: HeartPulse, view: 'Wellness' },
+    { label: 'Habit Builder', icon: BarChart3, view: 'Habit Builder' },
+    { label: 'Mentors', icon: GraduationCap, view: 'Mentors' },
   ];
 
   const renderActiveView = () => {
@@ -179,7 +184,7 @@ export function ChatView() {
               {messages.length === 0 && !isPending ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <h2 className="text-2xl font-semibold text-gray-600 mb-6">What can I help with?</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full max-w-2xl">
                     {suggestionButtons.map((btn) => {
                       const Icon = btn.icon;
                       return (
@@ -240,6 +245,8 @@ export function ChatView() {
         return <HabitBuilderView />;
       case 'Support':
         return <FriendFinderView />;
+      case 'Roadmaps':
+        return <RoadmapsView />;
       default:
         return (
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">
