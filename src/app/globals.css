@@ -230,11 +230,10 @@
 .dashboard-grid {
   display: grid;
   grid-template-columns: 2fr 5fr 2fr;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto 1fr;
   gap: 1.5rem;
   grid-template-areas:
-      "mood-tracker entry-area daily-prompts"
-      "calendar-timeline entry-area .";
+      "calendar-timeline entry-area daily-prompts";
 }
 
 .dashboard-grid .card {
@@ -1737,6 +1736,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 
   
+
 
 
 

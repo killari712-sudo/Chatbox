@@ -26,20 +26,11 @@ declare var window: Window;
 
 interface DiaryEntry {
     text: string;
-    mood: string | null;
 }
 
 interface AllEntries {
     [dateKey: string]: DiaryEntry;
 }
-
-const MOODS = [
-    { emoji: '🙂', name: 'Happy' },
-    { emoji: '😐', name: 'Neutral' },
-    { emoji: '😢', name: 'Sad' },
-    { emoji: '😍', name: 'Loving' },
-    { emoji: '❤️', name: 'Grateful' }
-];
 
 const PROMPTS = [
     'What made you smile today?',
@@ -58,7 +49,6 @@ export function DiaryView() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [entryText, setEntryText] = useState('');
-    const [selectedMood, setSelectedMood] = useState<string | null>(null);
     const [allEntries, setAllEntries] = useState<AllEntries>({});
     const [isRecording, setIsRecording] = useState(false);
 
@@ -102,7 +92,6 @@ export function DiaryView() {
         const dateKey = selectedDate.toDateString();
         const entry = allEntries[dateKey];
         setEntryText(entry?.text || '');
-        setSelectedMood(entry?.mood || null);
     }, [selectedDate, allEntries]);
 
 
@@ -110,7 +99,7 @@ export function DiaryView() {
         const dateKey = selectedDate.toDateString();
         const newEntries: AllEntries = {
             ...allEntries,
-            [dateKey]: { text: entryText, mood: selectedMood }
+            [dateKey]: { text: entryText }
         };
         setAllEntries(newEntries);
         localStorage.setItem('diaryEntries', JSON.stringify(newEntries));
@@ -173,7 +162,7 @@ export function DiaryView() {
             days.push(
                 <div key={i} className={dayClass} onClick={() => setSelectedDate(date)}>
                     {i}
-                    {entry && <div className="mood-dot" style={{ backgroundColor: `var(--mood-${entry.mood?.toLowerCase() || 'blue'})` }}></div>}
+                    {entry && <div className="mood-dot" style={{ backgroundColor: `var(--mood-blue)` }}></div>}
                 </div>
             );
         }
@@ -206,21 +195,6 @@ export function DiaryView() {
                 </header>
 
                 <main className="dashboard-grid">
-                    <section className="card mood-tracker">
-                        <h2 className="card-title">How are you feeling today?</h2>
-                        <div className="mood-emojis">
-                            {MOODS.map(mood => (
-                                <span 
-                                    key={mood.name} 
-                                    className={`mood-emoji ${selectedMood === mood.name ? 'selected' : ''}`}
-                                    onClick={() => setSelectedMood(mood.name)}
-                                >
-                                    {mood.emoji}
-                                </span>
-                            ))}
-                        </div>
-                    </section>
-
                     <section className="card daily-prompts">
                         <h2 className="card-title">Daily Prompts</h2>
                         <ul className="prompts-list">
