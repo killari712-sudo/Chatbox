@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ArrowLeft } from 'lucide-react';
 
 interface Mentor {
     name: string;
@@ -23,7 +24,11 @@ interface Mentor {
     match: number;
 }
 
-export function MentorView() {
+interface MentorViewProps {
+    onNavigate: (view: string) => void;
+}
+
+export function MentorView({ onNavigate }: MentorViewProps) {
     
     const [mentors, setMentors] = useState<Mentor[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,7 +68,15 @@ export function MentorView() {
     return (
         <div className="mentor-view-body">
             <div className="p-4 sm:p-6 md:p-8">
-                <header className="mb-8 text-center">
+                <header className="mb-8 text-center relative">
+                    <Button
+                        onClick={() => onNavigate('Home')}
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-0 left-0"
+                    >
+                        <ArrowLeft className="w-6 h-6" />
+                    </Button>
                     <h1 className="text-4xl md:text-5xl font-bold mb-2">Find Your Mentor</h1>
                     <p className="text-lg md:text-xl text-gray-600">Connect with experienced professionals to guide your journey.</p>
                 </header>
@@ -144,3 +157,5 @@ export function MentorView() {
         </div>
     );
 }
+
+    
