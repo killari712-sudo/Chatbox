@@ -3,9 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
+// In-memory "database" to simulate shared state across all users.
+// In a real application, this would be replaced by Firestore.
+const sharedQueries: any[] = [];
+
 export function QueryHubView() {
     const { user } = useAuth();
-    const [queries, setQueries] = useState<any[]>([]);
+    const [queries, setQueries] = useState<any[]>(sharedQueries);
 
     useEffect(() => {
         const queryFeed = document.getElementById('query-feed');
@@ -196,7 +200,11 @@ export function QueryHubView() {
                     repliesData: []
                 };
                 
-                setQueries(prev => [newQuery, ...prev]);
+                // Add to the shared "database"
+                sharedQueries.unshift(newQuery);
+                // Update the state for all components
+                setQueries([...sharedQueries]);
+
 
                 hideModal('new-query-modal');
                  if(newQueryForm) {
@@ -277,28 +285,6 @@ export function QueryHubView() {
         }
 
     }, [user, queries]);
-
-    useEffect(() => {
-        const queryFeed = document.getElementById('query-feed');
-        if (!queryFeed) return;
-        queryFeed.innerHTML = '';
-        if (queries.length === 0) {
-            queryFeed.innerHTML = `<div class="text-center py-16">
-                <p class="text-gray-500 text-xl">No queries yet.</p>
-                <p class="text-gray-400 mt-2">Be the first one to ask a question!</p>
-            </div>`;
-        } else {
-            queries.forEach(query => {
-                // This is a simplified render; the full render logic is in the other useEffect
-                const card = document.createElement('div');
-                card.className = 'frosted-card p-6 rounded-2xl flex flex-col space-y-4 cursor-pointer hover:border-gray-500 transition-colors fade-slide-up';
-                card.innerHTML = `<h2 class="text-xl font-bold text-gray-800 mb-2">${query.title}</h2><p class="text-gray-600 line-clamp-2">${query.description}</p>`;
-                card.onclick = () => { /* Logic to show expanded view is in other useEffect */ };
-                queryFeed.appendChild(card);
-            });
-        }
-    }, [queries]);
-
 
     return (
         <div className='query-hub-body'>
@@ -430,5 +416,7 @@ export function QueryHubView() {
         </div>
     );
 }
+
+    
 
     
