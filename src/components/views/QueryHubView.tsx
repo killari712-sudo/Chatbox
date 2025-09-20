@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useEffect } from 'react';
 
@@ -11,14 +12,34 @@ export function QueryHubView() {
         const crisisOverlay = document.getElementById('crisis-overlay');
         const expandedQueryContent = document.getElementById('expanded-query-content');
 
-        let mockQueries: any[] = [];
+        let mockQueries: any[] = [
+            {
+                id: 'q1',
+                title: 'How to cope with exam anxiety?',
+                description: 'I have a big exam coming up and I am feeling super stressed. Any tips on how to stay calm and focused? I have tried deep breathing but it is not helping much. I feel like my heart is always racing and I can\'t concentrate on my studies.',
+                user: 'Alex Smith',
+                type: 'Student',
+                views: 125,
+                replies: 12,
+                upvotes: 42,
+                time: '2h ago',
+                tags: ['#ExamStress', '#Anxiety', '#Focus'],
+                mood: 'anxious',
+                verified: true,
+                isAnonymous: false,
+                repliesData: [
+                    { user: 'Dr. Evelyn', type: 'Counselor', verified: true, text: 'It\'s completely normal to feel this way. Have you tried the 5-4-3-2-1 grounding technique? It can be very effective. Also, ensure you\'re getting enough sleep.', upvotes: 15 },
+                    { user: 'Sarah J.', type: 'Alumni', verified: false, text: 'I used to get this a lot! Pomodoro technique (25 min study, 5 min break) really helped me. Good luck!', upvotes: 9 }
+                ]
+            }
+        ];
 
         const moodEmojis: { [key: string]: string } = {
             'anxious': '😥', 'stressed': '😰', 'sad': '😔', 'happy': '😊'
         };
 
         const userBadges: { [key: string]: string } = {
-            'Student': '🧑 Student',
+            'Student': '🧑‍🎓 Student',
             'Alumni': '🎓 Alumni',
             'Mentor': '🧑‍🏫 Mentor',
             'Counselor': '🧑‍⚕️ Counselor'
@@ -75,7 +96,7 @@ export function QueryHubView() {
                         <div class="flex items-center space-x-2">
                             <span class="font-semibold text-gray-800">${userType}</span>
                             <span class="${badgeClass}">${badgeContent}</span>
-                            ${query.verified ? '<i class="fas fa-shield-alt text-green-500" title="Verified"></i>' : ''}
+                            ${query.verified ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>' : ''}
                         </div>
                         <div class="text-sm text-gray-500 flex items-center space-x-2">
                             <span>${query.time}</span>
@@ -95,17 +116,17 @@ export function QueryHubView() {
 
                 <div class="flex items-center justify-between text-sm text-gray-500">
                     <div class="flex items-center space-x-4">
-                        <span class="flex items-center space-x-1"><i data-lucide="eye" size="16"></i><span>${query.views}</span></span>
-                        <span class="flex items-center space-x-1"><i data-lucide="message-square" size="16"></i><span>${query.replies}</span></span>
+                        <span class="flex items-center space-x-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>${query.views}</span></span>
+                        <span class="flex items-center space-x-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${query.replies}</span></span>
                         <button class="upvote-btn flex items-center space-x-1 hover:text-gray-800 transition-colors">
-                            <i class="fas fa-star" size="16"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                             <span class="upvote-count">${query.upvotes}</span>
                         </button>
                     </div>
                     <div class="flex items-center space-x-3">
-                        <button class="hover:text-gray-800"><i data-lucide="bookmark" size="18"></i></button>
-                        <button class="hover:text-gray-800"><i data-lucide="share-2" size="18"></i></button>
-                        <button class="hover:text-gray-800"><i data-lucide="flag" size="18"></i></button>
+                        <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg></button>
+                        <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
+                        <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg></button>
                     </div>
                 </div>
             `;
@@ -142,11 +163,11 @@ export function QueryHubView() {
                                 <div class="flex items-center space-x-2 mb-2">
                                     <span class="font-semibold text-gray-800">${reply.user}</span>
                                     <span class="badge badge-${reply.type.toLowerCase()}">${userBadges[reply.type]}</span>
-                                    ${reply.verified ? '<i class="fas fa-shield-alt text-green-500" title="Verified"></i>' : ''}
+                                    ${reply.verified ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>' : ''}
                                 </div>
                                 <p class="text-gray-700">${reply.text}</p>
                                 <div class="flex items-center space-x-2 text-sm text-gray-500 mt-2">
-                                    <button class="upvote-btn hover:text-gray-800"><i class="fas fa-star text-sm"></i> <span class="upvote-count">${reply.upvotes}</span></button>
+                                    <button class="upvote-btn hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span class="upvote-count">${reply.upvotes}</span></button>
                                 </div>
                             </div>
                         `;
@@ -155,9 +176,6 @@ export function QueryHubView() {
             `;
             if (expandedQueryContent) expandedQueryContent.innerHTML = queryHtml;
             showModal('query-expanded-modal');
-            if (typeof (window as any).lucide !== 'undefined') {
-                (window as any).lucide.createIcons();
-            }
         }
 
         askButton?.addEventListener('click', () => {
@@ -188,8 +206,7 @@ export function QueryHubView() {
                     repliesData: []
                 };
                 
-                mockQueries = [];
-                mockQueries.push(newQuery);
+                mockQueries.unshift(newQuery);
 
                 hideModal('new-query-modal');
                 renderQueries();
@@ -202,9 +219,6 @@ export function QueryHubView() {
             mockQueries.forEach(query => {
                 queryFeed.appendChild(renderQueryCard(query));
             });
-            if (typeof (window as any).lucide !== 'undefined') {
-                (window as any).lucide.createIcons();
-            }
         }
 
         function renderHashtags() {
@@ -234,9 +248,6 @@ export function QueryHubView() {
 
         renderQueries();
         renderHashtags();
-        if (typeof (window as any).lucide !== 'undefined') {
-            (window as any).lucide.createIcons();
-        }
 
         const resizeHandler = () => {
             const isMobile = window.innerWidth <= 768;
@@ -274,13 +285,13 @@ export function QueryHubView() {
                     <p className="text-lg text-gray-700 mb-6">We noticed your post may be urgent. Do you want to chat with a counselor right now?</p>
                     <div className="flex flex-col space-y-4">
                         <button className="w-full bg-red-600 text-white font-semibold py-3 px-6 rounded-xl transition-all hover:bg-red-700">
-                            <i data-lucide="message-square-heart" className="inline-block mr-2"></i> Counselor Chat
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-message-square-heart inline-block mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M17.8 10c-1.5 1.5-3 3-5.8 3-2.8 0-4.3-1.5-5.8-3-1.5-1.5 0-4.5 5.8-4.5 5.8 0 7.3 3 5.8 4.5Z"/></svg> Counselor Chat
                         </button>
                         <button className="w-full bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-xl transition-all hover:bg-gray-500">
-                            <i data-lucide="phone-call" className="inline-block mr-2"></i> SOS Helpline
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-phone-call inline-block mr-2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/><path d="M14.05 2a9 9 0 0 1 8 7.94"/><path d="M14.05 6A5 5 0 0 1 18 10"/></svg> SOS Helpline
                         </button>
                         <button className="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-all hover:bg-blue-700">
-                            <i data-lucide="leaf" className="inline-block mr-2"></i> Quick Coping Exercise
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-leaf inline-block mr-2"><path d="M11 20A7 7 0 0 1 4 13V8a7.99 7.99 0 0 1 14 0v5a7 7 0 0 1-7 7z"/><path d="M12 18c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/></svg> Quick Coping Exercise
                         </button>
                     </div>
                     <button onClick={() => (window as any).hideCrisisOverlay()} className="mt-4 text-sm text-gray-500 hover:text-gray-600">
@@ -298,11 +309,11 @@ export function QueryHubView() {
                             <div className="relative w-full md:w-80">
                                 <input type="text" placeholder="🔍 How do I manage exam panic?" className="w-full pl-10 pr-4 py-2 rounded-full frosted-card border-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-gray-800 placeholder-gray-500" />
                                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                                    <i data-lucide="search" ></i>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                                 </div>
                             </div>
                             <button id="ask-button" className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-2 px-6 rounded-full transition-transform transform hover:scale-105 ripple-effect">
-                                <i data-lucide="plus" className="inline-block mr-1"></i> Ask
+                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-plus inline-block mr-1"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Ask
                             </button>
                         </div>
                     </header>
@@ -327,7 +338,7 @@ export function QueryHubView() {
                         </div>
                         <p className="text-gray-500 mb-4">Our AI has flagged a post that may need urgent attention. We are here to help.</p>
                         <button className="sos-btn w-full bg-red-600 text-white font-bold py-3 px-6 rounded-full transition-colors hover:bg-red-700">
-                            <i data-lucide="message-square-heart" className="inline-block mr-2"></i> Chat with a Counselor
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-message-square-heart inline-block mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M17.8 10c-1.5 1.5-3 3-5.8 3-2.8 0-4.3-1.5-5.8-3-1.5-1.5 0-4.5 5.8-4.5 5.8 0 7.3 3 5.8 4.5Z"/></svg> Chat with a Counselor
                         </button>
                     </div>
                     
@@ -350,12 +361,12 @@ export function QueryHubView() {
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold">Ask a Question</h2>
                         <button onClick={() => hideModal('new-query-modal')} className="text-gray-400 hover:text-gray-600">
-                            <i data-lucide="x" ></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                         </button>
                     </div>
                     <form id="new-query-form" className="space-y-4">
-                        <input type="text" id="query-title" placeholder="Title" className="w-full p-3 rounded-xl frosted-card border-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-gray-800 placeholder-gray-500" />
-                        <textarea id="query-description" placeholder="Description" rows={5} className="w-full p-3 rounded-xl frosted-card border-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-gray-800 placeholder-gray-500"></textarea>
+                        <input type="text" id="query-title" placeholder="Title" className="w-full p-3 rounded-xl frosted-card border-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-gray-800 placeholder-gray-500" required />
+                        <textarea id="query-description" placeholder="Description" rows={5} className="w-full p-3 rounded-xl frosted-card border-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-gray-800 placeholder-gray-500" required></textarea>
                         <input type="text" id="query-tags" placeholder="Hashtags (e.g., #ExamStress)" className="w-full p-3 rounded-xl frosted-card border-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-gray-800 placeholder-gray-500" />
                         <div className="flex items-center space-x-4">
                             <label className="text-gray-600">Post as:</label>
@@ -376,7 +387,7 @@ export function QueryHubView() {
             <div id="query-expanded-modal" className="hidden fixed inset-0 z-50 items-center justify-center p-4 modal-overlay">
                 <div className="frosted-card p-8 rounded-2xl max-w-4xl w-full h-full lg:max-h-[90vh] overflow-y-auto relative">
                     <button onClick={() => hideModal('query-expanded-modal')} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
-                        <i data-lucide="x"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                     </button>
                     <div id="expanded-query-content">
                     </div>
@@ -395,3 +406,5 @@ export function QueryHubView() {
         </div>
     );
 }
+
+    
