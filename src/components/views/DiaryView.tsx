@@ -2,31 +2,13 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic, Brain, X } from 'lucide-react';
+import { Brain, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getSummary, analyzeMood } from "@/app/actions";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 
 // Define interfaces for data structures
-interface SpeechRecognition extends EventTarget {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  onresult: ((this: SpeechRecognition, ev: any) => any) | null;
-  onerror: ((this: SpeechRecognition, ev: any) => any) | null;
-  onend: ((this: SpeechRecognition, ev: Event) => any) | null;
-}
-
-interface Window {
-  SpeechRecognition: new () => SpeechRecognition;
-  webkitSpeechRecognition: new () => SpeechRecognition;
-}
-
-declare var window: Window;
-
 interface DiaryEntry {
     text: string;
     mood: string;
@@ -104,66 +86,18 @@ const MoodTrendsModal = ({ isOpen, onClose, data }: { isOpen: boolean, onClose: 
 export function DiaryView() {
     const entryAreaCardRef = useRef<HTMLDivElement>(null);
     const saveButtonRef = useRef<HTMLButtonElement>(null);
-    const recognitionRef = useRef<SpeechRecognition | null>(null);
     const entryPadRef = useRef<HTMLDivElement>(null);
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [entryHtml, setEntryHtml] = useState('');
     const [allEntries, setAllEntries] = useState<AllEntries>({});
-    const [isRecording, setIsRecording] = useState(false);
     const [warningMessage, setWarningMessage] = useState('');
-    const [isVoicePopupVisible, setVoicePopupVisible] = useState(false);
     const [isSummarizing, setIsSummarizing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isTrendsModalOpen, setIsTrendsModalOpen] = useState(false);
     const [moodData, setMoodData] = useState<any[]>([]);
     
-    // This effect should run only once to set up speech recognition
-    useEffect(() => {
-        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognitionAPI) {
-          recognitionRef.current = new SpeechRecognitionAPI();
-          const recognition = recognitionRef.current;
-          recognition.continuous = true;
-          recognition.interimResults = true;
-          // Not setting `lang` makes it auto-detect the language
-    
-          recognition.onresult = (event) => {
-            let finalTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript;
-                }
-            }
-
-            if(finalTranscript && entryPadRef.current) {
-                // Append the new transcript with a space
-                entryPadRef.current.innerHTML += finalTranscript + ' ';
-                // Manually trigger the input event to update state
-                const event = new Event('input', { bubbles: true, cancelable: true });
-                entryPadRef.current.dispatchEvent(event);
-            }
-          };
-          
-          recognition.onend = () => {
-             // The onend event can fire unexpectedly. Only stop if it wasn't a manual stop.
-             if (isRecording) {
-                recognition.start();
-             }
-          };
-
-          recognition.onerror = (event) => {
-            console.error('Speech recognition error', event.error);
-            setIsRecording(false);
-            setVoicePopupVisible(false);
-          };
-
-        } else {
-            console.warn("Speech Recognition not supported in this browser.");
-        }
-    }, [isRecording]); // Added isRecording to dependencies
-
 
     // Load entries from localStorage on initial render
     useEffect(() => {
@@ -253,26 +187,6 @@ export function DiaryView() {
         const promptHtml = `<p><span class="diary-prompt-text">${prompt}</span>&nbsp;</p>`;
         entryPadRef.current.innerHTML += entryPadRef.current.innerHTML ? `<br>${promptHtml}`: promptHtml;
         handleInput({ currentTarget: entryPadRef.current } as React.FormEvent<HTMLDivElement>);
-    };
-
-    const handleMicClick = () => {
-        if (!recognitionRef.current) return;
-
-        if (isRecording) {
-            stopRecording();
-        } else {
-            setIsRecording(true);
-            setVoicePopupVisible(true);
-            recognitionRef.current.start();
-        }
-    };
-    
-    const stopRecording = () => {
-        if (recognitionRef.current) {
-            setIsRecording(false); 
-            setVoicePopupVisible(false);
-            recognitionRef.current.stop();
-        }
     };
 
     const handleDayClick = (date: Date) => {
@@ -421,14 +335,6 @@ export function DiaryView() {
                                 suppressContentEditableWarning={true}
                                 style={{ WebkitUserModify: isEditable ? 'read-write' : 'read-only' }}
                             />
-                            {isVoicePopupVisible && (
-                                <div className={`voice-popup ${isVoicePopupVisible ? 'visible' : ''}`}>
-                                    <p className="voice-popup-text">🎤 Listening...</p>
-                                    <button onClick={stopRecording} className="voice-popup-stop-button">
-                                        Stop
-                                    </button>
-                                </div>
-                            )}
                             {warningMessage && !isEditable && (
                                 <div className="entry-pad-overlay">
                                     {warningMessage}
@@ -437,16 +343,6 @@ export function DiaryView() {
                         </div>
 
                         <div className="flex items-center justify-end mt-auto gap-4">
-                            {isEditable && (
-                                <button
-                                    onClick={handleMicClick}
-                                    className={`mic-button ${isRecording ? 'recording' : ''}`}
-                                    title={isRecording ? 'Stop Recording' : 'Start Recording'}
-                                    disabled={!isEditable}
-                                >
-                                    <Mic className="w-5 h-5" />
-                                </button>
-                            )}
                             <button 
                                 className="save-button" 
                                 ref={saveButtonRef} 
@@ -466,7 +362,6 @@ export function DiaryView() {
                 <div className="fab-container">
                     <div className="fab-options">
                         <div className="fab-option" title="Text Entry">✍️</div>
-                        <div className="fab-option" title="Voice Entry" onClick={handleMicClick}>🎤</div>
                         <div className="fab-option" title="Add Photo/Doodle">📷</div>
                     </div>
                     <div className="fab">+</div>

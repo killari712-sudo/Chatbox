@@ -303,53 +303,6 @@
     pointer-events: none; /* Allow clicks to pass through to the textarea */
 }
 
-.voice-popup {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 1.5rem 2rem;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 20;
-    opacity: 0;
-    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
-}
-
-.voice-popup.visible {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-}
-
-.voice-popup-text {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--text-color);
-    margin-bottom: 1rem;
-    animation: pulse 1.5s infinite ease-in-out;
-}
-
-.voice-popup-stop-button {
-    background-color: #ef4444;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-
-.voice-popup-stop-button:hover {
-    background-color: #dc2626;
-}
-
 .entry-pad {
   width: 100%;
   height: 100%;
@@ -383,39 +336,6 @@
     cursor: not-allowed;
     transform: none;
     opacity: 0.6;
-}
-
-
-.mic-button {
-    background-color: rgba(0,0,0,0.05);
-    color: var(--text-muted);
-    border: 1px solid var(--border-color);
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.mic-button:hover {
-    background-color: rgba(0,0,0,0.1);
-    color: var(--text-color);
-}
-
-.mic-button.recording {
-    background-color: var(--mood-red);
-    color: white;
-    border-color: var(--mood-red);
-    animation: mic-pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes mic-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
 .calendar-timeline { grid-area: calendar-timeline; }
