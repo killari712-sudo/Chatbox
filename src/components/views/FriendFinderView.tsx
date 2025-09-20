@@ -1,10 +1,15 @@
 
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SupportCirclesView } from './SupportCirclesView';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Activity, Brain, Users, Compass } from 'lucide-react';
+
 
 export function FriendFinderView() {
+    const [isSidebarExpanded, setSidebarExpanded] = useState(false);
+
     useEffect(() => {
         const modal = document.getElementById('addFriendModal') as HTMLElement;
         const plusBtn = document.querySelector('.add-btn') as HTMLElement;
@@ -146,97 +151,142 @@ export function FriendFinderView() {
         }
     }, []);
 
+    const sidebarItems = [
+        { type: 'item', icon: Activity, label: 'Activity Feed', tooltip: 'See what your friends are up to.' },
+        { type: 'item', icon: Brain, label: 'Smart Tools', tooltip: 'AI-powered matching tools.' },
+        { type: 'item', icon: Compass, label: 'Mood Radar', tooltip: 'Check the community mood.' },
+        { type: 'divider', label: 'Actions' },
+        { type: 'item', icon: Users, label: 'Manage Friends', tooltip: 'View your connections.' },
+    ];
+    
+    const handleRipple = (event: React.MouseEvent<HTMLButtonElement>) => {
+        const btn = event.currentTarget;
+        const ripple = document.createElement('span');
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        
+        ripple.style.width = ripple.style.height = `${size}px`;
+        ripple.style.left = `${event.clientX - rect.left - size / 2}px`;
+        ripple.style.top = `${event.clientY - rect.top - size / 2}px`;
+        ripple.className = 'ripple';
+    
+        btn.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+    };
+
     return (
-        <div className="friend-finder-body">
-            <div className="app-container">
-                <div className="top-bar">
-                    <h1>Friends & Finder 👫</h1>
-                    <div className="top-bar-right">
-                        <button className="icon-btn">🔍</button>
-                        <button className="add-btn">+</button>
-                        <button className="icon-btn">⚙</button>
+        <TooltipProvider delayDuration={0}>
+            <div className="friend-finder-body flex flex-row">
+                <main className="flex-grow h-full overflow-y-auto">
+                    <div className="app-container">
+                        <div className="top-bar">
+                            <h1>Friends & Finder 👫</h1>
+                            <div className="top-bar-right">
+                                <button className="icon-btn">🔍</button>
+                                <button className="add-btn">+</button>
+                                <button className="icon-btn">⚙</button>
+                            </div>
+                        </div>
+
+                        <div className="main-content">
+                            <div className="left-section">
+                                <div className="tabs">
+                                    <button className="tab-btn active" data-tab="friends-dashboard">Friends Dashboard</button>
+                                    <button className="tab-btn" data-tab="friend-finder">Friend Finder</button>
+                                    <button className="tab-btn" data-tab="pods-groups">Pods & Groups</button>
+                                </div>
+
+                                <div id="friends-dashboard" className="content-section active">
+                                    <div className="empty-state">
+                                        <p>It looks like you havent added any friends yet.</p>
+                                        <p>Go to the Friend Finder to start making connections!</p>
+                                        <button className="cta-btn" onClick={() => document.querySelector<HTMLButtonElement>('.tab-btn[data-tab="friend-finder"]')?.click()}>Find Friends Now</button>
+                                    </div>
+                                </div>
+
+                                <div id="friend-finder" className="content-section">
+                                    <div className="empty-state">
+                                        <p>AI will suggest relevant connections here.</p>
+                                        <p>Start logging your habits and moods to get personalized matches!</p>
+                                        <button className="cta-btn">Start My Journey</button>
+                                    </div>
+                                </div>
+
+                                <div id="pods-groups" className="content-section">
+                                <SupportCirclesView />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </main>
+                
+                <aside 
+                    onMouseEnter={() => setSidebarExpanded(true)}
+                    onMouseLeave={() => setSidebarExpanded(false)}
+                    className="group flex-shrink-0 w-20 hover:w-64 bg-white/30 backdrop-blur-lg border-l h-full overflow-y-auto overflow-x-hidden p-2 transition-all duration-300 ease-in-out"
+                >
+                    <nav className="flex flex-col gap-2">
+                        {sidebarItems.map((item, index) => {
+                            if (item.type === 'divider') {
+                                return (
+                                <div key={index} className="flex items-center gap-4 px-4 py-2 transition-opacity duration-300">
+                                    <div className="h-px bg-gray-300/80 w-6 flex-shrink-0"></div>
+                                    <span className={`text-xs text-gray-500 uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
+                                </div>
+                                )
+                            }
+                            const Icon = item.icon;
+                            const button = (
+                            <button
+                                onClick={(e) => { handleRipple(e); }}
+                                className="w-full h-14 flex items-center justify-start gap-4 px-4 rounded-full text-gray-600 hover:text-blue-600 ripple-btn hover:bg-blue-500/10"
+                            >
+                                <Icon className="w-6 h-6 flex-shrink-0" />
+                                <span className={`font-medium whitespace-nowrap transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
+                            </button>
+                            );
+                            return (
+                            <Tooltip key={index}>
+                                <TooltipTrigger asChild>
+                                {button}
+                                </TooltipTrigger>
+                                {!isSidebarExpanded && (
+                                <TooltipContent side="left" className="bg-gray-800 text-white font-semibold">
+                                    <p>{item.tooltip}</p>
+                                </TooltipContent>
+                                )}
+                            </Tooltip>
+                            )
+                        })}
+                    </nav>
+                </aside>
 
-                <div className="main-content">
-                    <div className="left-section">
-                        <div className="tabs">
-                            <button className="tab-btn active" data-tab="friends-dashboard">Friends Dashboard</button>
-                            <button className="tab-btn" data-tab="friend-finder">Friend Finder</button>
-                            <button className="tab-btn" data-tab="pods-groups">Pods & Groups</button>
-                        </div>
+                <div id="addFriendModal" className="friend-finder-modal">
+                    <div className="friend-finder-modal-content">
+                        <span className="friend-finder-modal-close-btn">&times;</span>
+                        <h2>Find Your Match</h2>
+                        <p>What are your interests? Select all that apply.</p>
 
-                        <div id="friends-dashboard" className="content-section active">
-                            <div className="empty-state">
-                                <p>It looks like you havent added any friends yet.</p>
-                                <p>Go to the Friend Finder to start making connections!</p>
-                                <button className="cta-btn" onClick={() => document.querySelector<HTMLButtonElement>('.tab-btn[data-tab="friend-finder"]')?.click()}>Find Friends Now</button>
-                            </div>
+                        <div id="interests-container" className="interests-container">
+                            <span className="interest-tag" data-interest="Reading">Reading 📚</span>
+                            <span className="interest-tag" data-interest="Cooking">Cooking 🍳</span>
+                            <span className="interest-tag" data-interest="Photography">Photography 📷</span>
+                            
+                            <span className="interest-tag" data-interest="Gym workouts">Gym workouts 💪</span>
+                            <span className="interest-tag" data-interest="Yoga">Yoga 🧘</span>
+                            <span className="interest-tag" data-interest="Hiking">Hiking ⛰</span>
+                            
+                            <span className="interest-tag" data-interest="Gaming">Gaming 🎮</span>
+                            <span className="interest-tag" data-interest="Movies">Movies 🎬</span>
+                            <span className="interest-tag" data-interest="Music">Music 🎵</span>
+                            
+                            <span className="interest-tag" data-interest="Food Exploring">Food Exploring 🍔</span>
+                            <span className="interest-tag" data-interest="Road Trips">Road Trips 🚗</span>
                         </div>
-
-                        <div id="friend-finder" className="content-section">
-                            <div className="empty-state">
-                                <p>AI will suggest relevant connections here.</p>
-                                <p>Start logging your habits and moods to get personalized matches!</p>
-                                <button className="cta-btn">Start My Journey</button>
-                            </div>
-                        </div>
-
-                        <div id="pods-groups" className="content-section">
-                           <SupportCirclesView />
-                        </div>
-                    </div>
-
-                    <div className="right-sidebar">
-                        <div className="sidebar-section">
-                            <h4>Activity Feed</h4>
-                            <div className="activity-feed-item">🎯 Aisha completed 3 challenges</div>
-                            <div className="activity-feed-item">📖 John studied for 2 hours with Buddy Room</div>
-                            <div className="activity-feed-item">🧘 Sarah joined the Morning Meditation Pod</div>
-                        </div>
-                        <div className="sidebar-section">
-                            <h4>Smart Tools</h4>
-                            <div className="smart-tool-item">🤝 Volunteer / Mentor Matching</div>
-                            <div className="smart-tool-item">🎧 Study Buddy Match (Pomodoro)</div>
-                            <div className="smart-tool-item">🎮 Challenge Together</div>
-                        </div>
-                        <div className="sidebar-section">
-                            <h4>Mood Radar</h4>
-                            <div className="mood-radar">
-                                <span>😊</span>
-                                <span>😐</span>
-                                <span>😢</span>
-                            </div>
-                        </div>
+                        <button id="getStartedBtn" className="cta-btn empty-state-cta-btn">Get Started</button>
                     </div>
                 </div>
             </div>
-
-            <div id="addFriendModal" className="friend-finder-modal">
-                <div className="friend-finder-modal-content">
-                    <span className="friend-finder-modal-close-btn">&times;</span>
-                    <h2>Find Your Match</h2>
-                    <p>What are your interests? Select all that apply.</p>
-
-                    <div id="interests-container" className="interests-container">
-                        <span className="interest-tag" data-interest="Reading">Reading 📚</span>
-                        <span className="interest-tag" data-interest="Cooking">Cooking 🍳</span>
-                        <span className="interest-tag" data-interest="Photography">Photography 📷</span>
-                        
-                        <span className="interest-tag" data-interest="Gym workouts">Gym workouts 💪</span>
-                        <span className="interest-tag" data-interest="Yoga">Yoga 🧘</span>
-                        <span className="interest-tag" data-interest="Hiking">Hiking ⛰</span>
-                        
-                        <span className="interest-tag" data-interest="Gaming">Gaming 🎮</span>
-                        <span className="interest-tag" data-interest="Movies">Movies 🎬</span>
-                        <span className="interest-tag" data-interest="Music">Music 🎵</span>
-                        
-                        <span className="interest-tag" data-interest="Food Exploring">Food Exploring 🍔</span>
-                        <span className="interest-tag" data-interest="Road Trips">Road Trips 🚗</span>
-                    </div>
-                    <button id="getStartedBtn" className="cta-btn empty-state-cta-btn">Get Started</button>
-                </div>
-            </div>
-        </div>
+        </TooltipProvider>
     );
 }
