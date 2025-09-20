@@ -66,10 +66,11 @@ export function DiaryView() {
     const entryAreaCardRef = useRef<HTMLDivElement>(null);
     const saveButtonRef = useRef<HTMLButtonElement>(null);
     const recognitionRef = useRef<SpeechRecognition | null>(null);
+    const entryPadRef = useRef<HTMLDivElement>(null);
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [entryText, setEntryText] = useState('');
+    const [entryHtml, setEntryHtml] = useState('');
     const [allEntries, setAllEntries] = useState<AllEntries>({});
     const [isRecording, setIsRecording] = useState(false);
     const [warningMessage, setWarningMessage] = useState('');
@@ -100,8 +101,9 @@ export function DiaryView() {
                 interimTranscript += event.results[i][0].transcript;
               }
             }
-            if(finalTranscript) {
-                setEntryText(prev => prev + finalTranscript.trim() + '. ');
+            if(finalTranscript && entryPadRef.current) {
+                entryPadRef.current.innerHTML += finalTranscript.trim() + '. ';
+                setEntryHtml(entryPadRef.current.innerHTML);
             }
           };
           
@@ -125,7 +127,11 @@ export function DiaryView() {
     useEffect(() => {
         const dateKey = selectedDate.toDateString();
         const entry = allEntries[dateKey];
-        setEntryText(entry?.text || '');
+        setEntryHtml(entry?.text || '');
+        if (entryPadRef.current) {
+            entryPadRef.current.innerHTML = entry?.text || '';
+        }
+
 
         if (!entry && isPast(selectedDate)) {
             const dateString = selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -139,12 +145,13 @@ export function DiaryView() {
 
 
     const handleSave = () => {
-        if (!isToday(selectedDate)) return; // Should not be possible but as a safeguard
+        if (!isToday(selectedDate) || !entryPadRef.current) return;
 
+        const currentHtml = entryPadRef.current.innerHTML;
         const dateKey = selectedDate.toDateString();
         const newEntries: AllEntries = {
             ...allEntries,
-            [dateKey]: { text: entryText }
+            [dateKey]: { text: currentHtml }
         };
         setAllEntries(newEntries);
         localStorage.setItem('diaryEntries', JSON.stringify(newEntries));
@@ -170,8 +177,10 @@ export function DiaryView() {
     };
 
     const handlePromptClick = (prompt: string) => {
-        if (!isToday(selectedDate)) return;
-        setEntryText(prev => prev ? `${prev}\n\n${prompt}\n` : `${prompt}\n`);
+        if (!isToday(selectedDate) || !entryPadRef.current) return;
+        const promptHtml = `<p><span class="diary-prompt-text">${prompt}</span></p>`;
+        entryPadRef.current.innerHTML += entryPadRef.current.innerHTML ? `<br>${promptHtml}`: promptHtml;
+        setEntryHtml(entryPadRef.current.innerHTML);
     };
 
     const handleMicClick = () => {
@@ -197,6 +206,11 @@ export function DiaryView() {
         if (isFuture(date)) return;
         setSelectedDate(date);
     };
+    
+    const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+        setEntryHtml(e.currentTarget.innerHTML);
+    };
+
 
     const renderCalendar = () => {
         const year = currentMonth.getFullYear();
@@ -275,12 +289,13 @@ export function DiaryView() {
                             <Hash size={18} />
                         </div>
                         <div className="entry-pad-container">
-                            <textarea 
-                                className="entry-pad" 
-                                placeholder={isEditable ? "Start writing your entry..." : ""}
-                                value={entryText}
-                                onChange={(e) => isEditable && setEntryText(e.target.value)}
-                                readOnly={!isEditable}
+                            <div 
+                                ref={entryPadRef}
+                                className="entry-pad"
+                                contentEditable={isEditable}
+                                onInput={handleInput}
+                                dangerouslySetInnerHTML={{ __html: entryHtml }}
+                                suppressContentEditableWarning={true}
                             />
                             {warningMessage && (
                                 <div className="entry-pad-overlay">
@@ -303,7 +318,7 @@ export function DiaryView() {
                                 className="save-button" 
                                 ref={saveButtonRef} 
                                 onClick={handleSave}
-                                disabled={!isEditable || !entryText.trim()}
+                                disabled={!isEditable || !entryHtml.trim()}
                             >
                                 Save
                             </button>
@@ -327,3 +342,5 @@ export function DiaryView() {
         </ScrollArea>
     );
 }
+
+  
