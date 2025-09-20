@@ -183,6 +183,7 @@
   --mood-loving: #f472b6;
   --mood-grateful: #ef4444;
   --mood-blue: #3b82f6;
+  --mood-red: #ef4444;
 
 
   background-color: var(--bg-color);
@@ -384,6 +385,18 @@
   height: 6px;
   border-radius: 50%;
 }
+.calendar-day.disabled {
+    color: var(--text-muted);
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.calendar-day.disabled:hover {
+    background-color: transparent;
+}
+
 
 .fab-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 100; }
 .fab-options { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-bottom: 1rem; transform: scale(0); opacity: 0; transform-origin: bottom center; transition: all 0.2s ease-out; }
@@ -1507,3 +1520,6 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 
 
+
+
+    

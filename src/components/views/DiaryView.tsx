@@ -40,6 +40,27 @@ const PROMPTS = [
     'What’s on your mind right now?'
 ];
 
+// Helper to check if a date is today
+const isToday = (someDate: Date) => {
+    const today = new Date();
+    return someDate.getDate() === today.getDate() &&
+           someDate.getMonth() === today.getMonth() &&
+           someDate.getFullYear() === today.getFullYear();
+};
+
+// Helper to check if a date is in the past
+const isPast = (someDate: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of today
+    return someDate < today;
+};
+
+// Helper to check if a date is in the future
+const isFuture = (someDate: Date) => {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // Set to end of today
+    return someDate > today;
+};
 
 export function DiaryView() {
     const entryAreaCardRef = useRef<HTMLDivElement>(null);
@@ -60,30 +81,41 @@ export function DiaryView() {
         }
 
         // Speech Recognition Setup
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-          recognitionRef.current = new SpeechRecognition();
+        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognitionAPI) {
+          recognitionRef.current = new SpeechRecognitionAPI();
           recognitionRef.current.continuous = true;
           recognitionRef.current.interimResults = true;
           recognitionRef.current.lang = 'en-US';
     
           recognitionRef.current.onresult = (event) => {
+            let interimTranscript = '';
             let finalTranscript = '';
             for (let i = event.resultIndex; i < event.results.length; ++i) {
               if (event.results[i].isFinal) {
                 finalTranscript += event.results[i][0].transcript;
+              } else {
+                interimTranscript += event.results[i][0].transcript;
               }
             }
             if(finalTranscript) {
-                setEntryText(prev => prev + finalTranscript + ' ');
+                setEntryText(prev => prev + finalTranscript.trim() + '. ');
             }
           };
           
           recognitionRef.current.onend = () => {
-            if(isRecording){ // restart if it was stopped automatically
+             if (isRecording) { // Automatically restart if it was supposed to be recording
                 recognitionRef.current?.start();
-            }
+             }
           };
+
+          recognitionRef.current.onerror = (event) => {
+            console.error('Speech recognition error', event.error);
+            setIsRecording(false);
+          };
+
+        } else {
+            console.log("Speech Recognition not supported in this browser.");
         }
     }, []);
 
@@ -96,6 +128,8 @@ export function DiaryView() {
 
 
     const handleSave = () => {
+        if (isPast(selectedDate) || isFuture(selectedDate)) return; // Should not be possible but as a safeguard
+
         const dateKey = selectedDate.toDateString();
         const newEntries: AllEntries = {
             ...allEntries,
@@ -125,23 +159,37 @@ export function DiaryView() {
     };
 
     const handlePromptClick = (prompt: string) => {
+        if (!isToday(selectedDate)) return;
         setEntryText(prev => prev ? `${prev}\n\n${prompt}\n` : `${prompt}\n`);
     };
 
     const handleMicClick = () => {
+        if (!recognitionRef.current) return;
         if (isRecording) {
-            recognitionRef.current?.stop();
+            recognitionRef.current.stop();
             setIsRecording(false);
-        } else if (recognitionRef.current) {
+        } else {
             recognitionRef.current.start();
             setIsRecording(true);
         }
+    };
+    
+    // This is a manual stop, so we tell the onend handler not to restart
+    const stopRecording = () => {
+        if (recognitionRef.current) {
+            setIsRecording(false); // Set state first to prevent restart
+            recognitionRef.current.stop();
+        }
+    };
+
+    const handleDayClick = (date: Date) => {
+        if (isFuture(date)) return;
+        setSelectedDate(date);
     };
 
     const renderCalendar = () => {
         const year = currentMonth.getFullYear();
         const month = currentMonth.getMonth();
-        const today = new Date();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const firstDayIndex = new Date(year, month, 1).getDay();
 
@@ -156,11 +204,12 @@ export function DiaryView() {
             const entry = allEntries[dateKey];
             
             let dayClass = 'calendar-day';
-            if (date.toDateString() === today.toDateString()) dayClass += ' today';
+            if (isToday(date)) dayClass += ' today';
             if (date.toDateString() === selectedDate.toDateString()) dayClass += ' selected';
+            if (isFuture(date)) dayClass += ' disabled';
 
             days.push(
-                <div key={i} className={dayClass} onClick={() => setSelectedDate(date)}>
+                <div key={i} className={dayClass} onClick={() => handleDayClick(date)}>
                     {i}
                     {entry && <div className="mood-dot" style={{ backgroundColor: `var(--mood-blue)` }}></div>}
                 </div>
@@ -185,6 +234,9 @@ export function DiaryView() {
             </>
         );
     };
+    
+    const isEditable = isToday(selectedDate);
+
 
     return (
         <ScrollArea className="h-full">
@@ -213,23 +265,26 @@ export function DiaryView() {
                         </div>
                         <textarea 
                             className="entry-pad" 
-                            placeholder="Start writing your entry..."
+                            placeholder={isEditable ? "Start writing your entry..." : "This entry is read-only."}
                             value={entryText}
-                            onChange={(e) => setEntryText(e.target.value)}
+                            onChange={(e) => isEditable && setEntryText(e.target.value)}
+                            readOnly={!isEditable}
                         />
                         <div className="flex items-center justify-end mt-auto gap-4">
-                            <button
-                                onClick={handleMicClick}
-                                className={`mic-button ${isRecording ? 'recording' : ''}`}
-                                title={isRecording ? 'Stop Recording' : 'Start Recording'}
-                            >
-                                <Mic className="w-5 h-5" />
-                            </button>
+                            {isEditable && (
+                                <button
+                                    onClick={isRecording ? stopRecording : handleMicClick}
+                                    className={`mic-button ${isRecording ? 'recording' : ''}`}
+                                    title={isRecording ? 'Stop Recording' : 'Start Recording'}
+                                >
+                                    <Mic className="w-5 h-5" />
+                                </button>
+                            )}
                             <button 
                                 className="save-button" 
                                 ref={saveButtonRef} 
                                 onClick={handleSave}
-                                disabled={!entryText.trim()}
+                                disabled={!isEditable || !entryText.trim()}
                             >
                                 Save
                             </button>
@@ -253,3 +308,5 @@ export function DiaryView() {
         </ScrollArea>
     );
 }
+
+    
