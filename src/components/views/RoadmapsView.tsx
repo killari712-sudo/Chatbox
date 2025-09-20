@@ -217,12 +217,6 @@ export function RoadmapsView() {
                     <RoadmapDetailsModal roadmap={activeRoadmap} onClose={handleCloseRoadmap} onStepComplete={handleStepComplete} />
                 )}
             </AnimatePresence>
-            
-            <button className="fixed bottom-8 right-8 bg-purple-600 text-white p-4 rounded-full shadow-lg hover:bg-purple-700 transition-all transform hover:scale-110 z-50">
-                <User size={24} />
-            </button>
         </div>
     );
 }
-
-    
