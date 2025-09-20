@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Search, UserPlus, MoreVertical, MessageSquare, Video, Phone, Smile, Paperclip, Mic, Send } from 'lucide-react';
+import { Search, UserPlus, MoreVertical, MessageSquare, Video, Phone, Smile, Paperclip, Mic, Send, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 
 interface Message {
@@ -47,6 +47,7 @@ export function FriendFinderView() {
     const [leftPanelTab, setLeftPanelTab] = useState('friends');
     const [messages, setMessages] = useState<Message[]>(activeChat?.messages || []);
     const [newMessage, setNewMessage] = useState('');
+    const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
 
     const handleTabClick = (tabId: string) => {
         setActiveTab(tabId);
@@ -55,6 +56,7 @@ export function FriendFinderView() {
     const handleFriendClick = (friend: Friend) => {
         setActiveChat(friend);
         setMessages(friend.messages);
+        setMobileView('chat');
     };
     
     const handleSendMessage = (e: React.FormEvent) => {
@@ -65,8 +67,6 @@ export function FriendFinderView() {
         const updatedMessages = [...messages, newMsg];
         setMessages(updatedMessages);
         
-        // This is where you would update the friend object in a real DB
-        // For now, we just update the local state
         const updatedFriend = { ...activeChat, messages: updatedMessages, lastMessage: newMessage, timestamp: 'Just now' };
         
         setNewMessage('');
@@ -77,6 +77,9 @@ export function FriendFinderView() {
             {activeChat ? (
                 <>
                     <header className="flex items-center p-3 border-b bg-white shadow-sm">
+                        <button className="mr-2 md:hidden" onClick={() => setMobileView('list')}>
+                            <ArrowLeft size={20} />
+                        </button>
                         <Image src={activeChat.avatar} alt={activeChat.name} width={40} height={40} className="rounded-full" data-ai-hint="person avatar" />
                         <div className="ml-3">
                             <h2 className="font-semibold text-gray-800">{activeChat.name}</h2>
@@ -189,7 +192,7 @@ export function FriendFinderView() {
                 {activeTab === 'friends-dashboard' && (
                     <div className="flex w-full h-full">
                         {/* Left Sidebar */}
-                        <div className="w-full md:w-1/3 lg:w-1/4 h-full border-r flex flex-col">
+                        <div className={`w-full md:w-1/3 lg:w-1/4 h-full border-r flex-col ${mobileView === 'chat' ? 'hidden md:flex' : 'flex'}`}>
                             <div className="p-3 border-b">
                                 <div className="relative">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
@@ -206,7 +209,7 @@ export function FriendFinderView() {
                         </div>
 
                         {/* Right Main Chat Area */}
-                        <div className="flex-1 hidden md:flex h-full">
+                        <div className={`flex-1 h-full ${mobileView === 'list' ? 'hidden md:flex' : 'flex'}`}>
                             <ChatArea />
                         </div>
                     </div>
@@ -233,3 +236,5 @@ export function FriendFinderView() {
         </div>
     );
 }
+
+    
