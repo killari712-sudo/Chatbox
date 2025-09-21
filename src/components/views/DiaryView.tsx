@@ -6,6 +6,7 @@ import { Brain, X, Mic } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getSummary, analyzeMood } from "@/app/actions";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useAuth } from '@/hooks/useAuth';
 
 
 // Define interfaces for data structures
@@ -83,7 +84,7 @@ const MoodTrendsModal = ({ isOpen, onClose, data }: { isOpen: boolean, onClose: 
 };
 
 
-export function DiaryView() {
+export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void; }) {
     const entryAreaCardRef = useRef<HTMLDivElement>(null);
     const saveButtonRef = useRef<HTMLButtonElement>(null);
     const entryPadRef = useRef<HTMLDivElement>(null);
@@ -92,7 +93,6 @@ export function DiaryView() {
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [entryHtml, setEntryHtml] = useState('');
     const [allEntries, setAllEntries] = useState<AllEntries>({});
     const [warningMessage, setWarningMessage] = useState('');
     const [isSummarizing, setIsSummarizing] = useState(false);
@@ -101,12 +101,17 @@ export function DiaryView() {
     const [moodData, setMoodData] = useState<any[]>([]);
     const [isRecording, setIsRecording] = useState(false);
     const [isVoicePopupVisible, setIsVoicePopupVisible] = useState(false);
+    const [currentEntryText, setCurrentEntryText] = useState('');
     
 
     // Load entries from localStorage on initial render
     useEffect(() => {
+        if (!user) {
+            setAllEntries({});
+            return;
+        }
         try {
-            const savedEntries = localStorage.getItem('diaryEntries');
+            const savedEntries = localStorage.getItem(`diaryEntries_${user.uid}`);
             if (savedEntries) {
                 setAllEntries(JSON.parse(savedEntries));
             }
@@ -133,7 +138,7 @@ export function DiaryView() {
                     }
                 }
                 if (entryPadRef.current) {
-                    entryPadRef.current.innerHTML = entryHtml + finalTranscript + interimTranscript;
+                    entryPadRef.current.innerHTML = entryPadRef.current.innerHTML + finalTranscript + interimTranscript;
                 }
             };
             
@@ -141,12 +146,12 @@ export function DiaryView() {
                 setIsRecording(false);
                 setIsVoicePopupVisible(false);
                 if (entryPadRef.current) {
-                    setEntryHtml(entryPadRef.current.innerHTML);
+                    setCurrentEntryText(entryPadRef.current.innerHTML);
                 }
             };
         }
 
-    }, [entryHtml]);
+    }, [user]);
 
 
     // Update view when selectedDate or allEntries change
@@ -154,10 +159,11 @@ export function DiaryView() {
         const dateKey = selectedDate.toDateString();
         const entry = allEntries[dateKey];
         const newHtml = entry?.text || '';
-        setEntryHtml(newHtml);
+        
         if (entryPadRef.current) {
             entryPadRef.current.innerHTML = newHtml;
         }
+        setCurrentEntryText(newHtml);
 
         if (!entry && isPast(selectedDate)) {
             const dateString = selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -170,7 +176,7 @@ export function DiaryView() {
 
 
     const handleSave = async () => {
-        if (!isToday(selectedDate) || !entryPadRef.current || !entryHtml.trim()) return;
+        if (!isEditable || !entryPadRef.current || !entryPadRef.current.innerHTML.trim()) return;
 
         setIsSaving(true);
         const currentHtml = entryPadRef.current.innerHTML;
@@ -186,7 +192,7 @@ export function DiaryView() {
                 [dateKey]: { text: currentHtml, mood: mood }
             };
             setAllEntries(newEntries);
-            localStorage.setItem('diaryEntries', JSON.stringify(newEntries));
+            localStorage.setItem(`diaryEntries_${user.uid}`, JSON.stringify(newEntries));
 
             // Confetti effect
             const saveButton = saveButtonRef.current;
@@ -213,14 +219,14 @@ export function DiaryView() {
             const dateKey = selectedDate.toDateString();
             const newEntries: AllEntries = { ...allEntries, [dateKey]: { text: currentHtml, mood: 'unknown' } };
             setAllEntries(newEntries);
-            localStorage.setItem('diaryEntries', JSON.stringify(newEntries));
+            localStorage.setItem(`diaryEntries_${user.uid}`, JSON.stringify(newEntries));
         } finally {
             setIsSaving(false);
         }
     };
 
     const handlePromptClick = (prompt: string) => {
-        if (!isToday(selectedDate) || !entryPadRef.current) return;
+        if (!isEditable || !entryPadRef.current) return;
         const promptHtml = `<p><span class="diary-prompt-text">${prompt}</span>&nbsp;</p>`;
         entryPadRef.current.innerHTML += entryPadRef.current.innerHTML ? `<br>${promptHtml}`: promptHtml;
         handleInput({ currentTarget: entryPadRef.current } as React.FormEvent<HTMLDivElement>);
@@ -232,11 +238,11 @@ export function DiaryView() {
     };
     
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
-        setEntryHtml(e.currentTarget.innerHTML);
+        setCurrentEntryText(e.currentTarget.innerHTML);
     };
 
     const handleSummarize = async () => {
-        if (!entryPadRef.current || !entryHtml.trim() || isSummarizing) return;
+        if (!entryPadRef.current || !entryPadRef.current.innerHTML.trim() || isSummarizing) return;
         setIsSummarizing(true);
         const textToSummarize = entryPadRef.current.innerText; // Use innerText to get clean text without HTML
         try {
@@ -245,7 +251,7 @@ export function DiaryView() {
             if (result.summary && entryPadRef.current) {
                 const summaryHtml = `<p>${result.summary}</p>`;
                 entryPadRef.current.innerHTML = summaryHtml;
-                setEntryHtml(summaryHtml);
+                setCurrentEntryText(summaryHtml);
             } else if (result.error) {
                 alert(`Summarization failed: ${result.error}`);
             }
@@ -258,6 +264,7 @@ export function DiaryView() {
     };
 
     const handleViewTrends = () => {
+        if (!user) return;
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -279,8 +286,7 @@ export function DiaryView() {
         if (!isEditable || isRecording) return;
         
         if (entryPadRef.current) {
-            // Save current content before starting new recording session
-            setEntryHtml(entryPadRef.current.innerHTML);
+            setCurrentEntryText(entryPadRef.current.innerHTML);
         }
         
         recognitionRef.current?.start();
@@ -355,7 +361,7 @@ export function DiaryView() {
         );
     };
     
-    const isEditable = isToday(selectedDate);
+    const isEditable = isToday(selectedDate) && !!user;
 
 
     return (
@@ -374,7 +380,7 @@ export function DiaryView() {
                                 <li key={i} onClick={() => handlePromptClick(prompt)}>{prompt}</li>
                             ))}
                         </ul>
-                        <button className="trends-button" onClick={handleViewTrends}>📊 View Mood Trends</button>
+                        <button className="trends-button" onClick={handleViewTrends} disabled={!user}>📊 View Mood Trends</button>
                     </section>
 
                     <section className="card entry-area" ref={entryAreaCardRef}>
@@ -410,6 +416,12 @@ export function DiaryView() {
                                     {warningMessage}
                                 </div>
                             )}
+                            {!user && (
+                                <div className="entry-pad-overlay flex-col !bg-white/50 backdrop-blur-sm">
+                                    <p className="font-semibold text-lg">Please sign in to use the diary.</p>
+                                    <button onClick={onSignIn} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-full">Sign In</button>
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex items-center justify-end mt-auto gap-4">
@@ -425,7 +437,7 @@ export function DiaryView() {
                                 className="save-button" 
                                 ref={saveButtonRef} 
                                 onClick={handleSave}
-                                disabled={!isEditable || !entryHtml.trim() || isSaving}
+                                disabled={!isEditable || !currentEntryText.trim() || isSaving}
                             >
                                 {isSaving ? 'Saving...' : 'Save'}
                             </button>
@@ -454,5 +466,3 @@ export function DiaryView() {
         </ScrollArea>
     );
 }
-
-    
