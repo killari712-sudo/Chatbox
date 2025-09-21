@@ -45,15 +45,22 @@ import { AvatarVoiceView } from "./AvatarVoiceView";
 function Avatar3DView({ onClose }: { onClose: () => void }) {
   // NOTE: This component requires 3D libraries like @react-three/fiber and three.js
   // You would typically have a <Canvas> component here with your 3D scene.
+  const aiAvatar = PlaceHolderImages.find((p) => p.id === "ai-avatar-1");
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="w-full h-full relative">
         {/* Placeholder for the 3D Avatar */}
         <div className="w-full h-full flex flex-col items-center justify-center text-white">
             <div className="bg-white/10 p-8 rounded-lg text-center">
-                <p className="text-2xl">3D Avatar Would Be Displayed Here</p>
-                <p className="text-sm text-gray-300 mt-2">To render the .glb file, you need to add a 3D library like @react-three/fiber.</p>
-                <p className="text-sm text-gray-400 mt-1">GLB URL: https://models.readyplayer.me/68cf651b25028352774f8036.glb</p>
+                {aiAvatar && (
+                  <Image
+                    src={aiAvatar.imageUrl.replace('/100/100', '/400/400')} // Request a larger image
+                    alt="Dummy human avatar"
+                    width={400}
+                    height={400}
+                    className="rounded-lg"
+                  />
+                )}
             </div>
         </div>
         <button onClick={onClose} className="absolute top-4 right-4 text-white p-2 rounded-full bg-white/10 hover:bg-white/20">
