@@ -21,7 +21,7 @@ const GoogleIcon = () => (
 
 
 export function AuthView({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-    const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
+    const { signInWithGoogle, signInWithEmail, signUpWithEmail, signInAnonymously } = useAuth();
     const [emailLogin, setEmailLogin] = useState('');
     const [passwordLogin, setPasswordLogin] = useState('');
     const [emailSignUp, setEmailSignUp] = useState('');
@@ -60,6 +60,14 @@ export function AuthView({ open, onOpenChange }: { open: boolean; onOpenChange: 
         setLoading(true);
         setError(null);
         await signInWithGoogle();
+        setLoading(false);
+        onOpenChange(false);
+    }
+
+    const handleAnonymousSignIn = async () => {
+        setLoading(true);
+        setError(null);
+        await signInAnonymously();
         setLoading(false);
         onOpenChange(false);
     }
@@ -108,10 +116,16 @@ export function AuthView({ open, onOpenChange }: { open: boolean; onOpenChange: 
                                 <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
                             </div>
                         </div>
-                        <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
-                            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon />}
-                            Google
-                        </Button>
+                        <div className="grid grid-cols-1 gap-2">
+                            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
+                                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon />}
+                                Google
+                            </Button>
+                             <Button variant="outline" className="w-full" onClick={handleAnonymousSignIn} disabled={loading}>
+                                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Continue as Guest
+                            </Button>
+                        </div>
                         {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
                     </div>
                 </TabsContent>

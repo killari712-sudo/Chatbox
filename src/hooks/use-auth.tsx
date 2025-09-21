@@ -15,6 +15,7 @@ import {
   signOut as firebaseSignOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInAnonymously as firebaseSignInAnonymously,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase/client";
 
@@ -24,6 +25,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<any>;
   signInWithEmail: (email: string, pass: string) => Promise<any>;
+  signInAnonymously: () => Promise<any>;
   signOut: () => Promise<void>;
 }
 
@@ -68,6 +70,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInAnonymously = async () => {
+    try {
+      const userCredential = await firebaseSignInAnonymously(auth);
+      return { user: userCredential.user };
+    } catch (error: any) {
+      return { error: error.message };
+    }
+  };
+
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
@@ -76,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value = { user, loading, signInWithGoogle, signUpWithEmail, signInWithEmail, signOut };
+  const value = { user, loading, signInWithGoogle, signUpWithEmail, signInWithEmail, signOut, signInAnonymously };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

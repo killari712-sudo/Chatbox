@@ -54,7 +54,8 @@ export function ChatView() {
 
   const { user, signOut, loading } = useAuth();
   
-  const userAvatarUrl = user?.photoURL;
+  const userIsAnonymous = user?.isAnonymous;
+  const userAvatarUrl = user && !userIsAnonymous ? user.photoURL : null;
   const guestAvatar = PlaceHolderImages.find((p) => p.id === "user-avatar");
   const userAvatar = userAvatarUrl ? {imageUrl: userAvatarUrl, id: "user-avatar"} : guestAvatar;
   const aiAvatar = PlaceHolderImages.find((p) => p.id === "ai-avatar");
@@ -252,8 +253,8 @@ export function ChatView() {
               <div className="flex items-center gap-4">
                   {userAvatar && <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="rounded-full" />}
                   <div className="text-sm">
-                    <div className="font-semibold">{user.displayName || 'User'}</div>
-                    <div className="text-gray-500">{user.email}</div>
+                    <div className="font-semibold">{user.isAnonymous ? 'Guest User' : user.displayName || 'User'}</div>
+                    <div className="text-gray-500">{!user.isAnonymous && user.email}</div>
                   </div>
                   <Button onClick={signOut} variant="outline" size="sm">
                       <LogOut className="mr-2 h-4 w-4" />
