@@ -2,10 +2,11 @@
 "use client";
 
 import { ChatView } from "@/components/views/ChatView";
+import { AuthView } from "@/components/views/AuthView";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -13,6 +14,10 @@ export default function Home() {
             <p>Loading...</p>
         </div>
     );
+  }
+
+  if (!user) {
+    return <AuthView />;
   }
 
   return <ChatView />;
