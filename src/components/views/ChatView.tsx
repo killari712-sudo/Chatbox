@@ -51,7 +51,7 @@ function Avatar3DView({ onClose }: { onClose: () => void }) {
       <div className="w-full h-full relative">
         {aiAvatar && (
           <Image
-            src={aiAvatar.imageUrl.replace('/100/100', '/400/400')}
+            src={aiAvatar.imageUrl}
             alt="Dummy human avatar"
             width={400}
             height={400}
@@ -157,7 +157,7 @@ export function ChatView() {
             recognitionRef.current.stop();
         }
     }
-  }, [toast]);
+  }, [toast, isRecording]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -444,7 +444,7 @@ export function ChatView() {
                           className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-1.5 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden text-sm"
                           disabled={isPending}
                         />
-                        <Button type="button" onClick={() => setAvatar3DVisible(true)} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                        <Button type="button" variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
                           <Bot className="w-4 h-4 text-blue-600" />
                         </Button>
                         <Button type="button" onClick={toggleRecording} variant="ghost" size="icon" className={`w-8 h-8 rounded-full flex-shrink-0 ${isRecording ? 'bg-red-500/20 hover:bg-red-500/30' : 'hover:bg-blue-500/10'}`}>
@@ -490,16 +490,6 @@ export function ChatView() {
         </div>
         
         {/* OVERLAYS */}
-
-        {isRecording && (
-          <div className="fixed inset-0 bg-white/80 backdrop-blur-xl z-50 flex flex-col items-center justify-center pointer-events-none">
-              <div style={{animation: 'avatar-float 5s ease-in-out infinite'}}>
-                <div className="absolute inset-0 bg-blue-400 rounded-full blur-3xl opacity-40 animate-pulse"></div>
-                {aiAvatar && <Image src={aiAvatar.imageUrl} alt="Assistant Avatar" width={144} height={144} className="w-36 h-36 rounded-full border-4 border-blue-400 shadow-2xl shadow-blue-500/50" />}
-              </div>
-              <p className="mt-8 text-2xl font-medium text-gray-600 tracking-wider">Listening...</p>
-          </div>
-        )}
 
         {isSosOverlayVisible && (
           <div className="fixed inset-0 bg-red-100/50 backdrop-blur-2xl z-50 flex items-center justify-center p-4">
