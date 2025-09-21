@@ -6,7 +6,6 @@ import { Brain, X, Mic } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getSummary, analyzeMood } from "@/app/actions";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useAuth } from '@/hooks/useAuth';
 import { sanitizeHtml } from '@/lib/sanitize';
 
 
@@ -85,7 +84,7 @@ const MoodTrendsModal = ({ isOpen, onClose, data }: { isOpen: boolean, onClose: 
 };
 
 
-export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void; }) {
+export function DiaryView() {
     const entryAreaCardRef = useRef<HTMLDivElement>(null);
     const saveButtonRef = useRef<HTMLButtonElement>(null);
     const entryPadRef = useRef<HTMLDivElement>(null);
@@ -107,13 +106,8 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
 
     // Load entries from localStorage on initial render
     useEffect(() => {
-        if (!user) {
-            setAllEntries({});
-            if (entryPadRef.current) entryPadRef.current.innerHTML = '';
-            return;
-        }
         try {
-            const savedEntries = localStorage.getItem(`diaryEntries_${user.uid}`);
+            const savedEntries = localStorage.getItem(`diaryEntries`);
             if (savedEntries) {
                 setAllEntries(JSON.parse(savedEntries));
             }
@@ -155,7 +149,7 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
             };
         }
 
-    }, [user]);
+    }, []);
 
 
     // Update view when selectedDate or allEntries change
@@ -196,7 +190,7 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
                 [dateKey]: { text: currentHtml, mood: mood }
             };
             setAllEntries(newEntries);
-            localStorage.setItem(`diaryEntries_${user.uid}`, JSON.stringify(newEntries));
+            localStorage.setItem(`diaryEntries`, JSON.stringify(newEntries));
 
             // Confetti effect
             const saveButton = saveButtonRef.current;
@@ -223,7 +217,7 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
             const dateKey = selectedDate.toDateString();
             const newEntries: AllEntries = { ...allEntries, [dateKey]: { text: currentHtml, mood: 'unknown' } };
             setAllEntries(newEntries);
-            localStorage.setItem(`diaryEntries_${user.uid}`, JSON.stringify(newEntries));
+            localStorage.setItem(`diaryEntries`, JSON.stringify(newEntries));
         } finally {
             setIsSaving(false);
         }
@@ -270,7 +264,6 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
     };
 
     const handleViewTrends = () => {
-        if (!user) return;
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -367,7 +360,7 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
         );
     };
     
-    const isEditable = isToday(selectedDate) && !!user;
+    const isEditable = isToday(selectedDate);
 
 
     return (
@@ -386,7 +379,7 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
                                 <li key={i} onClick={() => handlePromptClick(prompt)}>{prompt}</li>
                             ))}
                         </ul>
-                        <button className="trends-button" onClick={handleViewTrends} disabled={!user}>📊 View Mood Trends</button>
+                        <button className="trends-button" onClick={handleViewTrends}>📊 View Mood Trends</button>
                     </section>
 
                     <section className="card entry-area" ref={entryAreaCardRef}>
@@ -420,12 +413,6 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
                             {warningMessage && !isEditable && (
                                 <div className="entry-pad-overlay">
                                     {warningMessage}
-                                </div>
-                            )}
-                            {!user && (
-                                <div className="entry-pad-overlay flex-col !bg-white/50 backdrop-blur-sm">
-                                    <p className="font-semibold text-lg">Please sign in to use the diary.</p>
-                                    <button onClick={onSignIn} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-full">Sign In</button>
                                 </div>
                             )}
                         </div>
@@ -472,5 +459,3 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
         </ScrollArea>
     );
 }
-
-    

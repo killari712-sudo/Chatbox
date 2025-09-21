@@ -31,8 +31,6 @@ import { DiaryView } from "./DiaryView";
 import { QueryHubView } from "./QueryHubView";
 import { WellnessView } from "./WellnessView";
 import { MentorView } from "./MentorView";
-import { useAuth } from "@/hooks/useAuth";
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { HabitBuilderView } from "./HabitBuilderView";
 import { RoadmapsView } from "./RoadmapsView";
 import { FriendFinderView } from "./FriendFinderView";
@@ -47,7 +45,6 @@ export function ChatView() {
   const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
   const [isSosOverlayVisible, setSosOverlayVisible] = useState(false);
   const [isSidebarExpanded, setSidebarExpanded] = useState(true);
-  const { user, auth, loading } = useAuth();
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -73,32 +70,6 @@ export function ChatView() {
       inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
     }
   };
-
-  const handleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("Error signing in with Google: ", error);
-    }
-  };
-  
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      setActiveView('Home');
-      // Clear user-specific data from localStorage
-      Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('diaryEntries_') || key.startsWith('user-habits_') || key.startsWith('queryHubQueries_')) {
-              localStorage.removeItem(key);
-          }
-      });
-      setMessages([]); // Clear chat messages
-    } catch (error) {
-      console.error("Error signing out: ", error);
-    }
-  };
-
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -161,14 +132,8 @@ export function ChatView() {
       setSosOverlayVisible(true);
       return;
     }
-  
-    const requiredAuthViews = ['Diary', 'Habit Builder'];
-  
-    if (requiredAuthViews.includes(item.label) && !user) {
-      handleSignIn();
-    } else {
-      setActiveView(item.label);
-    }
+    
+    setActiveView(item.label);
   };
 
   const handleRipple = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -211,8 +176,8 @@ export function ChatView() {
                       <div className={`max-w-md md:max-w-lg p-3 px-4 rounded-2xl ${message.role === 'user' ? 'bg-blue-500 text-white rounded-br-lg' : 'bg-white/80 rounded-bl-lg'}`}>
                           <p>{message.content}</p>
                       </div>
-                      {message.role === 'user' && user && user.photoURL && (
-                           <Image src={user.photoURL} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
+                      {message.role === 'user' && userAvatar && (
+                           <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="w-10 h-10 rounded-full" />
                       )}
                     </div>
                   ))}
@@ -230,7 +195,7 @@ export function ChatView() {
           </div>
         );
       case 'Diary':
-        return <DiaryView user={user} onSignIn={handleSignIn}/>;
+        return <DiaryView />;
       case 'Query Hub':
         return <QueryHubView />;
       case 'Wellness':
@@ -238,7 +203,7 @@ export function ChatView() {
       case 'Mentors':
         return <MentorView onNavigate={setActiveView} />;
       case 'Habit Builder':
-        return <HabitBuilderView user={user} onSignIn={handleSignIn}/>;
+        return <HabitBuilderView />;
       case 'Roadmaps':
         return <RoadmapsView onNavigate={setActiveView} />;
       case 'Support':
@@ -267,18 +232,6 @@ export function ChatView() {
                     <path d="M12 12V22" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 <span className="font-bold text-lg font-headline text-gray-800">EcosystemAI</span>
-            </div>
-            <div className="relative">
-                {!user && !loading && (
-                    <Button onClick={handleSignIn} size="sm" className="rounded-full bg-blue-500 hover:bg-blue-600 text-white">
-                        <svg className="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px">
-                            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
-                            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
-                            <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.619-3.317-11.28-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
-                        </svg>
-                        Sign in with Google
-                    </Button>
-                )}
             </div>
         </header>
 
@@ -349,27 +302,6 @@ export function ChatView() {
                     );
                   })}
               </nav>
-                {user && (
-                    <div className="mt-auto">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <div className="w-full h-16 flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-gray-500/10">
-                                    {user.photoURL && <Image src={user.photoURL} alt="Avatar" width={40} height={40} className="w-10 h-10 rounded-full flex-shrink-0" />}
-                                    <div className={`flex-grow overflow-hidden transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>
-                                        <p className="font-semibold text-sm truncate">{user.displayName}</p>
-                                    </div>
-                                    <ChevronDown className={`w-5 h-5 flex-shrink-0 transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`} />
-                                </div>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent side="top" align="start" className="w-56 mb-2">
-                                <DropdownMenuItem onClick={handleSignOut}>
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Sign Out</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                )}
             </aside>
         </div>
         

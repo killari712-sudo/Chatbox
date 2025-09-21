@@ -1,11 +1,9 @@
 
 "use client";
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
 import { sanitizeHtml } from '@/lib/sanitize';
 
 export function QueryHubView() {
-    const { user } = useAuth();
     const [queries, setQueries] = useState<any[]>([]);
 
     useEffect(() => {
@@ -218,19 +216,11 @@ export function QueryHubView() {
         }
 
         askButton?.addEventListener('click', () => {
-            if (user) {
-                showModal('new-query-modal');
-            } else {
-                alert("Please sign in to ask a question.");
-            }
+            showModal('new-query-modal');
         });
 
         const handleFormSubmit = (e: Event) => {
             e.preventDefault();
-            if (!user) {
-                alert("You must be logged in to post.");
-                return;
-            }
             const description = (document.getElementById('query-description') as HTMLTextAreaElement).value;
             const isCrisis = crisisWords.some(word => description.toLowerCase().includes(word));
             
@@ -242,7 +232,7 @@ export function QueryHubView() {
                     id: `q${queries.length + 1}`,
                     title: (document.getElementById('query-title') as HTMLInputElement).value,
                     description: description,
-                    user: user.displayName || 'User',
+                    user: 'Guest User',
                     type: 'Student',
                     views: 0,
                     replies: 0,
@@ -335,7 +325,7 @@ export function QueryHubView() {
           newQueryForm?.removeEventListener('submit', handleFormSubmit);
         }
 
-    }, [user, queries]);
+    }, [queries]);
 
     return (
         <div className='query-hub-body'>
@@ -373,7 +363,7 @@ export function QueryHubView() {
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                                 </div>
                             </div>
-                            <button id="ask-button" className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-2 px-6 rounded-full transition-transform transform hover:scale-105 ripple-effect disabled:opacity-50 disabled:cursor-not-allowed" disabled={!user}>
+                            <button id="ask-button" className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-2 px-6 rounded-full transition-transform transform hover:scale-105 ripple-effect">
                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-plus inline-block mr-1"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg> Ask
                             </button>
                         </div>
@@ -453,13 +443,13 @@ export function QueryHubView() {
                     <div id="expanded-query-content">
                     </div>
                     <div id="reply-tools" className="mt-6">
-                        <textarea id="reply-textarea" placeholder="Write a reply..." rows={3} className="w-full p-3 rounded-xl frosted-card border-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-gray-800 placeholder-gray-500" disabled={!user}></textarea>
+                        <textarea id="reply-textarea" placeholder="Write a reply..." rows={3} className="w-full p-3 rounded-xl frosted-card border-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent text-gray-800 placeholder-gray-500"></textarea>
                         <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center space-x-2 text-sm text-gray-600">
                                 <label htmlFor="reply-anonymous">Reply anonymously</label>
                                 <input type="checkbox" id="reply-anonymous" className="form-checkbox rounded text-blue-500" />
                             </div>
-                            <button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors hover:bg-blue-700 disabled:opacity-50" disabled={!user}>Post Reply</button>
+                            <button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors hover:bg-blue-700">Post Reply</button>
                         </div>
                     </div>
                 </div>
