@@ -102,6 +102,7 @@ export function DiaryView() {
     const [isRecording, setIsRecording] = useState(false);
     const [isVoicePopupVisible, setIsVoicePopupVisible] = useState(false);
     const [currentEntryText, setCurrentEntryText] = useState('');
+    const lastFinalTranscript = useRef('');
     
 
     // Load entries from localStorage on initial render
@@ -134,9 +135,10 @@ export function DiaryView() {
                 }
 
                 if (entryPadRef.current) {
-                    // Use textContent for current content to avoid complex HTML parsing
-                    const existingText = entryPadRef.current.textContent || '';
-                    const newContent = existingText + finalTranscript + interimTranscript;
+                    if (finalTranscript) {
+                        lastFinalTranscript.current += finalTranscript;
+                    }
+                    const newContent = lastFinalTranscript.current + interimTranscript;
                     entryPadRef.current.innerHTML = sanitizeHtml(newContent.replace(/\n/g, '<br>'));
                 }
             };
@@ -239,7 +241,9 @@ export function DiaryView() {
     };
     
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
-        setCurrentEntryText(e.currentTarget.innerHTML);
+        if (!isRecording) { // Only update from manual input if not recording
+          setCurrentEntryText(e.currentTarget.innerHTML);
+        }
     };
 
     const handleSummarize = async () => {
@@ -285,11 +289,7 @@ export function DiaryView() {
     const startRecording = () => {
         if (!isEditable || isRecording) return;
         
-        if (entryPadRef.current) {
-            // Clear the content before starting a new recording
-            entryPadRef.current.innerHTML = '';
-            setCurrentEntryText('');
-        }
+        lastFinalTranscript.current = entryPadRef.current?.innerHTML || '';
         
         recognitionRef.current?.start();
         setIsRecording(true);
