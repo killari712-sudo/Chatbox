@@ -940,6 +940,8 @@
     width: 100%;
     background-image: radial-gradient(circle at 10% 20%, rgba(74, 144, 226, 0.1), transparent 30%),
                       radial-gradient(circle at 90% 80%, rgba(226, 74, 144, 0.1), transparent 30%);
+    overflow-y: auto;
+    height: 100%;
 }
 
 .wellness-modal-overlay {
