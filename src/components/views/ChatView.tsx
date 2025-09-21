@@ -32,7 +32,6 @@ import {
   X,
 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DiaryView } from "./DiaryView";
 import { QueryHubView } from "./QueryHubView";
 import { WellnessView } from "./WellnessView";
@@ -92,7 +91,17 @@ export function ChatView() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      setActiveView('Home'); 
+      setActiveView('Home');
+      // Clear user-specific data from localStorage
+      Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('diaryEntries_') || key.startsWith('user-habits_')) {
+              localStorage.removeItem(key);
+          }
+      });
+      // For query hub, we might just want to reset the view, not clear all queries if they are meant to be public
+      // If they are user-specific, they should be cleared too.
+      // localStorage.removeItem('queryHubQueries');
+      setMessages([]); // Clear chat messages
     } catch (error) {
       console.error("Error signing out: ", error);
     }
@@ -139,16 +148,16 @@ export function ChatView() {
 
   const sidebarItems = [
       { type: 'item', icon: Home, label: 'Home', tooltip: 'Return to the main chat view.' },
-      { type: 'divider', label: 'Productivity' },
+      { type: 'divider' },
       { type: 'item', icon: Map, label: 'Roadmaps', tooltip: 'View your personalized goals and progress.' },
       { type: 'item', icon: BarChart3, label: 'Habit Builder', tooltip: "Build and track your habits." },
-      { type: 'divider', label: 'Wellness' },
+      { type: 'divider' },
       { type: 'item', icon: NotebookPen, label: 'Diary', tooltip: 'Your private, encrypted journal.' },
       { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
-      { type: 'divider', label: 'Community' },
+      { type: 'divider' },
       { type: 'item', icon: MessageSquare, label: 'Query Hub', tooltip: 'Ask questions and get answers from the community.' },
       { type: 'item', icon: Users, label: 'Support', tooltip: 'Chat with friends and support groups.' },
-      { type: 'divider', label: 'Settings' },
+      { type: 'divider' },
       { type: 'item', icon: Bot, label: 'Avatar & Voice', tooltip: 'Customize your AI assistant.' },
       { type: 'item', icon: AlertOctagon, label: 'SOS Crisis', isSOS: true, tooltip: 'Immediate crisis support.' }
   ];
@@ -156,18 +165,12 @@ export function ChatView() {
   const handleSidebarClick = (item: (typeof sidebarItems)[number]) => {
     if (item.type !== 'item') return;
 
-    const requiresAuth = ['Diary', 'Habit Builder', 'Query Hub', 'Support', 'Mentors'];
-
     if (item.isSOS) {
         setSosOverlayVisible(true);
         return;
     }
-
-    if (requiresAuth.includes(item.label) && !user) {
-        setActiveView(item.label);
-    } else {
-        setActiveView(item.label);
-    }
+    
+    setActiveView(item.label);
   };
 
   const handleRipple = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -256,7 +259,6 @@ export function ChatView() {
 
 
   return (
-    <TooltipProvider delayDuration={0}>
       <div className="h-screen w-screen flex flex-col font-body text-gray-800">
         {/* TOP BAR */}
         <header className="w-full h-16 flex-shrink-0 flex items-center justify-between px-6 glassmorphic border-b z-30">
@@ -337,27 +339,16 @@ export function ChatView() {
                       )
                     }
                     const Icon = item.icon;
-                    const button = (
+                    return (
                        <button
+                          key={index}
                           onClick={(e) => { handleSidebarClick(item); handleRipple(e); }}
                           className={`w-full h-14 flex items-center justify-start gap-4 px-4 rounded-full text-gray-600 hover:text-blue-600 ripple-btn ${item.isSOS ? 'hover:bg-red-500/10 text-red-500 hover:text-red-600' : 'hover:bg-blue-500/10'}`}
                         >
                           <Icon className="w-6 h-6 flex-shrink-0" />
-                          <span className={`font-medium whitespace-nowrap transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
+                          <span className={`font-medium whitespace-nowrap transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}></span>
                         </button>
                     );
-                    return (
-                      <Tooltip key={index}>
-                        <TooltipTrigger asChild>
-                          {button}
-                        </TooltipTrigger>
-                        {!isSidebarExpanded && (
-                          <TooltipContent side="left" className="bg-gray-800 text-white font-semibold">
-                            <p>{item.tooltip}</p>
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                    )
                   })}
               </nav>
                 {user && (
@@ -415,8 +406,5 @@ export function ChatView() {
           </div>
         )}
       </div>
-    </TooltipProvider>
   );
 }
-
-    
