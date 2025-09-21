@@ -1,11 +1,13 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XCircle, ChevronLeft, ChevronRight, Lightbulb, Search, Save, Moon, Sun, Activity, Droplet, MoonStar, HeartPulse, Dumbbell, Soup, Microscope, Calendar, Loader2, Award, FileDown, Smile, BrainCircuit } from 'lucide-react';
-import { getNutritionInfo } from '@/app/actions';
+import { getNutritionInfo, getWellnessData, updateWellnessMetric } from '@/app/actions';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
+import { useAuth } from '@/hooks/use-auth';
+import type { WellnessGoal, WellnessMetric } from '@/lib/types';
 
 
 // --- UTILITY ---
@@ -13,23 +15,6 @@ const getGreeting = (hour: number, name: string) => {
   if (hour >= 5 && hour < 12) return `Good Morning, ${name} ☀️`;
   if (hour >= 12 && hour < 18) return `Good Afternoon, ${name} 👋`;
   return `Good Evening, ${name} 🌙`;
-};
-
-// --- MOCK DATA ---
-const initialUserData = {
-  name: 'Alex',
-  metrics: {
-    calories: 450,
-    caloriesHistory: [{day: 'Mon', kcal: 300}, {day: 'Tue', kcal: 420}, {day: 'Wed', kcal: 350}, {day: 'Thu', kcal: 500}, {day: 'Fri', kcal: 450}, {day: 'Sat', kcal: 600}, {day: 'Sun', kcal: 450}],
-    sleep: 7.5,
-    sleepHistory: [{day: 'Mon', hrs: 6}, {day: 'Tue', hrs: 8}, {day: 'Wed', hrs: 7}, {day: 'Thu', hrs: 7.5}, {day: 'Fri', hrs: 6.5}, {day: 'Sat', hrs: 9}, {day: 'Sun', hrs: 7.5}],
-    hydration: 4,
-    heartRate: 72,
-    steps: 8500,
-  },
-  goals: [{ goal: 'Drink 8 cups of water', progress: 0.5 }, { goal: 'Walk 10,000 steps', progress: 0.85 }],
-  moodLogs: [{ name: 'Happy', count: 4 }, { name: 'Calm', count: 2 }, { name: 'Stressed', count: 1 }],
-  affirmations: ["I am capable and strong.", "I choose to be happy today.", "I am grateful for my journey."]
 };
 
 
@@ -145,7 +130,9 @@ const NutritionDatabase = ({ onClose }: { onClose: () => void }) => {
     );
 };
 
-const DailyAffirmations = ({ affirmations, onClose }: { affirmations: string[]; onClose: () => void }) => {
+const affirmations = ["I am capable and strong.", "I choose to be happy today.", "I am grateful for my journey."];
+
+const DailyAffirmations = ({ onClose }: { onClose: () => void }) => {
     return (
         <div className="wellness-modal-overlay">
             <motion.div className="wellness-modal-content" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
@@ -168,9 +155,9 @@ const DailyAffirmations = ({ affirmations, onClose }: { affirmations: string[]; 
 
 // --- MAIN VIEW ---
 
-const MetricCard = ({ title, value, unit, icon, onClick, children }: { title: string, value: any, unit: string, icon: React.ReactNode, onClick: () => void, children?: React.ReactNode }) => (
-    <motion.div className="bg-white/60 backdrop-blur-lg rounded-2xl p-6 shadow-md border border-white/30 cursor-pointer h-full flex flex-col"
-        whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}
+const MetricCard = ({ title, value, unit, icon, onClick, children }: { title: string, value: any, unit: string, icon: React.ReactNode, onClick?: () => void, children?: React.ReactNode }) => (
+    <motion.div className={`bg-white/60 backdrop-blur-lg rounded-2xl p-6 shadow-md border border-white/30 h-full flex flex-col ${onClick ? 'cursor-pointer' : ''}`}
+        whileHover={onClick ? { scale: 1.02, boxShadow: '0 10px 20px rgba(0,0,0,0.1)' } : {}}
         onClick={onClick}>
         <div className="flex items-center gap-2 text-gray-600">
             {icon}
@@ -199,47 +186,55 @@ const ToolCard = ({ title, icon, onClick }: { title: string, icon: React.ReactNo
 
 
 export function WellnessView() {
-    const [userData, setUserData] = useState(initialUserData);
+    const { user } = useAuth();
+    const [metrics, setMetrics] = useState<WellnessMetric | null>(null);
+    const [caloriesHistory, setCaloriesHistory] = useState<any[]>([]);
+    const [sleepHistory, setSleepHistory] = useState<any[]>([]);
+    const [goals, setGoals] = useState<WellnessGoal[]>([]);
+    const [moodLogs, setMoodLogs] = useState<any[]>([]);
+    const [isPending, startTransition] = useTransition();
+
     const [activeModal, setActiveModal] = useState<string | null>(null);
     const [currentTime, setCurrentTime] = useState(new Date());
 
+    const userName = user?.displayName?.split(' ')[0] || 'User';
+
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 60000);
-        
-        // Simulate real-time updates
-        const metricInterval = setInterval(() => {
-            setUserData(prev => ({
-                ...prev,
-                metrics: {
-                    ...prev.metrics,
-                    calories: prev.metrics.calories + Math.floor(Math.random() * 5),
-                    heartRate: 65 + Math.floor(Math.random() * 10),
-                    steps: prev.metrics.steps + Math.floor(Math.random() * 100),
-                }
-            }))
-        }, 5000);
-
-        return () => {
-            clearInterval(timer);
-            clearInterval(metricInterval);
-        };
+        return () => clearInterval(timer);
     }, []);
 
+    const fetchWellnessData = () => {
+        if (!user) return;
+        startTransition(async () => {
+            const data = await getWellnessData(user.uid);
+            setMetrics(data.metrics);
+            setCaloriesHistory(data.caloriesHistory);
+            setSleepHistory(data.sleepHistory);
+            setGoals(data.goals);
+            setMoodLogs(data.moodLogs);
+        });
+    }
+
+    useEffect(() => {
+        fetchWellnessData();
+    }, [user]);
+
+
     const handleUpdateHydration = () => {
-        setUserData(prev => ({
-            ...prev,
-            metrics: {
-                ...prev.metrics,
-                hydration: prev.metrics.hydration < 8 ? prev.metrics.hydration + 1 : 8,
-            }
-        }));
+        if (!user || !metrics) return;
+        const newHydration = (metrics.hydration || 0) < 8 ? (metrics.hydration || 0) + 1 : 8;
+        startTransition(async () => {
+            await updateWellnessMetric(user.uid, { hydration: newHydration });
+            fetchWellnessData(); // Refetch data to update UI
+        });
     };
 
     const renderModal = () => {
       switch (activeModal) {
         case 'breathing': return <BreathingCoach onClose={() => setActiveModal(null)} />;
         case 'nutrition': return <NutritionDatabase onClose={() => setActiveModal(null)} />;
-        case 'affirmations': return <DailyAffirmations affirmations={userData.affirmations} onClose={() => setActiveModal(null)} />;
+        case 'affirmations': return <DailyAffirmations onClose={() => setActiveModal(null)} />;
         // Placeholder modals for new features
         case 'workout':
         case 'bmi':
@@ -253,43 +248,62 @@ export function WellnessView() {
         default: return null;
       }
     };
+    
+    if (isPending && !metrics) {
+        return (
+            <div className="wellness-body flex items-center justify-center">
+                <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
+            </div>
+        );
+    }
+    
+    if (!user) {
+         return (
+            <div className="wellness-body flex items-center justify-center text-center">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-700">Please sign in</h2>
+                    <p className="text-gray-500">Sign in to track and view your wellness journey.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="wellness-body">
             <header className="p-8">
-                <h1 className="text-4xl font-bold text-gray-800">{getGreeting(currentTime.getHours(), userData.name)}</h1>
+                <h1 className="text-4xl font-bold text-gray-800">{getGreeting(currentTime.getHours(), userName)}</h1>
                 <p className="text-lg text-gray-500">Here's your wellness summary for today.</p>
             </header>
 
             <main className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Left Section - Metrics */}
                 <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <MetricCard title="Calories Burned" value={userData.metrics.calories} unit="kcal" icon={<Activity />} onClick={() => {}}>
+                    <MetricCard title="Calories Burned" value={metrics?.calories || 0} unit="kcal" icon={<Activity />}>
                         <ResponsiveContainer width="100%" height={80}>
-                            <LineChart data={userData.metrics.caloriesHistory}>
+                            <LineChart data={caloriesHistory}>
                                 <Line type="monotone" dataKey="kcal" stroke="#f97316" strokeWidth={2} dot={false} />
                                 <Tooltip wrapperStyle={{ outline: 'none' }} contentStyle={{ backgroundColor: 'rgba(255,255,255,0.8)', border: '1px solid #ddd', borderRadius: '8px' }} />
                             </LineChart>
                         </ResponsiveContainer>
                     </MetricCard>
-                    <MetricCard title="Sleep" value={userData.metrics.sleep} unit="hrs" icon={<Moon />} onClick={() => {}}>
+                    <MetricCard title="Sleep" value={metrics?.sleep || 0} unit="hrs" icon={<Moon />}>
                          <ResponsiveContainer width="100%" height={80}>
-                            <LineChart data={userData.metrics.sleepHistory}>
+                            <LineChart data={sleepHistory}>
                                 <Line type="monotone" dataKey="hrs" stroke="#8b5cf6" strokeWidth={2} dot={false} />
                                 <Tooltip wrapperStyle={{ outline: 'none' }} contentStyle={{ backgroundColor: 'rgba(255,255,255,0.8)', border: '1px solid #ddd', borderRadius: '8px' }} />
                             </LineChart>
                         </ResponsiveContainer>
                     </MetricCard>
-                    <MetricCard title="Hydration" value={userData.metrics.hydration} unit="cups" icon={<Droplet />} onClick={handleUpdateHydration}>
+                    <MetricCard title="Hydration" value={metrics?.hydration || 0} unit="cups" icon={<Droplet />} onClick={handleUpdateHydration}>
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
-                            <motion.div className="bg-blue-500 h-2.5 rounded-full" animate={{ width: `${(userData.metrics.hydration / 8) * 100}%` }} />
+                            <motion.div className="bg-blue-500 h-2.5 rounded-full" animate={{ width: `${((metrics?.hydration || 0) / 8) * 100}%` }} />
                         </div>
                     </MetricCard>
-                    <MetricCard title="Heart Rate" value={userData.metrics.heartRate} unit="bpm" icon={<HeartPulse />} onClick={() => {}} />
-                    <MetricCard title="Steps" value={userData.metrics.steps.toLocaleString()} unit="" icon={<Dumbbell />} onClick={() => {}} />
-                    <MetricCard title="Mood" value={userData.moodLogs[0].name} unit="" icon={<Smile />} onClick={() => {}}>
+                    <MetricCard title="Heart Rate" value={metrics?.heartRate || 0} unit="bpm" icon={<HeartPulse />} />
+                    <MetricCard title="Steps" value={(metrics?.steps || 0).toLocaleString()} unit="" icon={<Dumbbell />} />
+                    <MetricCard title="Mood" value={metrics?.mood || 'Neutral'} unit="" icon={<Smile />}>
                         <ResponsiveContainer width="100%" height={80}>
-                            <BarChart data={userData.moodLogs}>
+                            <BarChart data={moodLogs}>
                                 <Bar dataKey="count" fill="#3b82f6" />
                                 <XAxis dataKey="name" tick={{fontSize: 10}}/>
                                 <Tooltip wrapperStyle={{ outline: 'none' }} contentStyle={{ backgroundColor: 'rgba(255,255,255,0.8)', border: '1px solid #ddd', borderRadius: '8px' }} />

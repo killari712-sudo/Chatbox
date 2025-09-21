@@ -14,3 +14,20 @@ export type Message = {
   suggestions?: string[];
   resources?: string;
 };
+
+export type WellnessMetric = {
+    date: string; // YYYY-MM-DD
+    calories?: number;
+    sleep?: number; // hours
+    hydration?: number; // cups
+    heartRate?: number; // bpm
+    steps?: number;
+    mood?: string;
+};
+
+export type WellnessGoal = {
+    id: string;
+    text: string;
+    progress: number; // 0 to 1
+    category: string;
+};
