@@ -74,7 +74,12 @@ export function QueryHubView() {
         function renderQueryCard(query: any) {
             const card = document.createElement('div');
             card.className = 'frosted-card p-6 rounded-2xl flex flex-col space-y-4 cursor-pointer hover:border-gray-500 transition-colors fade-slide-up';
-            card.onclick = () => showExpandedView(query);
+            card.onclick = (e) => {
+                const target = e.target as HTMLElement;
+                if (!target.closest('.delete-query-btn')) {
+                    showExpandedView(query);
+                }
+            };
 
             const userType = query.isAnonymous ? 'Anonymous' : query.user;
             const badgeClass = `badge badge-${query.type.toLowerCase()}`;
@@ -129,6 +134,7 @@ export function QueryHubView() {
                     <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg></button>
                     <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
                     <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg></button>
+                    <button class="delete-query-btn hover:text-red-500" data-query-id="${query.id}"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
                 </div>
             `;
             
@@ -278,21 +284,34 @@ export function QueryHubView() {
             hashtagCloud.innerHTML = popularTags.map(tag => `<span class="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs hover:bg-gray-300 cursor-pointer">${tag}</span>`).join('');
         }
         
-        document.addEventListener('click', (e) => {
+        const handleDocumentClick = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
-            if (target.closest('.upvote-btn')) {
-                const btn = target.closest('.upvote-btn');
-                if (btn) {
-                    const countSpan = btn.querySelector('.upvote-count');
-                    if (countSpan) {
-                        let currentCount = parseInt(countSpan.textContent || '0');
-                        countSpan.textContent = (currentCount + 1).toString();
-                        btn.classList.add('upvote-sparkle');
-                        setTimeout(() => btn.classList.remove('upvote-sparkle'), 500);
+
+            const upvoteBtn = target.closest('.upvote-btn');
+            if (upvoteBtn) {
+                const countSpan = upvoteBtn.querySelector('.upvote-count');
+                if (countSpan) {
+                    let currentCount = parseInt(countSpan.textContent || '0');
+                    countSpan.textContent = (currentCount + 1).toString();
+                    upvoteBtn.classList.add('upvote-sparkle');
+                    setTimeout(() => upvoteBtn.classList.remove('upvote-sparkle'), 500);
+                }
+            }
+
+            const deleteBtn = target.closest('.delete-query-btn');
+            if (deleteBtn) {
+                const queryId = deleteBtn.getAttribute('data-query-id');
+                if (queryId) {
+                    if (confirm('Are you sure you want to delete this query?')) {
+                        const updatedQueries = queries.filter(q => q.id !== queryId);
+                        setQueries(updatedQueries);
+                        localStorage.setItem('queryHubQueries', JSON.stringify(updatedQueries));
                     }
                 }
             }
-        });
+        };
+
+        document.addEventListener('click', handleDocumentClick);
         
         (window as any).hideModal = hideModal;
 
@@ -323,6 +342,7 @@ export function QueryHubView() {
         return () => {
           window.removeEventListener('resize', resizeHandler);
           newQueryForm?.removeEventListener('submit', handleFormSubmit);
+          document.removeEventListener('click', handleDocumentClick);
         }
 
     }, [queries]);
