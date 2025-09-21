@@ -11,55 +11,55 @@
       "id": "ai-avatar",
       "description": "AI assistant avatar",
       "imageUrl": "https://picsum.photos/seed/human1/40/40",
-      "imageHint": "3d avatar"
+      "imageHint": "gaming character"
     },
     {
       "id": "ai-avatar-1",
-      "description": "3D rendered avatar of a woman",
-      "imageUrl": "https://picsum.photos/seed/3dhuman1/100/100",
-      "imageHint": "3d avatar"
+      "description": "Gaming character avatar of a woman",
+      "imageUrl": "https://picsum.photos/seed/gamechar1/100/100",
+      "imageHint": "gaming character"
     },
     {
       "id": "ai-avatar-2",
-      "description": "3D rendered avatar of a man",
-      "imageUrl": "https://picsum.photos/seed/3dhuman2/100/100",
-      "imageHint": "3d avatar"
+      "description": "Gaming character avatar of a man",
+      "imageUrl": "https://picsum.photos/seed/gamechar2/100/100",
+      "imageHint": "gaming character"
     },
     {
       "id": "ai-avatar-3",
-      "description": "3D rendered avatar of a person smiling",
-      "imageUrl": "https://picsum.photos/seed/3dhuman3/100/100",
-      "imageHint": "3d character"
+      "description": "Gaming character avatar of a person smiling",
+      "imageUrl": "https://picsum.photos/seed/gamechar3/100/100",
+      "imageHint": "gaming character"
     },
     {
       "id": "ai-avatar-4",
-      "description": "3D rendered avatar of a professional person",
-      "imageUrl": "https://picsum.photos/seed/3dhuman4/100/100",
-      "imageHint": "3d character"
+      "description": "Gaming character avatar of a professional person",
+      "imageUrl": "https://picsum.photos/seed/gamechar4/100/100",
+      "imageHint": "gaming character"
     },
     {
       "id": "ai-avatar-5",
-      "description": "3D rendered avatar of a person with glasses",
-      "imageUrl": "https://picsum.photos/seed/3dhuman5/100/100",
-      "imageHint": "3d avatar"
+      "description": "Gaming character avatar of a person with glasses",
+      "imageUrl": "https://picsum.photos/seed/gamechar5/100/100",
+      "imageHint": "gaming character"
     },
     {
       "id": "ai-avatar-6",
-      "description": "3D rendered avatar of a friendly person",
-      "imageUrl": "https://picsum.photos/seed/3dhuman6/100/100",
-      "imageHint": "3d character"
+      "description": "Gaming character avatar of a friendly person",
+      "imageUrl": "https://picsum.photos/seed/gamechar6/100/100",
+      "imageHint": "gaming character"
     },
     {
       "id": "ai-avatar-7",
-      "description": "3D rendered avatar of a diverse woman",
-      "imageUrl": "https://picsum.photos/seed/3dhuman7/100/100",
-      "imageHint": "3d avatar"
+      "description": "Gaming character avatar of a diverse woman",
+      "imageUrl": "https://picsum.photos/seed/gamechar7/100/100",
+      "imageHint": "gaming character"
     },
     {
       "id": "ai-avatar-8",
-      "description": "3D rendered avatar of a diverse man",
-      "imageUrl": "https://picsum.photos/seed/3dhuman8/100/100",
-      "imageHint": "3d character"
+      "description": "Gaming character avatar of a diverse man",
+      "imageUrl": "https://picsum.photos/seed/gamechar8/100/100",
+      "imageHint": "gaming character"
     }
   ]
 }
