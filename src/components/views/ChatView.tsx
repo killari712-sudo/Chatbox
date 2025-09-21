@@ -28,6 +28,7 @@ import {
   LogIn,
   HelpCircle,
   Phone,
+  StopCircle,
 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { DiaryView } from "./DiaryView";
@@ -40,29 +41,23 @@ import { FriendFinderView } from "./FriendFinderView";
 import { useAuth } from "@/hooks/use-auth";
 import { AuthView } from "./AuthView";
 import { AvatarVoiceView } from "./AvatarVoiceView";
+import { useToast } from "@/hooks/use-toast";
 
 
 function Avatar3DView({ onClose }: { onClose: () => void }) {
-  // NOTE: This component requires 3D libraries like @react-three/fiber and three.js
-  // You would typically have a <Canvas> component here with your 3D scene.
   const aiAvatar = PlaceHolderImages.find((p) => p.id === "ai-avatar-1");
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="w-full h-full relative">
-        {/* Placeholder for the 3D Avatar */}
-        <div className="w-full h-full flex flex-col items-center justify-center text-white">
-            <div className="bg-white/10 p-8 rounded-lg text-center">
-                {aiAvatar && (
-                  <Image
-                    src={aiAvatar.imageUrl.replace('/100/100', '/400/400')} // Request a larger image
-                    alt="Dummy human avatar"
-                    width={400}
-                    height={400}
-                    className="rounded-lg"
-                  />
-                )}
-            </div>
-        </div>
+        {aiAvatar && (
+          <Image
+            src={aiAvatar.imageUrl.replace('/100/100', '/400/400')}
+            alt="Dummy human avatar"
+            width={400}
+            height={400}
+            className="rounded-lg absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          />
+        )}
         <button onClick={onClose} className="absolute top-4 right-4 text-white p-2 rounded-full bg-white/10 hover:bg-white/20">
           <X size={24} />
         </button>
@@ -77,11 +72,15 @@ export function ChatView() {
   const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
   const [activeView, setActiveView] = useState("Home");
-  const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
   const [isSosOverlayVisible, setSosOverlayVisible] = useState(false);
   const [isSidebarExpanded, setSidebarExpanded] = useState(true);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [isAvatar3DVisible, setAvatar3DVisible] = useState(false);
+
+  // Voice state
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const { toast } = useToast();
 
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -111,12 +110,54 @@ export function ChatView() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+
+      recognitionRef.current.onresult = (event: any) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        setInput(prevInput => prevInput + finalTranscript);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error("Speech recognition error", event.error);
+        toast({
+          variant: "destructive",
+          title: "Voice Error",
+          description: `An error occurred: ${event.error}`,
+        });
+        setIsRecording(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        if(isRecording) {
+            setIsRecording(false);
+        }
+      };
+
+    } else {
+        console.warn("Speech recognition not supported in this browser.");
+    }
+
+    return () => {
+        recognitionRef.current?.stop();
+    }
+  }, [isRecording, toast]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      console.log("Selected file:", file.name);
-      // In a real app, you would handle the file upload here.
-      // For now, we can just display a message.
       const fileMessage: Message = {
         id: Date.now().toString(),
         role: "user",
@@ -128,16 +169,46 @@ export function ChatView() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
-    // Auto-resize textarea
     if (inputRef.current) {
       inputRef.current.style.height = 'auto';
       inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+    }
+  };
+  
+  const toggleRecording = () => {
+    if (!recognitionRef.current) {
+        toast({
+          variant: "destructive",
+          title: "Unsupported Browser",
+          description: "Your browser does not support voice recognition.",
+        });
+        return;
+    }
+    if (isRecording) {
+        recognitionRef.current.stop();
+        setIsRecording(false);
+    } else {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(() => {
+            recognitionRef.current.start();
+            setIsRecording(true);
+        }).catch(err => {
+            toast({
+              variant: "destructive",
+              title: "Microphone Access Denied",
+              description: "Please allow microphone access to use voice input.",
+            });
+        });
     }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isPending) return;
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -365,15 +436,15 @@ export function ChatView() {
                             }
                           }}
                           rows={1}
-                          placeholder="Type your message..."
+                          placeholder={isRecording ? "Listening..." : "Type your message..."}
                           className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-1.5 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden text-sm"
                           disabled={isPending}
                         />
                         <Button type="button" onClick={() => setAvatar3DVisible(true)} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
                           <Bot className="w-4 h-4 text-blue-600" />
                         </Button>
-                        <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
-                          <Mic className="w-4 h-4 text-blue-600" />
+                        <Button type="button" onClick={toggleRecording} variant="ghost" size="icon" className={`w-8 h-8 rounded-full flex-shrink-0 ${isRecording ? 'bg-red-500/20 hover:bg-red-500/30' : 'hover:bg-blue-500/10'}`}>
+                          {isRecording ? <StopCircle className="w-4 h-4 text-red-600" /> : <Mic className="w-4 h-4 text-blue-600" />}
                         </Button>
                         <Button type="submit" size="icon" className="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 text-white flex-shrink-0" disabled={isPending || !input.trim()}>
                           <Send className="w-4 h-4" />
@@ -416,16 +487,13 @@ export function ChatView() {
         
         {/* OVERLAYS */}
 
-        {isVoiceOverlayVisible && (
-          <div className="fixed inset-0 bg-white/80 backdrop-blur-xl z-50 flex flex-col items-center justify-center">
+        {isRecording && (
+          <div className="fixed inset-0 bg-white/80 backdrop-blur-xl z-50 flex flex-col items-center justify-center pointer-events-none">
               <div style={{animation: 'avatar-float 5s ease-in-out infinite'}}>
-                <div className="absolute inset-0 bg-blue-400 rounded-full blur-3xl opacity-40"></div>
+                <div className="absolute inset-0 bg-blue-400 rounded-full blur-3xl opacity-40 animate-pulse"></div>
                 {aiAvatar && <Image src={aiAvatar.imageUrl} alt="Assistant Avatar" width={144} height={144} className="w-36 h-36 rounded-full border-4 border-blue-400 shadow-2xl shadow-blue-500/50" />}
               </div>
               <p className="mt-8 text-2xl font-medium text-gray-600 tracking-wider">Listening...</p>
-              <Button onClick={() => setVoiceOverlayVisible(false)} variant="ghost" size="icon" className="absolute top-8 right-8 text-gray-500 hover:text-gray-800 w-10 h-10">
-                <X className="w-8 h-8" />
-              </Button>
           </div>
         )}
 
@@ -447,3 +515,5 @@ export function ChatView() {
       </div>
   );
 }
+
+    
