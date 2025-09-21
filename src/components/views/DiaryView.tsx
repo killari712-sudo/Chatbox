@@ -140,7 +140,9 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
                     }
                 }
                 if (entryPadRef.current) {
-                    entryPadRef.current.innerHTML = sanitizeHtml(entryPadRef.current.innerHTML + finalTranscript + interimTranscript);
+                    const currentContent = entryPadRef.current.innerHTML;
+                    const newContent = currentContent + finalTranscript + interimTranscript;
+                    entryPadRef.current.innerHTML = sanitizeHtml(newContent);
                 }
             };
             
@@ -230,8 +232,9 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
     const handlePromptClick = (prompt: string) => {
         if (!isEditable || !entryPadRef.current) return;
         const promptHtml = `<p><span class="diary-prompt-text">${prompt}</span>&nbsp;</p>`;
-        entryPadRef.current.innerHTML += entryPadRef.current.innerHTML ? `<br>${promptHtml}`: promptHtml;
-        entryPadRef.current.innerHTML = sanitizeHtml(entryPadRef.current.innerHTML);
+        const currentContent = entryPadRef.current.innerHTML || '';
+        const newContent = currentContent ? `${currentContent}<br>${promptHtml}` : promptHtml;
+        entryPadRef.current.innerHTML = sanitizeHtml(newContent);
         handleInput({ currentTarget: entryPadRef.current } as React.FormEvent<HTMLDivElement>);
     };
 
@@ -469,3 +472,5 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
         </ScrollArea>
     );
 }
+
+    
