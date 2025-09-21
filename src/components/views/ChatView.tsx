@@ -42,6 +42,29 @@ import { AuthView } from "./AuthView";
 import { AvatarVoiceView } from "./AvatarVoiceView";
 
 
+function Avatar3DView({ onClose }: { onClose: () => void }) {
+  // NOTE: This component requires 3D libraries like @react-three/fiber and three.js
+  // You would typically have a <Canvas> component here with your 3D scene.
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div className="w-full h-full relative">
+        {/* Placeholder for the 3D Avatar */}
+        <div className="w-full h-full flex flex-col items-center justify-center text-white">
+            <div className="bg-white/10 p-8 rounded-lg text-center">
+                <p className="text-2xl">3D Avatar Would Be Displayed Here</p>
+                <p className="text-sm text-gray-300 mt-2">To render the .glb file, you need to add a 3D library like @react-three/fiber.</p>
+                <p className="text-sm text-gray-400 mt-1">GLB URL: https://models.readyplayer.me/68cf651b25028352774f8036.glb</p>
+            </div>
+        </div>
+        <button onClick={onClose} className="absolute top-4 right-4 text-white p-2 rounded-full bg-white/10 hover:bg-white/20">
+          <X size={24} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
 export function ChatView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -51,6 +74,8 @@ export function ChatView() {
   const [isSosOverlayVisible, setSosOverlayVisible] = useState(false);
   const [isSidebarExpanded, setSidebarExpanded] = useState(true);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+  const [isAvatar3DVisible, setAvatar3DVisible] = useState(false);
+
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -256,6 +281,8 @@ export function ChatView() {
   return (
       <div className="h-screen w-screen flex flex-col font-body text-gray-800">
         <AuthView open={isAuthModalOpen} onOpenChange={setAuthModalOpen} />
+        {isAvatar3DVisible && <Avatar3DView onClose={() => setAvatar3DVisible(false)} />}
+        
         {/* TOP BAR */}
         <header className="w-full h-16 flex-shrink-0 flex items-center justify-between px-6 glassmorphic border-b z-30">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveView('Home')}>
@@ -318,7 +345,7 @@ export function ChatView() {
                           className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-1.5 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden text-sm"
                           disabled={isPending}
                         />
-                        <Button type="button" onClick={() => {}} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                        <Button type="button" onClick={() => setAvatar3DVisible(true)} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
                           <Bot className="w-4 h-4 text-blue-600" />
                         </Button>
                         <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
@@ -396,5 +423,3 @@ export function ChatView() {
       </div>
   );
 }
-
-    
