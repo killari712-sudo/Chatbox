@@ -319,7 +319,7 @@ export function ChatView() {
                           disabled={isPending}
                         />
                         <Button type="button" onClick={() => {}} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
-                          <Phone className="w-4 h-4 text-blue-600" />
+                          <Bot className="w-4 h-4 text-blue-600" />
                         </Button>
                         <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
                           <Mic className="w-4 h-4 text-blue-600" />
