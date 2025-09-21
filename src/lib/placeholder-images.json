@@ -11,55 +11,55 @@
       "id": "ai-avatar",
       "description": "AI assistant avatar",
       "imageUrl": "https://picsum.photos/seed/human1/40/40",
-      "imageHint": "woman face"
+      "imageHint": "3d avatar"
     },
     {
       "id": "ai-avatar-1",
-      "description": "AI assistant avatar option 1",
-      "imageUrl": "https://picsum.photos/seed/human1/100/100",
-      "imageHint": "woman face"
+      "description": "3D rendered avatar of a woman",
+      "imageUrl": "https://picsum.photos/seed/3dhuman1/100/100",
+      "imageHint": "3d avatar"
     },
     {
       "id": "ai-avatar-2",
-      "description": "AI assistant avatar option 2",
-      "imageUrl": "https://picsum.photos/seed/human2/100/100",
-      "imageHint": "man face"
+      "description": "3D rendered avatar of a man",
+      "imageUrl": "https://picsum.photos/seed/3dhuman2/100/100",
+      "imageHint": "3d avatar"
     },
     {
       "id": "ai-avatar-3",
-      "description": "AI assistant avatar option 3",
-      "imageUrl": "https://picsum.photos/seed/human3/100/100",
-      "imageHint": "person smiling"
+      "description": "3D rendered avatar of a person smiling",
+      "imageUrl": "https://picsum.photos/seed/3dhuman3/100/100",
+      "imageHint": "3d character"
     },
     {
       "id": "ai-avatar-4",
-      "description": "AI assistant avatar option 4",
-      "imageUrl": "https://picsum.photos/seed/human4/100/100",
-      "imageHint": "professional person"
+      "description": "3D rendered avatar of a professional person",
+      "imageUrl": "https://picsum.photos/seed/3dhuman4/100/100",
+      "imageHint": "3d character"
     },
     {
       "id": "ai-avatar-5",
-      "description": "AI assistant avatar option 5",
-      "imageUrl": "https://picsum.photos/seed/human5/100/100",
-      "imageHint": "person glasses"
+      "description": "3D rendered avatar of a person with glasses",
+      "imageUrl": "https://picsum.photos/seed/3dhuman5/100/100",
+      "imageHint": "3d avatar"
     },
     {
       "id": "ai-avatar-6",
-      "description": "AI assistant avatar option 6",
-      "imageUrl": "https://picsum.photos/seed/human6/100/100",
-      "imageHint": "friendly person"
+      "description": "3D rendered avatar of a friendly person",
+      "imageUrl": "https://picsum.photos/seed/3dhuman6/100/100",
+      "imageHint": "3d character"
     },
     {
       "id": "ai-avatar-7",
-      "description": "AI assistant avatar option 7",
-      "imageUrl": "https://picsum.photos/seed/human7/100/100",
-      "imageHint": "diverse woman"
+      "description": "3D rendered avatar of a diverse woman",
+      "imageUrl": "https://picsum.photos/seed/3dhuman7/100/100",
+      "imageHint": "3d avatar"
     },
     {
       "id": "ai-avatar-8",
-      "description": "AI assistant avatar option 8",
-      "imageUrl": "https://picsum.photos/seed/human8/100/100",
-      "imageHint": "diverse man"
+      "description": "3D rendered avatar of a diverse man",
+      "imageUrl": "https://picsum.photos/seed/3dhuman8/100/100",
+      "imageHint": "3d character"
     }
   ]
 }
