@@ -2,6 +2,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 export function QueryHubView() {
     const { user } = useAuth();
@@ -82,94 +83,133 @@ export function QueryHubView() {
             const badgeContent = userBadges[query.type];
             const profileIcon = query.isAnonymous ? '🤫' : '👤';
             
-            card.innerHTML = `
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-xl">
-                        ${profileIcon}
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-2">
-                            <span class="font-semibold text-gray-800">${userType}</span>
-                            <span class="${badgeClass}">${badgeContent}</span>
-                            ${query.verified ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>' : ''}
-                        </div>
-                        <div class="text-sm text-gray-500 flex items-center space-x-2">
-                            <span>${query.time}</span>
-                            ${query.mood ? `<span class="text-xl ml-2" title="Feeling ${query.mood}">${moodEmojis[query.mood]}</span>` : ''}
-                        </div>
-                    </div>
+            const cardHeader = document.createElement('div');
+            cardHeader.className = "flex items-center space-x-3";
+            cardHeader.innerHTML = `
+                <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-xl">
+                    ${profileIcon}
                 </div>
-
                 <div class="flex-1">
-                    <h2 class="text-xl font-bold text-gray-800 mb-2">${query.title}</h2>
-                    <p class="text-gray-600 line-clamp-2">${query.description}</p>
-                </div>
-
-                <div class="flex flex-wrap gap-2 text-xs text-gray-500">
-                    ${query.tags.map((tag: string) => `<span class="bg-gray-200 px-2 py-1 rounded-full">${tag}</span>`).join('')}
-                </div>
-
-                <div class="flex items-center justify-between text-sm text-gray-500">
-                    <div class="flex items-center space-x-4">
-                        <span class="flex items-center space-x-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>${query.views}</span></span>
-                        <span class="flex items-center space-x-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${query.replies}</span></span>
-                        <button class="upvote-btn flex items-center space-x-1 hover:text-gray-800 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                            <span class="upvote-count">${query.upvotes}</span>
-                        </button>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-semibold text-gray-800">${userType}</span>
+                        <span class="${badgeClass}">${badgeContent}</span>
+                        ${query.verified ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>' : ''}
                     </div>
-                    <div class="flex items-center space-x-3">
-                        <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg></button>
-                        <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
-                        <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg></button>
+                    <div class="text-sm text-gray-500 flex items-center space-x-2">
+                        <span>${query.time}</span>
+                        ${query.mood ? `<span class="text-xl ml-2" title="Feeling ${query.mood}">${moodEmojis[query.mood]}</span>` : ''}
                     </div>
                 </div>
             `;
+
+            const cardBody = document.createElement('div');
+            cardBody.className = "flex-1";
+            const title = document.createElement('h2');
+            title.className = "text-xl font-bold text-gray-800 mb-2";
+            title.textContent = query.title;
+            const description = document.createElement('p');
+            description.className = "text-gray-600 line-clamp-2";
+            description.innerHTML = sanitizeHtml(query.description);
+            cardBody.append(title, description);
+
+            const tagsContainer = document.createElement('div');
+            tagsContainer.className = "flex flex-wrap gap-2 text-xs text-gray-500";
+            tagsContainer.innerHTML = query.tags.map((tag: string) => `<span class="bg-gray-200 px-2 py-1 rounded-full">${tag}</span>`).join('');
+            
+            const cardFooter = document.createElement('div');
+            cardFooter.className = "flex items-center justify-between text-sm text-gray-500";
+            cardFooter.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <span class="flex items-center space-x-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>${query.views}</span></span>
+                    <span class="flex items-center space-x-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${query.replies}</span></span>
+                    <button class="upvote-btn flex items-center space-x-1 hover:text-gray-800 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <span class="upvote-count">${query.upvotes}</span>
+                    </button>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg></button>
+                    <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
+                    <button class="hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flag"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg></button>
+                </div>
+            `;
+            
+            card.append(cardHeader, cardBody, tagsContainer, cardFooter);
             return card;
         }
 
         function showExpandedView(query: any) {
-            const queryHtml = `
-                <div class="flex items-start space-x-4 mb-6">
-                    <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-2xl">
-                        ${query.isAnonymous ? '🤫' : '👤'}
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-2 mb-1">
-                            <span class="text-xl font-bold">${query.isAnonymous ? 'Anonymous' : query.user}</span>
-                            <span class="badge badge-${query.type.toLowerCase()}">${userBadges[query.type]}</span>
-                        </div>
-                        <h2 class="text-3xl font-bold text-gray-800 mb-2">${query.title}</h2>
-                        <p class="text-gray-700 text-lg">${query.description}</p>
-                        <div class="flex flex-wrap gap-2 text-xs text-gray-500 mt-2">
-                            ${query.tags.map((tag: string) => `<span class="bg-gray-200 px-2 py-1 rounded-full">${tag}</span>`).join('')}
-                        </div>
-                    </div>
+            if (!expandedQueryContent) return;
+            expandedQueryContent.innerHTML = ''; // Clear previous content
+
+            const header = document.createElement('div');
+            header.className = "flex items-start space-x-4 mb-6";
+            header.innerHTML = `
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-2xl">
+                    ${query.isAnonymous ? '🤫' : '👤'}
                 </div>
-                
-                <h3 class="text-xl font-semibold mb-4">Replies (${query.replies})</h3>
-                <div class="space-y-4" id="replies-container">
-                    ${query.repliesData?.map((reply: any) => {
-                        const isCounselor = reply.type === 'Counselor';
-                        const isMentor = reply.type === 'Mentor' || reply.type === 'Alumni';
-                        const replyClasses = `p-4 rounded-xl frosted-card ${isCounselor ? 'counselor-reply' : ''} ${isMentor ? 'mentor-reply' : ''}`;
-                        return `
-                            <div class="${replyClasses}">
-                                <div class="flex items-center space-x-2 mb-2">
-                                    <span class="font-semibold text-gray-800">${reply.user}</span>
-                                    <span class="badge badge-${reply.type.toLowerCase()}">${userBadges[reply.type]}</span>
-                                    ${reply.verified ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>' : ''}
-                                </div>
-                                <p class="text-gray-700">${reply.text}</p>
-                                <div class="flex items-center space-x-2 text-sm text-gray-500 mt-2">
-                                    <button class="upvote-btn hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span class="upvote-count">${reply.upvotes}</span></button>
-                                </div>
-                            </div>
-                        `;
-                    }).join('') || '<p class="text-gray-500">No replies yet. Be the first to respond!</p>'}
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-1">
+                        <span class="text-xl font-bold">${query.isAnonymous ? 'Anonymous' : query.user}</span>
+                        <span class="badge badge-${query.type.toLowerCase()}">${userBadges[query.type]}</span>
+                    </div>
                 </div>
             `;
-            if (expandedQueryContent) expandedQueryContent.innerHTML = queryHtml;
+
+            const title = document.createElement('h2');
+            title.className = "text-3xl font-bold text-gray-800 mb-2";
+            title.textContent = query.title;
+
+            const description = document.createElement('p');
+            description.className = "text-gray-700 text-lg";
+            description.innerHTML = sanitizeHtml(query.description);
+
+            const tags = document.createElement('div');
+            tags.className = "flex flex-wrap gap-2 text-xs text-gray-500 mt-2";
+            tags.innerHTML = query.tags.map((tag: string) => `<span class="bg-gray-200 px-2 py-1 rounded-full">${tag}</span>`).join('');
+            
+            header.querySelector('.flex-1')?.append(title, description, tags);
+
+            const repliesHeader = document.createElement('h3');
+            repliesHeader.className = "text-xl font-semibold mb-4";
+            repliesHeader.textContent = `Replies (${query.replies})`;
+
+            const repliesContainer = document.createElement('div');
+            repliesContainer.className = "space-y-4";
+            repliesContainer.id = "replies-container";
+            
+            if (query.repliesData?.length > 0) {
+                 query.repliesData.forEach((reply: any) => {
+                    const isCounselor = reply.type === 'Counselor';
+                    const isMentor = reply.type === 'Mentor' || reply.type === 'Alumni';
+                    const replyClasses = `p-4 rounded-xl frosted-card ${isCounselor ? 'counselor-reply' : ''} ${isMentor ? 'mentor-reply' : ''}`;
+                    const replyEl = document.createElement('div');
+                    replyEl.className = replyClasses;
+                    
+                    const replyText = document.createElement('p');
+                    replyText.className = "text-gray-700";
+                    replyText.innerHTML = sanitizeHtml(reply.text);
+
+                    replyEl.innerHTML = `
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="font-semibold text-gray-800">${reply.user}</span>
+                            <span class="badge badge-${reply.type.toLowerCase()}">${userBadges[reply.type]}</span>
+                            ${reply.verified ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>' : ''}
+                        </div>
+                    `;
+                    replyEl.appendChild(replyText);
+                    replyEl.innerHTML += `
+                        <div class="flex items-center space-x-2 text-sm text-gray-500 mt-2">
+                            <button class="upvote-btn hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span class="upvote-count">${reply.upvotes}</span></button>
+                        </div>
+                    `;
+                    repliesContainer.appendChild(replyEl);
+                });
+            } else {
+                repliesContainer.innerHTML = '<p class="text-gray-500">No replies yet. Be the first to respond!</p>';
+            }
+
+            expandedQueryContent.append(header, repliesHeader, repliesContainer);
             showModal('query-expanded-modal');
         }
 
@@ -404,7 +444,7 @@ export function QueryHubView() {
             <div id="query-expanded-modal" className="hidden fixed inset-0 z-50 items-center justify-center p-4 modal-overlay">
                 <div className="frosted-card p-8 rounded-2xl max-w-4xl w-full h-full lg:max-h-[90vh] overflow-y-auto relative">
                     <button onClick={() => hideModal('query-expanded-modal')} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                     </button>
                     <div id="expanded-query-content">
                     </div>
