@@ -137,11 +137,13 @@ export function ChatView() {
           title: "Voice Error",
           description: `An error occurred: ${event.error}`,
         });
-        setIsRecording(false);
+        if (isRecording) {
+            setIsRecording(false);
+        }
       };
 
       recognitionRef.current.onend = () => {
-        if(isRecording) {
+        if(isRecording) { // only turn off if it was on
             setIsRecording(false);
         }
       };
@@ -151,9 +153,11 @@ export function ChatView() {
     }
 
     return () => {
-        recognitionRef.current?.stop();
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
+        }
     }
-  }, [isRecording, toast]);
+  }, [toast]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
