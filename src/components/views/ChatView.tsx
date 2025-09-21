@@ -262,12 +262,9 @@ export function ChatView() {
               </div>
             ) : (
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => setAuthModalOpen(true)} variant="ghost" size="sm">
-                        <LogIn className="mr-2 h-4 w-4"/>
-                        Sign In
-                    </Button>
                     <Button onClick={() => setAuthModalOpen(true)} size="sm">
-                        Sign Up
+                        <LogIn className="mr-2 h-4 w-4"/>
+                        Sign In / Sign Up
                     </Button>
                 </div>
             )}
