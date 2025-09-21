@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { getSummary, analyzeMood } from "@/app/actions";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useAuth } from '@/hooks/useAuth';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 
 // Define interfaces for data structures
@@ -108,6 +109,7 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
     useEffect(() => {
         if (!user) {
             setAllEntries({});
+            if (entryPadRef.current) entryPadRef.current.innerHTML = '';
             return;
         }
         try {
@@ -138,7 +140,7 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
                     }
                 }
                 if (entryPadRef.current) {
-                    entryPadRef.current.innerHTML = entryPadRef.current.innerHTML + finalTranscript + interimTranscript;
+                    entryPadRef.current.innerHTML = sanitizeHtml(entryPadRef.current.innerHTML + finalTranscript + interimTranscript);
                 }
             };
             
@@ -161,7 +163,7 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
         const newHtml = entry?.text || '';
         
         if (entryPadRef.current) {
-            entryPadRef.current.innerHTML = newHtml;
+            entryPadRef.current.innerHTML = sanitizeHtml(newHtml);
         }
         setCurrentEntryText(newHtml);
 
@@ -229,6 +231,7 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
         if (!isEditable || !entryPadRef.current) return;
         const promptHtml = `<p><span class="diary-prompt-text">${prompt}</span>&nbsp;</p>`;
         entryPadRef.current.innerHTML += entryPadRef.current.innerHTML ? `<br>${promptHtml}`: promptHtml;
+        entryPadRef.current.innerHTML = sanitizeHtml(entryPadRef.current.innerHTML);
         handleInput({ currentTarget: entryPadRef.current } as React.FormEvent<HTMLDivElement>);
     };
 
@@ -250,7 +253,7 @@ export function DiaryView({ user, onSignIn }: { user: any; onSignIn: () => void;
 
             if (result.summary && entryPadRef.current) {
                 const summaryHtml = `<p>${result.summary}</p>`;
-                entryPadRef.current.innerHTML = summaryHtml;
+                entryPadRef.current.innerHTML = sanitizeHtml(summaryHtml);
                 setCurrentEntryText(summaryHtml);
             } else if (result.error) {
                 alert(`Summarization failed: ${result.error}`);
