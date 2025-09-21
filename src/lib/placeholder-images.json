@@ -10,56 +10,56 @@
     {
       "id": "ai-avatar",
       "description": "AI assistant avatar",
-      "imageUrl": "https://picsum.photos/seed/2/40/40",
-      "imageHint": "robot face"
+      "imageUrl": "https://picsum.photos/seed/human1/40/40",
+      "imageHint": "woman face"
     },
     {
       "id": "ai-avatar-1",
       "description": "AI assistant avatar option 1",
-      "imageUrl": "https://picsum.photos/seed/ai1/100/100",
-      "imageHint": "abstract robot"
+      "imageUrl": "https://picsum.photos/seed/human1/100/100",
+      "imageHint": "woman face"
     },
     {
       "id": "ai-avatar-2",
       "description": "AI assistant avatar option 2",
-      "imageUrl": "https://picsum.photos/seed/ai2/100/100",
-      "imageHint": "friendly robot"
+      "imageUrl": "https://picsum.photos/seed/human2/100/100",
+      "imageHint": "man face"
     },
     {
       "id": "ai-avatar-3",
       "description": "AI assistant avatar option 3",
-      "imageUrl": "https://picsum.photos/seed/ai3/100/100",
-      "imageHint": "geometric robot"
+      "imageUrl": "https://picsum.photos/seed/human3/100/100",
+      "imageHint": "person smiling"
     },
     {
       "id": "ai-avatar-4",
       "description": "AI assistant avatar option 4",
-      "imageUrl": "https://picsum.photos/seed/ai4/100/100",
-      "imageHint": "minimalist robot"
+      "imageUrl": "https://picsum.photos/seed/human4/100/100",
+      "imageHint": "professional person"
     },
     {
       "id": "ai-avatar-5",
       "description": "AI assistant avatar option 5",
-      "imageUrl": "https://picsum.photos/seed/ai5/100/100",
-      "imageHint": "glowing robot"
+      "imageUrl": "https://picsum.photos/seed/human5/100/100",
+      "imageHint": "person glasses"
     },
     {
       "id": "ai-avatar-6",
       "description": "AI assistant avatar option 6",
-      "imageUrl": "https://picsum.photos/seed/ai6/100/100",
-      "imageHint": "cute robot"
+      "imageUrl": "https://picsum.photos/seed/human6/100/100",
+      "imageHint": "friendly person"
     },
     {
       "id": "ai-avatar-7",
       "description": "AI assistant avatar option 7",
-      "imageUrl": "https://picsum.photos/seed/ai7/100/100",
-      "imageHint": "vintage robot"
+      "imageUrl": "https://picsum.photos/seed/human7/100/100",
+      "imageHint": "diverse woman"
     },
     {
       "id": "ai-avatar-8",
       "description": "AI assistant avatar option 8",
-      "imageUrl": "https://picsum.photos/seed/ai8/100/100",
-      "imageHint": "sleek robot"
+      "imageUrl": "https://picsum.photos/seed/human8/100/100",
+      "imageHint": "diverse man"
     }
   ]
 }
