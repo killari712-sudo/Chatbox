@@ -15,8 +15,6 @@ interface FriendFinderViewProps {
 
 const friendsData = [
   { id: 1, name: 'Dr. Emily Carter', avatar: 'https://picsum.photos/seed/friend1/40/40', lastMessage: 'Let\'s discuss your progress tomorrow.', time: '10:42 AM', online: true },
-  { id: 2, name: 'Alex Rivera', avatar: 'https://picsum.photos/seed/friend2/40/40', lastMessage: 'Great work on the project! Keep it up.', time: 'Yesterday', online: false },
-  { id: 3, name: 'Support Pod "Phoenix"', avatar: 'https://picsum.photos/seed/pod1/40/40', lastMessage: 'New check-in scheduled for Friday.', time: '3d ago', online: true },
 ];
 
 const messagesData = [
