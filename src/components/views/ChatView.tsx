@@ -25,6 +25,7 @@ import {
   HeartPulse,
   MessageSquare,
   BarChart3,
+  LogIn,
 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { DiaryView } from "./DiaryView";
@@ -35,6 +36,7 @@ import { HabitBuilderView } from "./HabitBuilderView";
 import { RoadmapsView } from "./RoadmapsView";
 import { FriendFinderView } from "./FriendFinderView";
 import { useAuth } from "@/hooks/use-auth";
+import { AuthView } from "./AuthView";
 
 
 export function ChatView() {
@@ -45,14 +47,23 @@ export function ChatView() {
   const [isVoiceOverlayVisible, setVoiceOverlayVisible] = useState(false);
   const [isSosOverlayVisible, setSosOverlayVisible] = useState(false);
   const [isSidebarExpanded, setSidebarExpanded] = useState(true);
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { user, signOut } = useAuth();
-  const userAvatar = user?.photoURL ? {imageUrl: user.photoURL, id: "user-avatar"} : PlaceHolderImages.find((p) => p.id === "user-avatar");
+  const { user, signOut, loading } = useAuth();
+  
+  const userAvatarUrl = user?.photoURL;
+  const guestAvatar = PlaceHolderImages.find((p) => p.id === "user-avatar");
+  const userAvatar = userAvatarUrl ? {imageUrl: userAvatarUrl, id: "user-avatar"} : guestAvatar;
   const aiAvatar = PlaceHolderImages.find((p) => p.id === "ai-avatar");
 
+  useEffect(() => {
+    if (!loading && !user) {
+      // User is a guest, they can continue using the app
+    }
+  }, [user, loading]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -224,6 +235,7 @@ export function ChatView() {
 
   return (
       <div className="h-screen w-screen flex flex-col font-body text-gray-800">
+        <AuthView open={isAuthModalOpen} onOpenChange={setAuthModalOpen} />
         {/* TOP BAR */}
         <header className="w-full h-16 flex-shrink-0 flex items-center justify-between px-6 glassmorphic border-b z-30">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveView('Home')}>
@@ -234,7 +246,9 @@ export function ChatView() {
                 </svg>
                 <span className="font-bold text-lg font-headline text-gray-800">EcosystemAI</span>
             </div>
-            {user && (
+            {loading ? (
+                <div className="h-8 w-24 bg-gray-200 animate-pulse rounded-md"></div>
+            ) : user ? (
               <div className="flex items-center gap-4">
                   {userAvatar && <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="rounded-full" />}
                   <div className="text-sm">
@@ -246,6 +260,16 @@ export function ChatView() {
                       Logout
                   </Button>
               </div>
+            ) : (
+                <div className="flex items-center gap-2">
+                    <Button onClick={() => setAuthModalOpen(true)} variant="ghost" size="sm">
+                        <LogIn className="mr-2 h-4 w-4"/>
+                        Sign In
+                    </Button>
+                    <Button onClick={() => setAuthModalOpen(true)} size="sm">
+                        Sign Up
+                    </Button>
+                </div>
             )}
         </header>
 
