@@ -86,6 +86,7 @@ export function ChatView() {
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { user, signOut, loading } = useAuth();
   
@@ -109,6 +110,21 @@ export function ChatView() {
       });
     }
   }, [messages]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      console.log("Selected file:", file.name);
+      // In a real app, you would handle the file upload here.
+      // For now, we can just display a message.
+      const fileMessage: Message = {
+        id: Date.now().toString(),
+        role: "user",
+        content: `Selected file: ${file.name}`,
+      };
+      setMessages((prev) => [...prev, fileMessage]);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
@@ -334,7 +350,8 @@ export function ChatView() {
                 {activeView === 'Home' && (
                   <div className="w-full flex-shrink-0 px-4 md:px-6 pb-4 md:pb-6 pt-2">
                     <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto glassmorphic-dark glowing-edge rounded-full p-1 flex items-center gap-2 shadow-2xl shadow-black/10">
-                        <Button type="button" variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                        <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
+                        <Button type="button" variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10" onClick={() => fileInputRef.current?.click()}>
                           <Paperclip className="w-4 h-4 text-blue-600" />
                         </Button>
                         <Textarea
