@@ -26,6 +26,7 @@ import {
   MessageSquare,
   BarChart3,
   LogIn,
+  HelpCircle,
 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { DiaryView } from "./DiaryView";
@@ -173,6 +174,20 @@ export function ChatView() {
               {messages.length === 0 && !isPending ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <h2 className="text-2xl font-semibold text-gray-600 mb-6">What can I help with?</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl">
+                    <button className="suggestion-button" onClick={() => setActiveView('Query Hub')}>
+                      <HelpCircle className="w-6 h-6 text-blue-500"/>
+                      <span>Query Hub</span>
+                    </button>
+                    <button className="suggestion-button" onClick={() => setActiveView('Support')}>
+                      <Users className="w-6 h-6 text-green-500"/>
+                      <span>Support</span>
+                    </button>
+                    <button className="suggestion-button" onClick={() => setActiveView('Diary')}>
+                      <NotebookPen className="w-6 h-6 text-purple-500"/>
+                      <span>Diary</span>
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-6">
