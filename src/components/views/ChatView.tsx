@@ -10,26 +10,21 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import {
   AlertOctagon,
-  AlertTriangle,
-  BarChart3,
-  BookOpen,
   Bot,
   ChevronDown,
-  GraduationCap,
-  HeartPulse,
-  HelpCircle,
   Home,
   Loader2,
   LogOut,
   Map,
-  MessageSquare,
   Mic,
-  NotebookPen,
   Paperclip,
-  Route,
   Send,
   Users,
   X,
+  NotebookPen,
+  HeartPulse,
+  MessageSquare,
+  BarChart3,
 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { DiaryView } from "./DiaryView";
@@ -94,13 +89,10 @@ export function ChatView() {
       setActiveView('Home');
       // Clear user-specific data from localStorage
       Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('diaryEntries_') || key.startsWith('user-habits_')) {
+          if (key.startsWith('diaryEntries_') || key.startsWith('user-habits_') || key.startsWith('queryHubQueries_')) {
               localStorage.removeItem(key);
           }
       });
-      // For query hub, we might just want to reset the view, not clear all queries if they are meant to be public
-      // If they are user-specific, they should be cleared too.
-      // localStorage.removeItem('queryHubQueries');
       setMessages([]); // Clear chat messages
     } catch (error) {
       console.error("Error signing out: ", error);
@@ -147,30 +139,36 @@ export function ChatView() {
   };
 
   const sidebarItems = [
-      { type: 'item', icon: Home, label: 'Home', tooltip: 'Return to the main chat view.' },
+      { type: 'item', icon: Home, label: 'Home' },
       { type: 'divider' },
-      { type: 'item', icon: Map, label: 'Roadmaps', tooltip: 'View your personalized goals and progress.' },
-      { type: 'item', icon: BarChart3, label: 'Habit Builder', tooltip: "Build and track your habits." },
+      { type: 'item', icon: Map, label: 'Roadmaps' },
+      { type: 'item', icon: BarChart3, label: 'Habit Builder' },
       { type: 'divider' },
-      { type: 'item', icon: NotebookPen, label: 'Diary', tooltip: 'Your private, encrypted journal.' },
-      { type: 'item', icon: HeartPulse, label: 'Wellness', tooltip: 'Monitor your wellness metrics.' },
+      { type: 'item', icon: NotebookPen, label: 'Diary' },
+      { type: 'item', icon: HeartPulse, label: 'Wellness' },
       { type: 'divider' },
-      { type: 'item', icon: MessageSquare, label: 'Query Hub', tooltip: 'Ask questions and get answers from the community.' },
-      { type: 'item', icon: Users, label: 'Support', tooltip: 'Chat with friends and support groups.' },
+      { type: 'item', icon: MessageSquare, label: 'Query Hub' },
+      { type: 'item', icon: Users, label: 'Support' },
       { type: 'divider' },
-      { type: 'item', icon: Bot, label: 'Avatar & Voice', tooltip: 'Customize your AI assistant.' },
-      { type: 'item', icon: AlertOctagon, label: 'SOS Crisis', isSOS: true, tooltip: 'Immediate crisis support.' }
+      { type: 'item', icon: Bot, label: 'Avatar & Voice' },
+      { type: 'item', icon: AlertOctagon, label: 'SOS Crisis', isSOS: true }
   ];
 
   const handleSidebarClick = (item: (typeof sidebarItems)[number]) => {
     if (item.type !== 'item') return;
-
+  
     if (item.isSOS) {
-        setSosOverlayVisible(true);
-        return;
+      setSosOverlayVisible(true);
+      return;
     }
-    
-    setActiveView(item.label);
+  
+    const requiredAuthViews = ['Diary', 'Habit Builder'];
+  
+    if (requiredAuthViews.includes(item.label) && !user) {
+      handleSignIn();
+    } else {
+      setActiveView(item.label);
+    }
   };
 
   const handleRipple = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -232,7 +230,7 @@ export function ChatView() {
           </div>
         );
       case 'Diary':
-        return <DiaryView />;
+        return <DiaryView user={user} onSignIn={handleSignIn}/>;
       case 'Query Hub':
         return <QueryHubView />;
       case 'Wellness':
@@ -240,7 +238,7 @@ export function ChatView() {
       case 'Mentors':
         return <MentorView onNavigate={setActiveView} />;
       case 'Habit Builder':
-        return <HabitBuilderView />;
+        return <HabitBuilderView user={user} onSignIn={handleSignIn}/>;
       case 'Roadmaps':
         return <RoadmapsView onNavigate={setActiveView} />;
       case 'Support':
@@ -346,7 +344,7 @@ export function ChatView() {
                           className={`w-full h-14 flex items-center justify-start gap-4 px-4 rounded-full text-gray-600 hover:text-blue-600 ripple-btn ${item.isSOS ? 'hover:bg-red-500/10 text-red-500 hover:text-red-600' : 'hover:bg-blue-500/10'}`}
                         >
                           <Icon className="w-6 h-6 flex-shrink-0" />
-                          <span className={`font-medium whitespace-nowrap transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}></span>
+                          <span className={`font-medium whitespace-nowrap transition-all duration-300 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
                         </button>
                     );
                   })}
@@ -393,7 +391,7 @@ export function ChatView() {
         {isSosOverlayVisible && (
           <div className="fixed inset-0 bg-red-100/50 backdrop-blur-2xl z-50 flex items-center justify-center p-4">
               <div className="glassmorphic bg-red-500/10 border-red-500/30 rounded-3xl p-8 md:p-12 text-center max-w-lg w-full">
-                  <AlertTriangle className="w-20 h-20 text-red-500 mx-auto animate-pulse" />
+                  <AlertOctagon className="w-20 h-20 text-red-500 mx-auto animate-pulse" />
                   <h2 className="text-4xl md:text-5xl font-bold font-headline mt-6 text-red-900">Crisis Alert</h2>
                   <p className="text-red-800 mt-4 max-w-sm mx-auto">You've activated the SOS protocol. Help is being notified. Please stay calm.</p>
                   <Button className="mt-10 bg-red-600/80 border-2 border-red-400 text-white font-bold text-xl py-4 px-10 rounded-full transition-transform hover:scale-105 h-auto" style={{animation: 'pulse-glow 2s infinite'}}>
