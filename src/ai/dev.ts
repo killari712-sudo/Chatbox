@@ -9,5 +9,6 @@ import '@/ai/flows/proactive-suggestions.ts';
 import '@/ai/flows/nutrition-analysis.ts';
 import '@/ai/tools/date.ts';
 import '@/ai/flows/summarize-text.ts';
+import '@/ai/flows/wellness-facts.ts';
 
     

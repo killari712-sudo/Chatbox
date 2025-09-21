@@ -7,6 +7,7 @@ import { analyzeMoodAndSuggestResources } from "@/ai/flows/mood-tracking-and-ui-
 import { getProactiveSuggestions } from "@/ai/flows/proactive-suggestions";
 import { getNutritionInfo as getNutritionInfoFlow } from "@/ai/flows/nutrition-analysis";
 import { summarizeText as summarizeTextFlow } from "@/ai/flows/summarize-text";
+import { getWellnessFact as getWellnessFactFlow } from "@/ai/flows/wellness-facts";
 import { z } from "zod";
 import { WellnessMetric } from "@/lib/types";
 
@@ -83,6 +84,17 @@ export async function analyzeMood(userInput: string) {
         return { error: "Failed to analyze mood from AI." };
     }
 }
+
+export async function getWellnessFact() {
+    try {
+        const result = await getWellnessFactFlow();
+        return { fact: result.fact };
+    } catch (error) {
+        console.error("Error in getWellnessFact action:", error);
+        return { error: "Failed to get wellness fact from AI." };
+    }
+}
+
 
 // Mocked wellness data actions
 // In a real app, these would interact with a database like Firestore.

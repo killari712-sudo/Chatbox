@@ -3,11 +3,12 @@
 
 import React, { useState, useEffect, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XCircle, ChevronLeft, ChevronRight, Lightbulb, Search, Save, Moon, Sun, Activity, Droplet, MoonStar, HeartPulse, Dumbbell, Soup, Microscope, Calendar, Loader2, Award, FileDown, Smile, BrainCircuit } from 'lucide-react';
+import { XCircle, Lightbulb, Search, Dumbbell, Soup, Microscope, Loader2, Award, FileDown, Smile, BrainCircuit, HeartPulse } from 'lucide-react';
 import { getNutritionInfo, getWellnessData, updateWellnessMetric } from '@/app/actions';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
+import { getWellnessFact } from '@/ai/flows/wellness-facts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { useAuth } from '@/hooks/use-auth';
-import type { WellnessGoal, WellnessMetric } from '@/lib/types';
+import type { WellnessMetric, WellnessGoal } from '@/lib/types';
 
 
 // --- UTILITY ---
@@ -19,6 +20,103 @@ const getGreeting = (hour: number, name: string) => {
 
 
 // --- MODAL COMPONENTS ---
+
+const BmrCalculator = ({ onClose }: { onClose: () => void }) => {
+    const [bmr, setBmr] = useState<number | null>(null);
+    const [gender, setGender] = useState('male');
+    
+    const calculateBmr = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const weight = parseFloat(formData.get('weight') as string);
+        const height = parseFloat(formData.get('height') as string);
+        const age = parseInt(formData.get('age') as string);
+
+        if(weight > 0 && height > 0 && age > 0) {
+            let calculatedBmr;
+            if (gender === 'male') {
+                calculatedBmr = 10 * weight + 6.25 * height - 5 * age + 5;
+            } else {
+                calculatedBmr = 10 * weight + 6.25 * height - 5 * age - 161;
+            }
+            setBmr(calculatedBmr);
+        }
+    };
+
+    return (
+        <div className="wellness-modal-overlay">
+            <motion.div className="wellness-modal-content" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><XCircle size={24} /></button>
+                <h2 className="text-3xl font-bold mb-6 text-center">BMR Calculator</h2>
+                <form onSubmit={calculateBmr} className="space-y-4">
+                    <div>
+                        <label className="block mb-1 font-medium">Gender</label>
+                        <select onChange={(e) => setGender(e.target.value)} value={gender} className="w-full p-2 border rounded">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Weight (kg)</label>
+                        <input type="number" name="weight" className="w-full p-2 border rounded" required />
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Height (cm)</label>
+                        <input type="number" name="height" className="w-full p-2 border rounded" required />
+                    </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Age</label>
+                        <input type="number" name="age" className="w-full p-2 border rounded" required />
+                    </div>
+                    <button type="submit" className="wellness-btn-primary w-full">Calculate</button>
+                </form>
+                {bmr && (
+                    <div className="mt-6 text-center">
+                        <p className="text-lg">Your Basal Metabolic Rate is:</p>
+                        <p className="text-3xl font-bold">{Math.round(bmr)} kcal/day</p>
+                    </div>
+                )}
+            </motion.div>
+        </div>
+    );
+};
+
+
+const WellnessFacts = ({ onClose }: { onClose: () => void }) => {
+    const [fact, setFact] = useState('');
+    const [loading, setLoading] = useState(true);
+
+    const fetchFact = async () => {
+        setLoading(true);
+        try {
+            const result = await getWellnessFact();
+            if (result.fact) {
+                setFact(result.fact);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchFact();
+    }, []);
+
+    return (
+        <div className="wellness-modal-overlay">
+            <motion.div className="wellness-modal-content" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><XCircle size={24} /></button>
+                <h2 className="text-3xl font-bold mb-6 text-center">Wellness Fact</h2>
+                <div className="text-center p-4 min-h-[100px] flex items-center justify-center">
+                    {loading ? <Loader2 className="animate-spin" /> : <p className="text-xl">{fact}</p>}
+                </div>
+                <button onClick={fetchFact} className="wellness-btn-secondary w-full mt-4" disabled={loading}>
+                    {loading ? 'Loading...' : 'Get Another Fact'}
+                </button>
+            </motion.div>
+        </div>
+    );
+};
 
 const BreathingCoach = ({ onClose }: { onClose: () => void }) => {
     const [breathingState, setBreathingState] = useState('inhale');
@@ -199,11 +297,6 @@ export function WellnessView() {
 
     const userName = user?.displayName?.split(' ')[0] || 'User';
 
-    useEffect(() => {
-        const timer = setInterval(() => setCurrentTime(new Date()), 60000);
-        return () => clearInterval(timer);
-    }, []);
-
     const fetchWellnessData = () => {
         if (!user) return;
         startTransition(async () => {
@@ -217,7 +310,9 @@ export function WellnessView() {
     }
 
     useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 60000);
         fetchWellnessData();
+        return () => clearInterval(timer);
     }, [user]);
 
 
@@ -235,10 +330,10 @@ export function WellnessView() {
         case 'breathing': return <BreathingCoach onClose={() => setActiveModal(null)} />;
         case 'nutrition': return <NutritionDatabase onClose={() => setActiveModal(null)} />;
         case 'affirmations': return <DailyAffirmations onClose={() => setActiveModal(null)} />;
+        case 'bmi': return <BmrCalculator onClose={() => setActiveModal(null)} />;
+        case 'facts': return <WellnessFacts onClose={() => setActiveModal(null)} />;
         // Placeholder modals for new features
         case 'workout':
-        case 'bmi':
-        case 'facts':
         case 'goals':
         case 'stress':
         case 'report':
@@ -278,7 +373,7 @@ export function WellnessView() {
             <main className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Left Section - Metrics */}
                 <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <MetricCard title="Calories Burned" value={metrics?.calories || 0} unit="kcal" icon={<Activity />}>
+                    <MetricCard title="Calories Burned" value={metrics?.calories || 0} unit="kcal" icon={<Dumbbell />}>
                         <ResponsiveContainer width="100%" height={80}>
                             <LineChart data={caloriesHistory}>
                                 <Line type="monotone" dataKey="kcal" stroke="#f97316" strokeWidth={2} dot={false} />
@@ -286,7 +381,7 @@ export function WellnessView() {
                             </LineChart>
                         </ResponsiveContainer>
                     </MetricCard>
-                    <MetricCard title="Sleep" value={metrics?.sleep || 0} unit="hrs" icon={<Moon />}>
+                    <MetricCard title="Sleep" value={metrics?.sleep || 0} unit="hrs" icon={<HeartPulse />}>
                          <ResponsiveContainer width="100%" height={80}>
                             <LineChart data={sleepHistory}>
                                 <Line type="monotone" dataKey="hrs" stroke="#8b5cf6" strokeWidth={2} dot={false} />
@@ -294,7 +389,7 @@ export function WellnessView() {
                             </LineChart>
                         </ResponsiveContainer>
                     </MetricCard>
-                    <MetricCard title="Hydration" value={metrics?.hydration || 0} unit="cups" icon={<Droplet />} onClick={handleUpdateHydration}>
+                    <MetricCard title="Hydration" value={metrics?.hydration || 0} unit="cups" icon={<Soup />} onClick={handleUpdateHydration}>
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
                             <motion.div className="bg-blue-500 h-2.5 rounded-full" animate={{ width: `${((metrics?.hydration || 0) / 8) * 100}%` }} />
                         </div>
