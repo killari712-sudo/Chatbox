@@ -34,7 +34,7 @@ import { MentorView } from "./MentorView";
 import { HabitBuilderView } from "./HabitBuilderView";
 import { RoadmapsView } from "./RoadmapsView";
 import { FriendFinderView } from "./FriendFinderView";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
 
 
 export function ChatView() {
@@ -49,7 +49,8 @@ export function ChatView() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const userAvatar = PlaceHolderImages.find((p) => p.id === "user-avatar");
+  const { user, signOut } = useAuth();
+  const userAvatar = user?.photoURL ? {imageUrl: user.photoURL, id: "user-avatar"} : PlaceHolderImages.find((p) => p.id === "user-avatar");
   const aiAvatar = PlaceHolderImages.find((p) => p.id === "ai-avatar");
 
 
@@ -233,6 +234,15 @@ export function ChatView() {
                 </svg>
                 <span className="font-bold text-lg font-headline text-gray-800">EcosystemAI</span>
             </div>
+            {user && userAvatar && (
+              <div className="flex items-center gap-4">
+                  <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="rounded-full" />
+                  <Button onClick={signOut} variant="outline" size="sm">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                  </Button>
+              </div>
+            )}
         </header>
 
         {/* MAIN CONTAINER */}
