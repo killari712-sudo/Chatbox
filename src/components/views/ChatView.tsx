@@ -38,6 +38,7 @@ import { RoadmapsView } from "./RoadmapsView";
 import { FriendFinderView } from "./FriendFinderView";
 import { useAuth } from "@/hooks/use-auth";
 import { AuthView } from "./AuthView";
+import { AvatarVoiceView } from "./AvatarVoiceView";
 
 
 export function ChatView() {
@@ -236,6 +237,8 @@ export function ChatView() {
         return <RoadmapsView onNavigate={setActiveView} />;
       case 'Support':
         return <FriendFinderView onNavigate={setActiveView} />;
+      case 'Avatar & Voice':
+        return <AvatarVoiceView />;
       default:
         return (
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center p-8">

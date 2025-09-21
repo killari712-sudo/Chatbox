@@ -1,3 +1,4 @@
+
 {
   "placeholderImages": [
     {
@@ -11,6 +12,54 @@
       "description": "AI assistant avatar",
       "imageUrl": "https://picsum.photos/seed/2/40/40",
       "imageHint": "robot face"
+    },
+    {
+      "id": "ai-avatar-1",
+      "description": "AI assistant avatar option 1",
+      "imageUrl": "https://picsum.photos/seed/ai1/100/100",
+      "imageHint": "abstract robot"
+    },
+    {
+      "id": "ai-avatar-2",
+      "description": "AI assistant avatar option 2",
+      "imageUrl": "https://picsum.photos/seed/ai2/100/100",
+      "imageHint": "friendly robot"
+    },
+    {
+      "id": "ai-avatar-3",
+      "description": "AI assistant avatar option 3",
+      "imageUrl": "https://picsum.photos/seed/ai3/100/100",
+      "imageHint": "geometric robot"
+    },
+    {
+      "id": "ai-avatar-4",
+      "description": "AI assistant avatar option 4",
+      "imageUrl": "https://picsum.photos/seed/ai4/100/100",
+      "imageHint": "minimalist robot"
+    },
+    {
+      "id": "ai-avatar-5",
+      "description": "AI assistant avatar option 5",
+      "imageUrl": "https://picsum.photos/seed/ai5/100/100",
+      "imageHint": "glowing robot"
+    },
+    {
+      "id": "ai-avatar-6",
+      "description": "AI assistant avatar option 6",
+      "imageUrl": "https://picsum.photos/seed/ai6/100/100",
+      "imageHint": "cute robot"
+    },
+    {
+      "id": "ai-avatar-7",
+      "description": "AI assistant avatar option 7",
+      "imageUrl": "https://picsum.photos/seed/ai7/100/100",
+      "imageHint": "vintage robot"
+    },
+    {
+      "id": "ai-avatar-8",
+      "description": "AI assistant avatar option 8",
+      "imageUrl": "https://picsum.photos/seed/ai8/100/100",
+      "imageHint": "sleek robot"
     }
   ]
 }
