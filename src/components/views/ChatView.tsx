@@ -27,6 +27,7 @@ import {
   BarChart3,
   LogIn,
   HelpCircle,
+  Phone,
 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { DiaryView } from "./DiaryView";
@@ -317,6 +318,9 @@ export function ChatView() {
                           className="w-full bg-transparent focus:outline-none text-gray-800 placeholder-gray-500 max-h-40 py-1.5 border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none overflow-hidden text-sm"
                           disabled={isPending}
                         />
+                        <Button type="button" onClick={() => {}} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
+                          <Phone className="w-4 h-4 text-blue-600" />
+                        </Button>
                         <Button type="button" onClick={() => setVoiceOverlayVisible(true)} variant="ghost" size="icon" className="w-8 h-8 rounded-full flex-shrink-0 hover:bg-blue-500/10">
                           <Mic className="w-4 h-4 text-blue-600" />
                         </Button>
@@ -392,3 +396,5 @@ export function ChatView() {
       </div>
   );
 }
+
+    
