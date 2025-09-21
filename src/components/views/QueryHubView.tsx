@@ -182,27 +182,31 @@ export function QueryHubView() {
                  query.repliesData.forEach((reply: any) => {
                     const isCounselor = reply.type === 'Counselor';
                     const isMentor = reply.type === 'Mentor' || reply.type === 'Alumni';
-                    const replyClasses = `p-4 rounded-xl frosted-card ${isCounselor ? 'counselor-reply' : ''} ${isMentor ? 'mentor-reply' : ''}`;
-                    const replyEl = document.createElement('div');
-                    replyEl.className = replyClasses;
                     
+                    const replyEl = document.createElement('div');
+                    replyEl.className = `p-4 rounded-xl frosted-card ${isCounselor ? 'counselor-reply' : ''} ${isMentor ? 'mentor-reply' : ''}`;
+
+                    const replyHeader = document.createElement('div');
+                    replyHeader.className = 'flex items-center space-x-2 mb-2';
+                    replyHeader.innerHTML = `
+                        <span class="font-semibold text-gray-800">${reply.user}</span>
+                        <span class="badge badge-${reply.type.toLowerCase()}">${userBadges[reply.type]}</span>
+                        ${reply.verified ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>' : ''}
+                    `;
+
                     const replyText = document.createElement('p');
                     replyText.className = "text-gray-700";
                     replyText.innerHTML = sanitizeHtml(reply.text);
 
-                    replyEl.innerHTML = `
-                        <div class="flex items-center space-x-2 mb-2">
-                            <span class="font-semibold text-gray-800">${reply.user}</span>
-                            <span class="badge badge-${reply.type.toLowerCase()}">${userBadges[reply.type]}</span>
-                            ${reply.verified ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>' : ''}
-                        </div>
+                    const replyFooter = document.createElement('div');
+                    replyFooter.className = 'flex items-center space-x-2 text-sm text-gray-500 mt-2';
+                    replyFooter.innerHTML = `
+                        <button class="upvote-btn hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span class="upvote-count">${reply.upvotes}</span></button>
                     `;
+                    
+                    replyEl.appendChild(replyHeader);
                     replyEl.appendChild(replyText);
-                    replyEl.innerHTML += `
-                        <div class="flex items-center space-x-2 text-sm text-gray-500 mt-2">
-                            <button class="upvote-btn hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span class="upvote-count">${reply.upvotes}</span></button>
-                        </div>
-                    `;
+                    replyEl.appendChild(replyFooter);
                     repliesContainer.appendChild(replyEl);
                 });
             } else {
