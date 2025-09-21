@@ -234,9 +234,13 @@ export function ChatView() {
                 </svg>
                 <span className="font-bold text-lg font-headline text-gray-800">EcosystemAI</span>
             </div>
-            {user && userAvatar && (
+            {user && (
               <div className="flex items-center gap-4">
-                  <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="rounded-full" />
+                  {userAvatar && <Image src={userAvatar.imageUrl} alt="User Avatar" width={40} height={40} className="rounded-full" />}
+                  <div className="text-sm">
+                    <div className="font-semibold">{user.displayName || 'User'}</div>
+                    <div className="text-gray-500">{user.email}</div>
+                  </div>
                   <Button onClick={signOut} variant="outline" size="sm">
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
