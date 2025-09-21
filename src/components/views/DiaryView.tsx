@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Brain, X, Mic } from 'lucide-react';
+import { Brain, X, Mic, StopCircle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getSummary, analyzeMood } from "@/app/actions";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -122,10 +122,9 @@ export function DiaryView() {
             recognitionRef.current.continuous = true;
             recognitionRef.current.interimResults = true;
 
-            let finalTranscript = '';
-
             recognitionRef.current.onresult = (event: any) => {
                 let interimTranscript = '';
+                let finalTranscript = '';
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         finalTranscript += event.results[i][0].transcript + ' ';
@@ -133,10 +132,12 @@ export function DiaryView() {
                         interimTranscript += event.results[i][0].transcript;
                     }
                 }
+
                 if (entryPadRef.current) {
-                    const currentContent = entryPadRef.current.innerHTML;
-                    const newContent = currentContent + finalTranscript + interimTranscript;
-                    entryPadRef.current.innerHTML = sanitizeHtml(newContent);
+                    // Use textContent for current content to avoid complex HTML parsing
+                    const existingText = entryPadRef.current.textContent || '';
+                    const newContent = existingText + finalTranscript + interimTranscript;
+                    entryPadRef.current.innerHTML = sanitizeHtml(newContent.replace(/\n/g, '<br>'));
                 }
             };
             
@@ -285,7 +286,9 @@ export function DiaryView() {
         if (!isEditable || isRecording) return;
         
         if (entryPadRef.current) {
-            setCurrentEntryText(entryPadRef.current.innerHTML);
+            // Clear the content before starting a new recording
+            entryPadRef.current.innerHTML = '';
+            setCurrentEntryText('');
         }
         
         recognitionRef.current?.start();
@@ -419,12 +422,12 @@ export function DiaryView() {
 
                         <div className="flex items-center justify-end mt-auto gap-4">
                              <button
-                                onClick={startRecording}
-                                disabled={!isEditable || isRecording}
-                                className="mic-button"
-                                title="Start recording"
+                                onClick={isRecording ? stopRecording : startRecording}
+                                disabled={!isEditable}
+                                className={`mic-button ${isRecording ? 'recording' : ''}`}
+                                title={isRecording ? "Stop recording" : "Start recording"}
                             >
-                                <Mic size={20} />
+                                {isRecording ? <StopCircle size={20} /> : <Mic size={20} />}
                             </button>
                             <button 
                                 className="save-button" 
